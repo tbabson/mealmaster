@@ -1,70 +1,53 @@
-import User from '../models/User.js';
-import jwt from 'jsonwebtoken';
-import { StatusCodes } from 'http-status-codes';
-import bcrypt from 'bcryptjs';
+import { StatusCodes } from "http-status-codes"
+import User from '../models/UserSchema.js'
+import { comparePassword, hashPassword } from "../utils/passwordUtils.js"
+import { UnauthenticatedError, BadRequestError } from "../errors/customErrors.js"
+import { createJWT } from "../utils/tokenUtils.js"
 
-// Helper to create JWT
-const createToken = (user) => {
-  return jwt.sign(
-    { userId: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.JWT_LIFETIME,
-    }
-  );
-};
 
-// @desc    Register new user
-// @route   POST /api/auth/register
+
 export const register = async (req, res) => {
-  const { fullName, email, password, role } = req.body;
+  const isFirstAccount = await User.countDocuments() === 0
+  req.body.role = isFirstAccount ? 'admin' : 'user'
 
-  try {
-    const user = await User.create({ fullName, email, password, role });
-    const token = createToken(user);
-    res.status(StatusCodes.CREATED).json({
-      user: { fullName: user.fullName, email: user.email, role: user.role },
-      token,
-    });
-  } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
+  if (req.body.password.length < 8) {
+    throw new UnauthenticatedError('Password must be at least 8 characters long');
   }
-};
 
-// @desc    Login user
-// @route   POST /api/auth/login
+  const hashedPassword = await hashPassword(req.body.password)
+  req.body.password = hashedPassword
+
+
+
+  const user = await User.create(req.body)
+  res.status(StatusCodes.CREATED).json({ msg: 'user created' })
+}
+
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const user = await User.findOne({ email: req.body.email })
 
-  if (!email || !password) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ message: 'Please provide both email and password' });
-  }
+  const isValidUser = user && (await comparePassword(req.body.password, user.password))
 
-  try {
-    const user = await User.findOne({ email });
+  if (!isValidUser) throw new UnauthenticatedError('invalid credentials')
 
-    if (!user || !(await user.matchPassword(password))) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: 'Invalid credentials' });
-    }
+  const token = createJWT({ userId: user._id, role: user.role, name: user.fullName })
 
-    const token = createToken(user);
-    res.status(StatusCodes.OK).json({
-      user: { fullName: user.fullName, email: user.email, role: user.role },
-      token,
-    });
-  } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: error.message });
-  }
-};
+  const oneDay = 1000 * 60 * 60 * 24
 
-// @desc    Logout user
-// @route   POST /api/auth/logout
+  res.cookie('token', token, {
+    httpOnly: true,
+    expires: new Date(Date.now() + oneDay),
+    secure: process.env.NODE_ENV === 'production',
+
+  })
+  res.status(StatusCodes.OK).json({ msg: 'user logged in' })
+}
+
 export const logout = (req, res) => {
-  res.status(StatusCodes.OK).json({ message: 'User logged out' });
-};
+  //res.clearCookie('token', { path: '/' });
+  res.cookie('token', 'logout', {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  })
+  res.status(StatusCodes.OK).json({ msg: 'user logged out!' })
+}

@@ -1,7 +1,7 @@
 import {
   UnauthenticatedError,
   UnauthorizedError,
-} from '../errors/customError.js';
+} from '../errors/customErrors.js';
 import { verifyJWT } from '../utils/tokenUtils.js';
 
 export const authenticateUser = (req, res, next) => {
