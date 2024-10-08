@@ -30,6 +30,8 @@ const MealSchema = new mongoose.Schema({
     cloudinaryId: {
         type: String, // To store Cloudinary public ID for deletion, if needed
     },
-});
+},
+    { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+);
 
 export default mongoose.model("Meal", MealSchema);

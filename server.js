@@ -7,7 +7,7 @@ const app = express();
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
-//import { v2 as cloudinary } from 'cloudinary';
+import cloudinary from 'cloudinary';
 
 //CUSTOM IMPORTS
 //routers
@@ -18,6 +18,12 @@ import mealRouter from './routes/MealRoutes.js'
 //Middleware
 import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
 
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
+
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -25,6 +31,7 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use(express.json());
 app.use(cookieParser());
+
 
 app.get('/', (req, res) => {
   res.send('hello world');
