@@ -10,10 +10,11 @@ const MealSchema = new mongoose.Schema({
         enum: ["Breakfast", "Lunch", "Dinner", "Snack"],
         required: [true, "Please provide the meal type"],
     },
-    ingredients: {
-        type: [String],
-        required: [true, "Please provide ingredients for the meal"],
-    },
+    ingredients: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Ingredient', // Reference to Ingredient schema
+        required: [true, 'Please provide ingredients for the meal'],
+    }],
     cuisine: {
         type: String,
         enum: ["Nigeria", "America", "French", "Uk"],
@@ -33,5 +34,6 @@ const MealSchema = new mongoose.Schema({
 },
     { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
 
 export default mongoose.model("Meal", MealSchema);

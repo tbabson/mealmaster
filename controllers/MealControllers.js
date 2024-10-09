@@ -64,21 +64,23 @@ export const createMeal = async (req, res) => {
         let imagePublicId = null;
 
         // Check if the image file is present
-        if (req.file) {
-            // Upload image to Cloudinary
-            const result = await cloudinary.v2.uploader.upload(req.file.path, {
-                folder: 'mealmaster', // Cloudinary folder
-                use_filename: true,
-            });
-
-            // Remove local file after upload
-            await fs.unlink(req.file.path);
-
-            // Store the Cloudinary URL and public ID
-            imageUrl = result.secure_url;
-            imagePublicId = result.public_id;
+        if (!req.file) {
+            // If no file is provided, return an error response
+            return res.status(StatusCodes.BAD_REQUEST).json({ message: "Please upload a meal image" });
         }
 
+        // Upload image to Cloudinary
+        const result = await cloudinary.v2.uploader.upload(req.file.path, {
+            folder: 'mealmaster', // Cloudinary folder
+            use_filename: true,
+        });
+
+        // Remove local file after upload
+        await fs.unlink(req.file.path);
+
+        // Store the Cloudinary URL and public ID
+        imageUrl = result.secure_url;
+        imagePublicId = result.public_id;
 
         // Create the new meal in the database
         const meal = await Meal.create({
@@ -90,7 +92,7 @@ export const createMeal = async (req, res) => {
             picture: imageUrl,         // URL for the image
             cloudinaryId: imagePublicId // Save Cloudinary public ID
         });
-        console.log(meal);
+
 
 
         // Respond with the created meal
@@ -100,6 +102,7 @@ export const createMeal = async (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
+
 
 // @desc    Get all meals
 // @route   GET /api/meals

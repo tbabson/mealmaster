@@ -1,9 +1,9 @@
 //PACKAGE IMPORTS
-import 'express-async-errors';
 import * as dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 const app = express();
+import 'express-async-errors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
@@ -39,6 +39,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/meals', mealRouter)
+
 
 app.use(errorHandlerMiddleware);
 

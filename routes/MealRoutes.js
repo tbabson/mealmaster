@@ -32,10 +32,10 @@ import { authenticateUser, authorizePermissions } from "../middleware/authMiddle
 
 // Routes
 
-router.post('/meals', upload.single("picture"), authenticateUser, authorizePermissions("admin"), createMeal)
+router.post('/', upload.single("picture"), authenticateUser, authorizePermissions("admin"), createMeal)
 // Create a meal with image upload
 
-router.get("/", getAllMeals) // Get all meals
+router.get("/meals", getAllMeals) // Get all meals
 
 router.get("/:id", getMealById) // Get meal by ID
 
