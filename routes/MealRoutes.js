@@ -13,23 +13,6 @@ import { authenticateUser, authorizePermissions } from "../middleware/authMiddle
 
 
 
-// Multer setup for file uploads
-// Configure multer to store files in the 'uploads/' directory
-// const storage = multer.diskStorage({
-//     destination: (req, file, cb) => {
-//         cb(null, 'uploads/');
-//     },
-//     filename: (req, file, cb) => {
-//         cb(null, `${Date.now()}-${file.originalname}`);
-//     },
-// });
-
-// // const upload = multer({ storage });
-
-// const upload = multer({ dest: "uploads/" });
-
-
-
 // Routes
 
 router.post('/', upload.single("picture"), authenticateUser, authorizePermissions("admin"), createMeal)

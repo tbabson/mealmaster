@@ -37,7 +37,13 @@ const IngredientSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: [true, 'Quantity is required']
+    },
+    createdBy: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
     }
-}, { timestamps: true });
+},
+    { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+);
 
 export default mongoose.model('Ingredient', IngredientSchema);

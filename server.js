@@ -13,6 +13,7 @@ import cloudinary from 'cloudinary';
 //routers
 import authRouter from './routes/authRoutes.js'
 import mealRouter from './routes/MealRoutes.js'
+import ingredientRouter from './routes/ingredientRoutes.js'
 
 
 //Middleware
@@ -39,6 +40,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/meals', mealRouter)
+app.use('/api/v1', ingredientRouter)
 
 
 app.use(errorHandlerMiddleware);

@@ -3,62 +3,41 @@ import { StatusCodes } from "http-status-codes";
 import cloudinary from 'cloudinary';
 import { promises as fs } from 'fs';
 
-//import { v2 as cloudinary } from 'cloudinary';
-
-
-
-
-
-// @desc    Create new meal
-// @route   POST /api/meals
+//REFACTORED MEAL CONTROLLERS
 // export const createMeal = async (req, res) => {
+//     // Set the createdBy field from the user information
+//     req.body.createdBy = req.user.userId;
 
-
-//     try {
-//         const { name, mealType, ingredients, cuisine, preparationSteps } = req.body;
-
-//         // Upload image to Cloudinary
-//         const result = async (req, res) => {
-//             const result = await cloudinary.v2.uploader.upload(
-//                 req.files.image.tempFilePath,
-//                 {
-//                     use_filename: true,
-//                     folder: 'wte-food-images',
-//                 }
-//             )
-//             fs.unlinkSync(req.files.image.tempFilePath);
-//             return res.status(StatusCodes.OK).json({ image: { src: result.secure_url } });
-//         }
-
-//         // Upload image to Cloudinary
-//         // const result = await cloudinary.uploader.upload(req.file.path, {
-//         //     folder: 'folder_name'
-//         // });
-
-//         // Send the Cloudinary URL in the response
-//         //res.json({ imageUrl: result.secure_url });
-
-//         // Create the new meal
-//         const meal = await Meal.create({
-//             name,
-//             mealType,
-//             ingredients,
-//             cuisine,
-//             preparationSteps,
-//             picture: result.secure_url, // URL for the image
-//             cloudinaryId: result.public_id, // Save Cloudinary public ID
-//         });
-
-//         res.status(StatusCodes.CREATED).json({ meal });
-//     } catch (error) {
-//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
+//     // Check if the image file is present
+//     if (!req.file) {
+//         return res.status(StatusCodes.BAD_REQUEST).json({ message: "Please upload a meal image" });
 //     }
+
+//     // Upload image to Cloudinary
+//     const result = await cloudinary.v2.uploader.upload(req.file.path, {
+//         folder: 'mealmaster',
+//         use_filename: true,
+//     });
+
+//     // Remove local file after upload
+//     await fs.unlink(req.files.tempFilePath);
+
+//     // Add Cloudinary URL and public ID to req.body
+//     req.body.picture = result.secure_url;
+//     req.body.cloudinaryId = result.public_id;
+
+//     // Create the new food item in the database
+//     const meal = await Meal.create(req.body);
+
+//     // Respond with the created food
+//     res.status(StatusCodes.CREATED).json({ meal });
 // };
 
 export const createMeal = async (req, res) => {
 
     try {
         const { name, mealType, ingredients, cuisine, preparationSteps } = req.body;
+
 
         let imageUrl = null;
         let imagePublicId = null;
@@ -82,6 +61,7 @@ export const createMeal = async (req, res) => {
         imageUrl = result.secure_url;
         imagePublicId = result.public_id;
 
+
         // Create the new meal in the database
         const meal = await Meal.create({
             name,
@@ -90,7 +70,8 @@ export const createMeal = async (req, res) => {
             cuisine,
             preparationSteps,
             picture: imageUrl,         // URL for the image
-            cloudinaryId: imagePublicId // Save Cloudinary public ID
+            cloudinaryId: imagePublicId, // Save Cloudinary public ID
+            createdBy: req.user.userId.fullName
         });
 
 
@@ -102,6 +83,7 @@ export const createMeal = async (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
+
 
 
 // @desc    Get all meals
