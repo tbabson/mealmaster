@@ -1,29 +1,47 @@
-import { Router } from "express";
+import { Router } from 'express';
 const router = Router();
 //import multer from "multer"; // Middleware to handle file uploads
-import upload from "../middleware/multer.js";
+import upload from '../middleware/multer.js';
 import {
-    createMeal,
-    getAllMeals,
-    getMealById,
-    updateMeal,
-    deleteMeal,
-} from "../controllers/MealControllers.js";
-import { authenticateUser, authorizePermissions } from "../middleware/authMiddleware.js";
-
-
+  createMeal,
+  getAllMeals,
+  getMealById,
+  updateMeal,
+  deleteMeal,
+} from '../controllers/MealControllers.js';
+import {
+  authenticateUser,
+  authorizePermissions,
+} from '../middleware/authMiddleware.js';
 
 // Routes
 
-router.post('/', upload.single("picture"), authenticateUser, authorizePermissions("admin"), createMeal)
+router.post(
+  '/',
+  upload.single('picture'),
+  authenticateUser,
+  authorizePermissions('admin'),
+  createMeal
+);
 // Create a meal with image upload
 
-router.get("/meals", getAllMeals) // Get all meals
+router.get('/', getAllMeals); // Get all meals
 
-router.get("/:id", getMealById) // Get meal by ID
+router.get('/:id', getMealById); // Get meal by ID
 
-router.patch("/:id", upload.single("picture"), authenticateUser, authorizePermissions("admin"), updateMeal)// Update meal with image upload
+router.patch(
+  '/:id',
+  upload.single('picture'),
+  authenticateUser,
+  authorizePermissions('admin'),
+  updateMeal
+); // Update meal with image upload
 
-router.delete("/:id", authenticateUser, authorizePermissions("admin"), deleteMeal) // Delete meal
+router.delete(
+  '/:id',
+  authenticateUser,
+  authorizePermissions('admin'),
+  deleteMeal
+); // Delete meal
 
 export default router;
