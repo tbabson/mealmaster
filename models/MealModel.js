@@ -11,6 +11,11 @@ const MealSchema = new mongoose.Schema(
       enum: ['Breakfast', 'Lunch', 'Dinner', 'Snack'],
       required: [true, 'Please provide the meal type'],
     },
+    cuisine: {
+      type: String,
+      enum: ['Nigeria', 'America', 'French', 'Uk'],
+      required: [true, 'Please specify the cuisine type'],
+    },
     ingredients: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -18,15 +23,13 @@ const MealSchema = new mongoose.Schema(
         required: [false, 'Please provide ingredients for the meal'],
       },
     ],
-    cuisine: {
-      type: String,
-      enum: ['Nigeria', 'America', 'French', 'Uk'],
-      required: [true, 'Please specify the cuisine type'],
-    },
-    preparationSteps: {
-      type: [String],
-      required: [false, 'Please provide preparation steps for the meal'],
-    },
+    preparationSteps: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PreparationSteps', // Reference to Ingredient schema
+        required: [false, 'Please provide preparation Step for the meal'],
+      },
+    ],
     picture: {
       type: String, // URL for the image stored in Cloudinary
       required: [false, 'Please upload a meal image'],
