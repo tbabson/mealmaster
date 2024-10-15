@@ -20,7 +20,7 @@ router.get('/preparationsteps', authenticateUser,
     authorizePermissions('admin'), getPreparationSteps); // Get all preparation steps (with optional skill level filter)
 router.get('/preparationsteps/:id', authenticateUser,
     authorizePermissions('admin'), getPreparationStepById); // Get a single preparation step by ID
-router.put('/preparationsteps/:id', authenticateUser,
+router.patch('/preparationsteps/:id', authenticateUser,
     authorizePermissions('admin'), updatePreparationStep); // Update a preparation step
 router.delete('/preparationsteps/:id', authenticateUser,
     authorizePermissions('admin'), deletePreparationStep); // Delete a preparation step

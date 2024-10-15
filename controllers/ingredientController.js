@@ -124,3 +124,4 @@ export const deleteIngredient = async (req, res) => {
     throw new BadRequestError(error.message);
   }
 };
+

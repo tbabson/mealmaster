@@ -7,26 +7,26 @@ import { BadRequestError, NotFoundError } from '../errors/customErrors.js';
 // @desc    Create a new preparation step
 // @route   POST /api/preparationsteps
 export const createPreparationStep = async (req, res) => {
-    const { meal: mealId, description, skillLevel, steps, voiceGuideUrl } = req.body;
+    const { meal: mealId, description, skillLevel, steps } = req.body;
 
     try {
         // Check if the meal exists and retrieve it
-        const meal = await Meal.findById(mealId);
+        const meal = await Meal.findById(mealId); // Populate ingredients from the meal
         if (!meal) {
             throw new NotFoundError(`No meal with id: ${mealId}`);
         }
 
-        // Use the meal's existing ingredients
-        const ingredients = meal.ingredients;
+        // Use the meal's existing ingredients' IDs
+        const ingredients = meal.ingredients.map(ingredient => ingredient._id); // Extract ingredient IDs
 
-        // Create the preparation step
+        // Create the preparation step with the meal's ingredients
         const preparationStep = await PreparationSteps.create({
             meal: mealId,
             description,
             skillLevel,
-            ingredients,  // Use the ingredients from the meal
+            ingredients,  // Assign ingredient IDs from the meal
             steps,
-            voiceGuideUrl,
+            createdBy: req.user.userId,
         });
 
         // Update the meal's preparationSteps array with the new preparationStep ID
@@ -52,7 +52,7 @@ export const getPreparationSteps = async (req, res) => {
         }
 
         const preparationSteps = await PreparationSteps.find(query);
-        res.status(StatusCodes.OK).json({ preparationSteps });
+        res.status(StatusCodes.OK).json({ preparationSteps, count: preparationSteps.length });
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
@@ -64,12 +64,12 @@ export const getPreparationStepById = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const preparationStep = await PreparationSteps.findById(id);
-        if (!preparationStep) {
+        const preparationSteps = await PreparationSteps.findById(id)
+        if (!preparationSteps) {
             return res.status(StatusCodes.NOT_FOUND).json({ message: 'Preparation step not found' });
         }
 
-        res.status(StatusCodes.OK).json({ preparationStep });
+        res.status(StatusCodes.OK).json({ preparationSteps });
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
@@ -131,7 +131,7 @@ export const deletePreparationStep = async (req, res) => {
             return res.status(StatusCodes.NOT_FOUND).json({ message: 'Preparation step not found' });
         }
 
-        await preparationStep.remove();
+        await preparationStep.deleteOne();
         res.status(StatusCodes.OK).json({ message: 'Preparation step deleted successfully' });
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });

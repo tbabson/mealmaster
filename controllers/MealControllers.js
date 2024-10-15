@@ -4,35 +4,6 @@ import cloudinary from 'cloudinary';
 import { promises as fs } from 'fs';
 import { NotFoundError } from '../errors/customErrors.js';
 
-//REFACTORED MEAL CONTROLLERS
-// export const createMeal = async (req, res) => {
-//     // Set the createdBy field from the user information
-//     req.body.createdBy = req.user.userId;
-
-//     // Check if the image file is present
-//     if (!req.file) {
-//         return res.status(StatusCodes.BAD_REQUEST).json({ message: "Please upload a meal image" });
-//     }
-
-//     // Upload image to Cloudinary
-//     const result = await cloudinary.v2.uploader.upload(req.file.path, {
-//         folder: 'mealmaster',
-//         use_filename: true,
-//     });
-
-//     // Remove local file after upload
-//     await fs.unlink(req.files.tempFilePath);
-
-//     // Add Cloudinary URL and public ID to req.body
-//     req.body.picture = result.secure_url;
-//     req.body.cloudinaryId = result.public_id;
-
-//     // Create the new food item in the database
-//     const meal = await Meal.create(req.body);
-
-//     // Respond with the created food
-//     res.status(StatusCodes.CREATED).json({ meal });
-// };
 
 export const createMeal = async (req, res) => {
     try {
@@ -167,7 +138,7 @@ export const deleteMeal = async (req, res) => {
         await cloudinary.v2.uploader.destroy(meal.cloudinaryId);
 
         // Delete the meal from the database
-        await meal.remove();
+        await meal.deleteOne();
 
         res.status(StatusCodes.OK).json({ message: 'Meal deleted successfully' });
     } catch (error) {

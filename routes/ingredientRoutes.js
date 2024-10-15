@@ -18,4 +18,5 @@ router.patch('/ingredients/:id', authenticateUser, authorizePermissions("admin")
 router.delete('/ingredients/:id', authenticateUser, authorizePermissions("admin"), deleteIngredient); // Delete an ingredient
 
 
+
 export default router;
