@@ -1,19 +1,14 @@
 import express from 'express';
 import {
-  placeOrder,
-  getUserOrders,
-  getOrderById,
-  cancelOrder,
+    placeOrder,
+    getUserOrders,
+    getOrderById,
+    cancelOrder,
 } from '../controllers/OrderController.js';
-
+import { updateTrackingStatus, getTrackingUpdates } from '../controllers/DeliveryController.js';
 import {
-  updateTrackingStatus,
-  getTrackingUpdates,
-} from '../controllers/DeliveryController.js';
-
-import {
-  authenticateUser,
-  authorizePermissions,
+    authenticateUser,
+    authorizePermissions,
 } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -21,14 +16,17 @@ const router = express.Router();
 // Order routes
 router.post('/orders', authenticateUser, placeOrder); // Place a new order
 router.get('/orders', authenticateUser, getUserOrders); // Get all user orders
-router.get('/orders/:id', getOrderById); // Get order by ID
-router.delete('/orders/:id', cancelOrder); // Cancel an order
+router.get('/orders/:id', authenticateUser, getOrderById); // Get order by ID
+router.delete('/orders/:id', authenticateUser, cancelOrder); // Cancel an order
 
-/////DELIVERY ROUTES //////
+////DELIVERY ROUTES////
 
-// Delivery routes
-router.put('/delivery/:id/tracking', updateTrackingStatus); // Update tracking status
-router.get('/delivery/:id/tracking', getTrackingUpdates); // Get tracking updates
+// Route to update tracking status
+router.patch('/orders/:id/delivery/tracking', authenticateUser, authorizePermissions('admin'), updateTrackingStatus);
+
+router.get('/orders/:id/delivery/tracking', authenticateUser, getTrackingUpdates); // Get tracking updates
+
+
 
 export default router;
 

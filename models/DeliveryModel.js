@@ -5,17 +5,17 @@ const DeliverySchema = new mongoose.Schema({
     order: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Order',
-        required: true,
+        required: false,
     },
     deliveryTime: {
         type: Date,
-        required: [true, 'Delivery time is required'],
+        required: [false, 'Delivery time is required'],
     },
     deliveryAddress: {
-        street: { type: String, required: true },
-        city: { type: String, required: true },
-        state: { type: String, required: true },
-        postalCode: { type: String, required: true },
+        street: { type: String, required: false },
+        city: { type: String, required: false },
+        state: { type: String, required: false },
+        postalCode: { type: String, required: false },
     },
     deliveryStatus: {
         type: String,
@@ -24,7 +24,7 @@ const DeliverySchema = new mongoose.Schema({
     },
     trackingNumber: {
         type: String,
-        required: [true, 'Tracking number is required'],
+        required: [false, 'Tracking number is required'],
     },
     trackingUpdates: [
         {

@@ -31,12 +31,11 @@ export default router;
     { "ingredient": "<ingredient_id_1>", "quantity": 3, "price": 5.00 },
     { "ingredient": "<ingredient_id_2>", "quantity": 2, "price": 10.00 }
   ],
-  "totalAmount": 35.00,
-  "deliveryAddress": {
+    "deliveryAddress": {
     "street": "123 Main St",
-    "city": "Los Angeles",
-    "state": "CA",
-    "postalCode": "90001"
+      "city": "Los Angeles",
+        "state": "CA",
+          "postalCode": "90001"
   },
   "deliveryTime": "2024-10-05T10:00:00Z"
 }

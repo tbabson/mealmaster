@@ -17,6 +17,7 @@ import ingredientRouter from './routes/ingredientRoutes.js';
 import preparationRouter from './routes/prepStepRoutes.js';
 import shoppingListsRouter from './routes/shoppingListRoutes.js';
 import ordersRouter from './routes/OrderRoutes.js';
+//import deliveryRouter from './routes/OrderRoutes.js';
 
 //Middleware
 import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
@@ -44,6 +45,7 @@ app.use('/api/v1', ingredientRouter);
 app.use('/api/v1', preparationRouter);
 app.use('/api/v1/', shoppingListsRouter);
 app.use('/api/v1/', ordersRouter);
+//app.use('/api/v1/', deliveryRouter);
 
 app.use(errorHandlerMiddleware);
 
