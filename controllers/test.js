@@ -1,52 +1,47 @@
-export const createMeal = async (req, res) => {
+import express from 'express';
+import {
+  placeOrder,
+  getUserOrders,
+  getOrderById,
+  cancelOrder,
+} from '../controllers/orderController.js';
+import {
+  updateTrackingStatus,
+  getTrackingUpdates,
+} from '../controllers/deliveryController.js';
 
-    try {
-        const { name, mealType, ingredients, cuisine, preparationSteps } = req.body;
+const router = express.Router();
 
+// Order routes
+router.post('/orders', placeOrder); // Place a new order
+router.get('/orders', getUserOrders); // Get all user orders
+router.get('/orders/:id', getOrderById); // Get order by ID
+router.delete('/orders/:id', cancelOrder); // Cancel an order
 
-        let imageUrl = null;
-        let imagePublicId = null;
+// Delivery routes
+router.put('/delivery/:id/tracking', updateTrackingStatus); // Update tracking status
+router.get('/delivery/:id/tracking', getTrackingUpdates); // Get tracking updates
 
-        // Check if the image file is present
-        if (!req.file) {
-            // If no file is provided, return an error response
-            return res.status(StatusCodes.BAD_REQUEST).json({ message: "Please upload a meal image" });
-        }
-
-        // Upload image to Cloudinary
-        const result = await cloudinary.v2.uploader.upload(req.file.path, {
-            folder: 'mealmaster', // Cloudinary folder
-            use_filename: true,
-        });
-
-        // Remove local file after upload
-        await fs.unlink(req.file.path);
-
-        // Store the Cloudinary URL and public ID
-        imageUrl = result.secure_url;
-        imagePublicId = result.public_id;
-
-
-        // Create the new meal in the database
-        const meal = await Meal.create({
-            name,
-            mealType,
-            ingredients,
-            cuisine,
-            preparationSteps,
-            picture: imageUrl,         // URL for the image
-            cloudinaryId: imagePublicId, // Save Cloudinary public ID
-            createdBy: req.user.userId
-        });
+export default router;
 
 
 
-        // Respond with the created meal
-        res.status(StatusCodes.CREATED).json({ meal });
+{
+  "items": [
+    { "ingredient": "<ingredient_id_1>", "quantity": 3, "price": 5.00 },
+    { "ingredient": "<ingredient_id_2>", "quantity": 2, "price": 10.00 }
+  ],
+  "totalAmount": 35.00,
+  "deliveryAddress": {
+    "street": "123 Main St",
+    "city": "Los Angeles",
+    "state": "CA",
+    "postalCode": "90001"
+  },
+  "deliveryTime": "2024-10-05T10:00:00Z"
+}
 
-    } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
-    }
-};
-
-
+//Update Tracking Status (PUT): /api/delivery/:id/tracking
+{
+  "status": "Out for Delivery"
+}
