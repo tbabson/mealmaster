@@ -29,10 +29,6 @@ const ReminderSchema = new mongoose.Schema({
         enum: ['daily', 'weekly', 'monthly'], // Recurring reminders (optional)
         default: null,
     },
-    healthGoals: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'HealthGoal', // Reference to Health Goals (optional feature)
-    },
 }, { timestamps: true });
 
 export default mongoose.model('Reminder', ReminderSchema);

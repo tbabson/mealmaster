@@ -1,6 +1,6 @@
 import Reminder from '../models/ReminderModel.js';
-import HealthGoal from '../models/HealthGoalModel.js';
 import { StatusCodes } from 'http-status-codes';
+import Meal from '../models/MealModel.js'; // Assuming a Meal model exists
 import nodemailer from 'nodemailer';
 
 // Email setup for Nodemailer
@@ -15,18 +15,24 @@ const transporter = nodemailer.createTransport({
 // @desc    Create a new meal reminder
 // @route   POST /api/reminders
 export const createReminder = async (req, res) => {
-    const { meal, reminderTime, notificationMethod, isRecurring, recurringFrequency, healthGoals } = req.body;
-    const userId = req.user._id; // Assuming user authentication
+    const { meal: mealId, reminderTime, notificationMethod, isRecurring, recurringFrequency } = req.body;
+    const userId = req.user.userId; // Assuming user authentication
 
     try {
+        //Validate or fetch the provided meal
+        const meal = await Meal.findById(mealId);
+        if (!meal) {
+            return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid meal ID provided' });
+        }
+
+
         const reminder = await Reminder.create({
             user: userId,
-            meal,
+            meal: meal._id,  // Link the valid meal ID,
             reminderTime,
             notificationMethod,
             isRecurring,
-            recurringFrequency,
-            healthGoals,
+            recurringFrequency
         });
 
         res.status(StatusCodes.CREATED).json({ reminder });
@@ -34,6 +40,46 @@ export const createReminder = async (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
+
+
+// @desc    Create a new meal reminder 
+// @route   POST /api/reminders
+// export const createReminder = async (req, res) => {
+//     const { meal: mealId, reminderTime, notificationMethod, isRecurring, recurringFrequency, healthGoals } = req.body;
+//     const userId = req.user.userId; // Assuming user authentication
+
+//     try {
+//         // Validate or fetch the provided meal
+//         const meal = await Meal.findById(mealId);
+//         if (!meal) {
+//             return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid meal ID provided' });
+//         }
+
+//         // Validate or fetch the provided health goals
+//         const validHealthGoals = await HealthGoal.find({ _id: { $in: healthGoals } });
+//         if (validHealthGoals.length !== healthGoals.length) {
+//             return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid health goals provided' });
+//         }
+
+//         // Create a new reminder
+//         const reminder = await Reminder.create({
+//             user: userId,
+//             meal: meal._id,  // Link the valid meal ID
+//             reminderTime,
+//             notificationMethod,
+//             isRecurring,
+//             recurringFrequency,
+//             healthGoals: validHealthGoals.map(goal => goal._id), // Storing only the IDs of valid health goals
+//         });
+
+//         res.status(StatusCodes.CREATED).json({ reminder });
+//     } catch (error) {
+//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
+//     }
+// };
+
+
+
 
 // @desc    Send email reminder
 // @route   POST /api/reminders/send-email/:id
@@ -95,7 +141,7 @@ export const getUserReminders = async (req, res) => {
     const userId = req.user._id;
 
     try {
-        const reminders = await Reminder.find({ user: userId }).populate('meal healthGoals');
+        const reminders = await Reminder.find({ user: userId }).populate('meal');
         res.status(StatusCodes.OK).json({ reminders });
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
@@ -118,7 +164,7 @@ export const updateReminder = async (req, res) => {
         reminder.notificationMethod = notificationMethod || reminder.notificationMethod;
         reminder.isRecurring = isRecurring !== undefined ? isRecurring : reminder.isRecurring;
         reminder.recurringFrequency = recurringFrequency || reminder.recurringFrequency;
-        reminder.healthGoals = healthGoals || reminder.healthGoals;
+        //reminder.healthGoals = healthGoals || reminder.healthGoals;
 
         await reminder.save();
         res.status(StatusCodes.OK).json({ reminder });
