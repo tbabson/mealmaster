@@ -13,6 +13,7 @@ import cloudinary from 'cloudinary';
 //routers
 import authRouter from './routes/authRoutes.js';
 import mealRouter from './routes/MealRoutes.js';
+import mealScheduleRouter from './routes/MealScheduleRoutes.js';
 import ingredientRouter from './routes/ingredientRoutes.js';
 import preparationRouter from './routes/prepStepRoutes.js';
 import shoppingListsRouter from './routes/shoppingListRoutes.js';
@@ -41,6 +42,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/meals', mealRouter);
+app.use('/api/v1', mealScheduleRouter);
 app.use('/api/v1', ingredientRouter);
 app.use('/api/v1', preparationRouter);
 app.use('/api/v1/', shoppingListsRouter);
