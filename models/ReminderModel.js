@@ -1,14 +1,15 @@
 import mongoose from 'mongoose';
 
+
 const ReminderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Reference to the User model
-        required: true,
+        ref: 'User',
+        required: false,
     },
     meal: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Meal', // Reference to the Meal model (assuming meal records exist)
+        ref: 'Meal',
         required: true,
     },
     reminderTime: {
@@ -26,7 +27,11 @@ const ReminderSchema = new mongoose.Schema({
     },
     recurringFrequency: {
         type: String,
-        enum: ['daily', 'weekly', 'monthly'], // Recurring reminders (optional)
+        enum: ['once', 'daily', 'weekly', 'monthly'],
+        default: 'once',
+    },
+    pushSubscription: {
+        type: Object, // Storing push subscription details (publicKey, auth, endpoint)
         default: null,
     },
 }, { timestamps: true });

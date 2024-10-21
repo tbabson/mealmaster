@@ -13,12 +13,11 @@ import cloudinary from 'cloudinary';
 //routers
 import authRouter from './routes/authRoutes.js';
 import mealRouter from './routes/MealRoutes.js';
-import mealScheduleRouter from './routes/MealScheduleRoutes.js';
 import ingredientRouter from './routes/ingredientRoutes.js';
 import preparationRouter from './routes/prepStepRoutes.js';
 import shoppingListsRouter from './routes/shoppingListRoutes.js';
 import ordersRouter from './routes/OrderRoutes.js';
-//import deliveryRouter from './routes/OrderRoutes.js';
+import reminderRoutes from './routes/ReminderRoutes.js';
 
 //Middleware
 import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
@@ -42,12 +41,11 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/meals', mealRouter);
-app.use('/api/v1', mealScheduleRouter);
 app.use('/api/v1', ingredientRouter);
 app.use('/api/v1', preparationRouter);
 app.use('/api/v1/', shoppingListsRouter);
 app.use('/api/v1/', ordersRouter);
-//app.use('/api/v1/', deliveryRouter);
+app.use('/api/v1', reminderRoutes);
 
 app.use(errorHandlerMiddleware);
 
