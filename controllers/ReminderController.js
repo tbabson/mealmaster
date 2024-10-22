@@ -4,6 +4,8 @@ import Meal from '../models/MealModel.js'; // Assuming a Meal model exists
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
 import webPush from 'web-push';
+import dotenv from 'dotenv';
+dotenv.config();
 
 
 // Email setup for Nodemailer
@@ -31,6 +33,7 @@ export const createReminder = async (req, res) => {
         notificationMethod,
         isRecurring,
         recurringFrequency,
+        pushSubscription
     } = req.body;
     const userId = req.user.userId; // Assuming user authentication
 
@@ -50,6 +53,7 @@ export const createReminder = async (req, res) => {
             notificationMethod,
             isRecurring,
             recurringFrequency,
+            pushSubscription,
         });
 
         res.status(StatusCodes.CREATED).json({ reminder });
@@ -132,6 +136,7 @@ export const sendEmailReminder = async (req, res) => {
             .json({ message: error.message });
     }
 };
+
 
 
 // @desc Send push notification
@@ -249,7 +254,7 @@ export const syncWithCalendar = async (req, res) => {
 // @desc    Get user reminders
 // @route   GET /api/reminders
 export const getUserReminders = async (req, res) => {
-    const userId = req.user._id;
+    const userId = req.user.userId;
 
     try {
         const reminders = await Reminder.find({ user: userId }).populate('meal');
@@ -318,3 +323,27 @@ export const savePushSubscription = async (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
+
+// @desc    Save push subscription for reminders
+// @route   POST /api/reminders/subscribe
+// export const savePushSubscription = async (req, res) => {
+//     const { subscription, mealId } = req.body;
+//     const userId = req.user._id; // Assuming user authentication
+
+//     try {
+//         // Find or create the reminder for this meal and user
+//         let reminder = await Reminder.findOne({ user: userId, meal: mealId });
+
+//         if (!reminder) {
+//             return res.status(StatusCodes.NOT_FOUND).json({ message: 'Reminder not found' });
+//         }
+
+//         // Save the push subscription in the reminder
+//         reminder.pushSubscription = subscription;
+//         await reminder.save();
+
+//         res.status(StatusCodes.OK).json({ message: 'Push subscription saved successfully' });
+//     } catch (error) {
+//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
+//     }
+// };

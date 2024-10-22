@@ -30,9 +30,12 @@ const ReminderSchema = new mongoose.Schema({
         enum: ['once', 'daily', 'weekly', 'monthly'],
         default: 'once',
     },
-    pushSubscription: {
-        type: Object, // Storing push subscription details (publicKey, auth, endpoint)
-        default: null,
+    subscription: {
+        endpoint: String,
+        keys: {
+            p256dh: String,
+            auth: String
+        }
     },
 }, { timestamps: true });
 
