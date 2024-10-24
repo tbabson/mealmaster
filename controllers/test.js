@@ -66,7 +66,7 @@
 //   return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
 // }
 
-
+////Define the Subscription Model
 
 import mongoose from 'mongoose';
 
@@ -89,6 +89,8 @@ const Subscription = mongoose.model('Subscription', subscriptionSchema);
 
 export default Subscription;
 
+
+////Set Up the Service Layer
 
 import Subscription from '../models/subscription';
 import webPush from 'web-push';
@@ -136,6 +138,8 @@ export const sendNotification = async (title, body, image) => {
 };
 
 
+////Create API Routes and Controllers
+
 const { saveSubscription, sendNotification } = require('../../services/subscriptionService');
 
 exports.subscribe = async (req, res) => {
@@ -158,6 +162,7 @@ exports.pushNotification = async (req, res) => {
   }
 };
 
+/////Create src/api/routes/subscriptionRoutes.ts to define the API routes.
 
 
 const { Router } = require('express');

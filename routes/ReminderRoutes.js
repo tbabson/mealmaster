@@ -17,7 +17,7 @@ router.post('/reminders/send-email/:id', authenticateUser, sendEmailReminder);
 router.post('/reminders/send-push/:id', authenticateUser, sendPushNotification);
 
 // Send push notification
-router.post('/reminders/save-subscription/:id', authenticateUser, savePushSubscription);
+router.post('/reminders/subscribe', authenticateUser, savePushSubscription);
 
 // Sync reminder with calendar
 router.post('/reminders/calendar-sync/:id', authenticateUser, syncWithCalendar);
