@@ -31,11 +31,8 @@ const ReminderSchema = new mongoose.Schema({
         default: 'once',
     },
     subscription: {
-        endpoint: String,
-        keys: {
-            p256dh: String,
-            auth: String
-        }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Subscription', // Reference to the subscription model
     },
 }, { timestamps: true });
 

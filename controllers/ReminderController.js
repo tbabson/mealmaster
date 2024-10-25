@@ -12,6 +12,9 @@ dotenv.config();
 // Email setup for Nodemailer
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,// false for port 587
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -60,18 +63,21 @@ webPush.setVapidDetails(
 
 
 // Save the push subscription in the database
+
 export const savePushSubscription = async (req, res) => {
-    const { subscription } = req.body;
+    const { endpoint, keys } = req.body;
 
     try {
-        await Subscription.create({
-            endpoint: subscription.endpoint,
-            p256dh: subscription.keys.p256dh,
-            auth: subscription.keys.auth
+        // Save subscription to the database
+        const subscription = await Subscription.create({
+            endpoint,
+            p256dh: keys.p256dh,
+            auth: keys.auth,
         });
-        res.status(StatusCodes.CREATED).json({ message: 'Push subscription saved successfully.' });
+
+        res.status(StatusCodes.CREATED).json({ message: 'Push subscription saved successfully', subscription });
     } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Failed to save subscription.' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Failed to save subscription' });
     }
 };
 
@@ -87,7 +93,7 @@ export const createReminder = async (req, res) => {
         notificationMethod,
         isRecurring,
         recurringFrequency,
-
+        subscription,
     } = req.body;
     const userId = req.user.userId; // Assuming user authentication
 
@@ -100,6 +106,16 @@ export const createReminder = async (req, res) => {
                 .json({ message: 'Invalid meal ID provided' });
         }
 
+        // Save the subscription if provided
+        let savedSubscription = null;
+        if (subscription) {
+            savedSubscription = await Subscription.create({
+                endpoint: subscription.endpoint,
+                p256dh: subscription.keys.p256dh,
+                auth: subscription.keys.auth,
+            });
+        }
+
         const reminder = await Reminder.create({
             user: userId,
             meal: meal._id, // Link the valid meal ID,
@@ -107,6 +123,7 @@ export const createReminder = async (req, res) => {
             notificationMethod,
             isRecurring,
             recurringFrequency,
+            subscription: savedSubscription ? savedSubscription._id : null,
         });
 
         res.status(StatusCodes.CREATED).json({ reminder });
@@ -160,7 +177,11 @@ export const sendEmailReminder = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const reminder = await Reminder.findById(id).populate('user meal');
+        // Populate user and meal with only necessary fields
+        const reminder = await Reminder.findById(id).populate([
+            { path: 'user', select: 'email fullName' },
+            { path: 'meal', select: 'name' },
+        ]);
 
         if (!reminder) {
             return res
@@ -170,7 +191,7 @@ export const sendEmailReminder = async (req, res) => {
 
         const mailOptions = {
             from: process.env.EMAIL_USER,
-            to: reminder.user.email,
+            to: reminder.user.email, // User's email should now be populated
             subject: `Meal Reminder: ${reminder.meal.name}`,
             text: `Hello ${reminder.user.fullName}, just a reminder to prepare your meal: ${reminder.meal.name} at ${reminder.reminderTime}.`,
         };
@@ -260,9 +281,9 @@ export const sendPushNotification = async (req, res) => {
 
 
 const oAuth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID, // Google Client ID
-    process.env.GOOGLE_CLIENT_SECRET, // Google Client Secret
-    process.env.GOOGLE_REDIRECT_URI // Google Redirect URI
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI
 );
 
 // @desc    Sync reminder with Google Calendar
@@ -271,32 +292,32 @@ export const syncWithCalendar = async (req, res) => {
     const { id } = req.params;
 
     try {
+        // Retrieve reminder and populate related data
         const reminder = await Reminder.findById(id).populate('user meal');
-
         if (!reminder) {
-            return res
-                .status(StatusCodes.NOT_FOUND)
-                .json({ message: 'Reminder not found' });
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'Reminder not found' });
         }
 
-        // Authenticate and set the credentials (this token should be obtained after user login with Google)
-        oAuth2Client.setCredentials({ refresh_token: req.user.googleRefreshToken });
+        // Check for the user's refresh token
+        if (!req.user.googleRefreshToken) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Missing Google refresh token' });
+        }
 
+        // Set credentials using the user's refresh token
+        oAuth2Client.setCredentials({ refresh_token: req.user.googleRefreshToken });
         const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
 
-        // Create the event details from the reminder
+        // Define the Google Calendar event details
         const event = {
             summary: `Meal Reminder: ${reminder.meal.name}`,
             description: `Reminder to have your meal: ${reminder.meal.name}`,
             start: {
-                dateTime: new Date(reminder.reminderTime).toISOString(), // Start time of the reminder
-                timeZone: 'West Africa Time UTC+01:00', // Adjust the timezone accordingly
+                dateTime: new Date(reminder.reminderTime).toISOString(),
+                timeZone: 'Africa/Lagos', // Corrected time zone for Nigeria
             },
             end: {
-                dateTime: new Date(
-                    new Date(reminder.reminderTime).getTime() + 60 * 60 * 1000
-                ).toISOString(), // Assuming event duration is 1 hour
-                timeZone: 'West Africa Time UTC+01:00',
+                dateTime: new Date(new Date(reminder.reminderTime).getTime() + 60 * 60 * 1000).toISOString(),
+                timeZone: 'Africa/Lagos',
             },
             attendees: [{ email: reminder.user.email }],
         };
@@ -312,11 +333,10 @@ export const syncWithCalendar = async (req, res) => {
             eventLink: response.data.htmlLink,
         });
     } catch (error) {
-        res
-            .status(StatusCodes.INTERNAL_SERVER_ERROR)
-            .json({ message: error.message });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
+
 
 // @desc    Get user reminders
 // @route   GET /api/reminders
