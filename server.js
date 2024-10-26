@@ -8,6 +8,7 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import cloudinary from 'cloudinary';
+import { scheduleReminders } from './controllers/ScheduleReminders.js';
 
 //CUSTOM IMPORTS
 //routers
@@ -31,6 +32,8 @@ cloudinary.config({
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+scheduleReminders(); // Start the reminder scheduler
 
 app.use(express.json());
 app.use(cookieParser());
