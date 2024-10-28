@@ -177,7 +177,6 @@ export const sendEmailReminder = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Populate user and meal with only necessary fields
         const reminder = await Reminder.findById(id).populate([
             { path: 'user', select: 'email fullName' },
             { path: 'meal', select: 'name' },
@@ -191,26 +190,23 @@ export const sendEmailReminder = async (req, res) => {
 
         const mailOptions = {
             from: process.env.EMAIL_USER,
-            to: reminder.user.email, // User's email should now be populated
+            to: reminder.user.email,
             subject: `Meal Reminder: ${reminder.meal.name}`,
             text: `Hello ${reminder.user.fullName}, just a reminder to prepare your meal: ${reminder.meal.name} at ${reminder.reminderTime}.`,
         };
 
-        // Send email
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                return res
-                    .status(StatusCodes.INTERNAL_SERVER_ERROR)
-                    .json({ message: error.message });
-            }
-            res.status(StatusCodes.OK).json({ message: 'Email reminder sent', info });
-        });
+        // Send email and wait for the response
+        await transporter.sendMail(mailOptions);
+        console.log(`Email sent for reminder ${id}`);
+        return res.status(StatusCodes.OK).json({ message: 'Email reminder sent' });
     } catch (error) {
-        res
+        console.error('Error sending email:', error);
+        return res
             .status(StatusCodes.INTERNAL_SERVER_ERROR)
             .json({ message: error.message });
     }
 };
+
 
 
 

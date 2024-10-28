@@ -27,8 +27,7 @@ const ReminderSchema = new mongoose.Schema(
     },
     recurringFrequency: {
       type: String,
-      enum: ['once', 'daily', 'weekly', 'monthly'],
-      default: 'once',
+      enum: ['daily', 'weekly', 'monthly'],
     },
     subscription: {
       type: mongoose.Schema.Types.ObjectId,
