@@ -1,14 +1,14 @@
-import cron from 'node-cron';
-import dotenv from 'dotenv';
-import nodemailer from 'nodemailer';
-import Reminder from '../models/ReminderModel.js';
-import { StatusCodes } from 'http-status-codes';
-import {
-  sendPushNotification,
-  syncWithCalendar,
-} from './ReminderController.js';
-dotenv.config();
-import moment from 'moment-timezone';
+// import cron from 'node-cron';
+// import dotenv from 'dotenv';
+// dotenv.config();
+// import nodemailer from 'nodemailer';
+// import Reminder from '../models/ReminderModel.js';
+// import { StatusCodes } from 'http-status-codes';
+// import {
+//   sendPushNotification,
+//   syncWithCalendar,
+// } from './ReminderController.js';
+// import moment from 'moment-timezone';
 
 // Email setup for Nodemailer
 // export const transporter = nodemailer.createTransport({
@@ -204,19 +204,168 @@ import moment from 'moment-timezone';
 
 
 
-// Email setup for Nodemailer
-export const transporter = nodemailer.createTransport({
+/////Email setup for Nodemailer//////
+
+
+
+
+
+
+
+// export const transporter = nodemailer.createTransport({
+//   service: 'Gmail',
+//   host: 'smtp.gmail.com',
+//   port: 465,
+//   secure: true,
+//   auth: {
+//     user: process.env.EMAIL_USER,
+//     pass: process.env.EMAIL_PASS,
+//   },
+// });
+
+// // Helper function to calculate the next reminder time based on frequency
+// const getNextReminderTime = (currentReminderTime, frequency) => {
+//   const nextTime = new Date(currentReminderTime);
+
+//   switch (frequency) {
+//     case 'daily':
+//       nextTime.setDate(nextTime.getDate() + 1);
+//       break;
+//     case 'weekly':
+//       nextTime.setDate(nextTime.getDate() + 7);
+//       break;
+//     case 'monthly':
+//       nextTime.setMonth(nextTime.getMonth() + 1);
+//       break;
+//     default:
+//       return null;
+//   }
+
+//   return nextTime;
+// };
+
+// // Function to send email and update reminder as notified
+// const sendEmailReminder = async (reminder) => {
+//   const mailOptions = {
+//     from: process.env.EMAIL_USER,
+//     to: reminder.user.email,
+//     subject: `Meal Reminder: ${reminder.meal.name}`,
+//     text: `Hello ${reminder.user.fullName}, just a reminder to prepare your meal: ${reminder.meal.name} at ${reminder.reminderTime}.`,
+//   };
+
+//   try {
+//     await transporter.sendMail(mailOptions);
+//     console.log(`Email sent for reminder ID: ${reminder._id}`);
+//     reminder.notified = true; // Update notified to true after sending email
+//     await reminder.save(); // Save the updated reminder
+//   } catch (error) {
+//     console.error(`Error sending email for reminder ID ${reminder._id}:`, error);
+//   }
+// };
+
+// // Main function to check for reminders due and send notifications
+// export const scheduleReminders = () => {
+//   cron.schedule('* * * * *', async () => {
+//     const now = moment().tz('Africa/Lagos').toDate();
+//     console.log('Cron job triggered at', now);
+
+//     try {
+//       const dueReminders = await Reminder.find({
+//         reminderTime: { $lte: now },
+//         notified: false,
+//       }).populate(['user', 'meal']);
+
+//       if (dueReminders.length) {
+//         console.log(`Processing ${dueReminders.length} due reminders`);
+//       }
+
+//       for (const reminder of dueReminders) {
+//         // Check notification method and send the appropriate notification
+//         if (reminder.notificationMethod === 'email') {
+//           await sendEmailReminder(reminder);
+//         } else if (reminder.notificationMethod === 'push') {
+//           await sendPushNotification({ params: { id: reminder._id } }, { status: () => ({ json: () => { } }) });
+//         } else if (reminder.notificationMethod === 'calendar') {
+//           await syncWithCalendar({ params: { id: reminder._id } }, { status: () => ({ json: () => { } }) });
+//         }
+
+//         // Update next reminder time if it's a recurring reminder
+//         if (reminder.isRecurring && reminder.recurringFrequency) {
+//           const nextReminderTime = getNextReminderTime(reminder.reminderTime, reminder.recurringFrequency);
+//           reminder.reminderTime = nextReminderTime || reminder.reminderTime;
+//           reminder.isRecurring = !!nextReminderTime;
+//           await reminder.save();
+//         }
+//       }
+//     } catch (error) {
+//       console.error('Error processing reminders:', error);
+//     }
+//   });
+// };
+
+/////NEW CODE//////
+import cron from 'node-cron';
+import Reminder from '../models/ReminderModel.js';
+import { StatusCodes } from 'http-status-codes';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+dotenv.config();
+
+// Configure email transporter
+const transporter = nodemailer.createTransport({
   service: 'Gmail',
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
+    pass: process.env.EMAIL_PASSWORD
+  }
 });
 
-// Helper function to calculate the next reminder time based on frequency
+
+
+// Function to send email reminder
+const sendEmailReminder = async (reminder) => {
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: reminder.user.email,
+      subject: `Meal Reminder: ${reminder.meal.name}`,
+      text: `Hello ${reminder.user.fullName}, just a reminder to prepare your meal: ${reminder.meal.name} at ${reminder.reminderTime}.`
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`Email sent for reminder ${reminder._id}`);
+    return true;
+  } catch (error) {
+    console.error('Error sending email:', error);
+    return false;
+  }
+};
+
+// Function to send push notification
+const sendPushNotification = async (reminder) => {
+  try {
+    // Your push notification logic here
+    console.log(`Push notification sent for reminder ${reminder._id}`);
+    return true;
+  } catch (error) {
+    console.error('Error sending push notification:', error);
+    return false;
+  }
+};
+
+// Function to sync with calendar
+const syncWithCalendar = async (reminder) => {
+  try {
+    // Your calendar sync logic here
+    console.log(`Calendar synced for reminder ${reminder._id}`);
+    return true;
+  } catch (error) {
+    console.error('Error syncing with calendar:', error);
+    return false;
+  }
+};
+
+// Function to calculate next reminder time
 const getNextReminderTime = (currentReminderTime, frequency) => {
   const nextTime = new Date(currentReminderTime);
 
@@ -237,61 +386,81 @@ const getNextReminderTime = (currentReminderTime, frequency) => {
   return nextTime;
 };
 
-// Function to send email and update reminder as notified
-const sendEmailReminder = async (reminder) => {
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: reminder.user.email,
-    subject: `Meal Reminder: ${reminder.meal.name}`,
-    text: `Hello ${reminder.user.fullName}, just a reminder to prepare your meal: ${reminder.meal.name} at ${reminder.reminderTime}.`,
-  };
+// Function to process a single reminder
+const processReminder = async (reminder) => {
+  let notificationSent = false;
 
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Email sent for reminder ID: ${reminder._id}`);
-    reminder.notified = true; // Update notified to true after sending email
-    await reminder.save(); // Save the updated reminder
-  } catch (error) {
-    console.error(`Error sending email for reminder ID ${reminder._id}:`, error);
+  // Send notification based on method
+  switch (reminder.notificationMethod) {
+    case 'email':
+      notificationSent = await sendEmailReminder(reminder);
+      break;
+    case 'push':
+      notificationSent = await sendPushNotification(reminder);
+      break;
+    case 'calendar':
+      notificationSent = await syncWithCalendar(reminder);
+      break;
+    default:
+      console.log(`Unknown notification method: ${reminder.notificationMethod}`);
+      return false;
   }
+
+  if (notificationSent) {
+    // Handle recurring reminders
+    if (reminder.isRecurring && reminder.recurringFrequency) {
+      const nextReminderTime = getNextReminderTime(
+        reminder.reminderTime,
+        reminder.recurringFrequency
+      );
+
+      if (nextReminderTime) {
+        reminder.reminderTime = nextReminderTime;
+        reminder.notified = false; // Reset for next occurrence
+      } else {
+        reminder.isRecurring = false;
+        reminder.notified = true;
+      }
+    } else {
+      reminder.notified = true;
+    }
+
+    await reminder.save();
+    return true;
+  }
+
+  return false;
 };
 
-// Main function to check for reminders due and send notifications
+// Main scheduler function
 export const scheduleReminders = () => {
+  // Run every minute
   cron.schedule('* * * * *', async () => {
-    const now = moment().tz('Africa/Lagos').toDate();
-    console.log('Cron job triggered at', now);
-
     try {
+      // Find all due reminders within the next minute that haven't been notified
       const dueReminders = await Reminder.find({
-        reminderTime: { $lte: now },
-        notified: false,
-      }).populate(['user', 'meal']);
+        reminderTime: {
+          $lte: new Date(new Date().getTime() + 60000) // 1-minute buffer
+        },
+        notified: false
+      }).populate([
+        { path: 'user', select: 'email fullName' },
+        { path: 'meal', select: 'name' }
+      ]);
 
-      if (dueReminders.length) {
-        console.log(`Processing ${dueReminders.length} due reminders`);
-      }
-
+      // Process each due reminder
       for (const reminder of dueReminders) {
-        // Check notification method and send the appropriate notification
-        if (reminder.notificationMethod === 'email') {
-          await sendEmailReminder(reminder);
-        } else if (reminder.notificationMethod === 'push') {
-          await sendPushNotification({ params: { id: reminder._id } }, { status: () => ({ json: () => { } }) });
-        } else if (reminder.notificationMethod === 'calendar') {
-          await syncWithCalendar({ params: { id: reminder._id } }, { status: () => ({ json: () => { } }) });
-        }
-
-        // Update next reminder time if it's a recurring reminder
-        if (reminder.isRecurring && reminder.recurringFrequency) {
-          const nextReminderTime = getNextReminderTime(reminder.reminderTime, reminder.recurringFrequency);
-          reminder.reminderTime = nextReminderTime || reminder.reminderTime;
-          reminder.isRecurring = !!nextReminderTime;
-          await reminder.save();
-        }
+        await processReminder(reminder);
       }
     } catch (error) {
       console.error('Error processing reminders:', error);
     }
   });
 };
+
+// Start the reminder scheduler
+export const initializeReminderSystem = () => {
+  console.log('Initializing reminder system...');
+  scheduleReminders();
+};
+
