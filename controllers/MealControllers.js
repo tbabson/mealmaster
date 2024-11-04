@@ -72,7 +72,14 @@ export const getMealById = async (req, res) => {
         // Fetch the meal by ID and populate associated ingredients and preparation steps
         const meal = await Meal.findById(req.params.id)
             .populate('ingredients') // Populating ingredients associated with the meal
-            .populate('preparationSteps'); // Populating preparation steps
+            .populate('preparationSteps') // Populating preparation steps
+            .populate({
+                path: 'reviews',
+                populate: {
+                    path: 'user',
+                    select: 'fullName',
+                },
+            });
 
         // Check if the meal was found
         if (!meal) {

@@ -37,6 +37,14 @@ const MealSchema = new mongoose.Schema(
     cloudinaryId: {
       type: String, // To store Cloudinary public ID for deletion, if needed
     },
+    averageRating: {
+      type: Number,
+      default: 0,
+    },
+    numOfReviews: {
+      type: Number,
+      default: 0,
+    },
     createdBy: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
@@ -45,12 +53,15 @@ const MealSchema = new mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-// MealSchema.virtual('ingredients', {
-//   ref: 'Ingredient',
-//   localField: '_id',
-//   foreignField: 'meal',
-//   justOne: false,
-//   // match: { rating: 5 },
-// });
+MealSchema.virtual('reviews', {
+  ref: 'Review', localField: '_id', foreignField: 'meal',
+  justOne: false,
+  // match: { rating: 5 },
+})
+
+MealSchema.pre('deleteOne', { document: false, query: true }, async function () {
+  const mealId = this.getFilter()._id;
+  await mongoose.model('Review').deleteMany({ meal: mealId });
+});
 
 export default mongoose.model('Meal', MealSchema);

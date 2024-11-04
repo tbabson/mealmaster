@@ -20,6 +20,8 @@ import preparationRouter from './routes/prepStepRoutes.js';
 import shoppingListsRouter from './routes/shoppingListRoutes.js';
 import ordersRouter from './routes/OrderRoutes.js';
 import reminderRoutes from './routes/ReminderRoutes.js';
+import reviewRoutes from './routes/ReviewRoutes.js';
+import userRoutes from './routes/UserRoutes.js';
 
 //Middleware
 import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
@@ -50,6 +52,8 @@ app.use('/api/v1', preparationRouter);
 app.use('/api/v1/', shoppingListsRouter);
 app.use('/api/v1/', ordersRouter);
 app.use('/api/v1', reminderRoutes);
+app.use('/api/v1', reviewRoutes);
+app.use('/api/v1', userRoutes);
 
 app.use(errorHandlerMiddleware);
 
