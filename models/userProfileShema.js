@@ -26,12 +26,6 @@ const UserSchema = new mongoose.Schema(
                 ref: 'Order', // Link to the Order model
             },
         ],
-        mealSchedules: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'MealSchedule', // Link to the MealSchedule model
-            },
-        ],
         shoppingLists: [
             {
                 type: mongoose.Schema.Types.ObjectId,

@@ -341,7 +341,7 @@ export const getUserReminders = async (req, res) => {
 
     try {
         const reminders = await Reminder.find({ user: userId }).populate('meal');
-        res.status(StatusCodes.OK).json({ reminders });
+        res.status(StatusCodes.OK).json({ reminders, count: reminders.length });
     } catch (error) {
         res
             .status(StatusCodes.INTERNAL_SERVER_ERROR)

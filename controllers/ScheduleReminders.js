@@ -203,14 +203,7 @@
 // };
 
 
-
 /////Email setup for Nodemailer//////
-
-
-
-
-
-
 
 // export const transporter = nodemailer.createTransport({
 //   service: 'Gmail',
@@ -304,19 +297,26 @@
 // };
 
 /////NEW CODE//////
+
+
 import cron from 'node-cron';
+import schedule from 'node-schedule';
 import Reminder from '../models/ReminderModel.js';
 import { StatusCodes } from 'http-status-codes';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 dotenv.config();
+import moment from 'moment-timezone';
 
 // Configure email transporter
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,// false for port 587
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
+    pass: process.env.EMAIL_PASS
   }
 });
 
@@ -324,6 +324,7 @@ const transporter = nodemailer.createTransport({
 
 // Function to send email reminder
 const sendEmailReminder = async (reminder) => {
+  console.log(`Preparing to send email reminder for reminder ID: ${reminder._id}`);
   try {
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -435,12 +436,14 @@ const processReminder = async (reminder) => {
 // Main scheduler function
 export const scheduleReminders = () => {
   // Run every minute
-  cron.schedule('* * * * *', async () => {
+  schedule.scheduleJob('* * * * *', async () => {
+    const now = moment().tz('Africa/Lagos').toDate();
+    console.log('Cron job triggered at', now);
     try {
       // Find all due reminders within the next minute that haven't been notified
       const dueReminders = await Reminder.find({
         reminderTime: {
-          $lte: new Date(new Date().getTime() + 60000) // 1-minute buffer
+          $lte: new Date(new Date().getTime() + 120000) // 1-minute buffer
         },
         notified: false
       }).populate([

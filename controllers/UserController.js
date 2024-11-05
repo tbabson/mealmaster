@@ -2,6 +2,9 @@ import User from '../models/UserSchema.js'
 import { StatusCodes } from 'http-status-codes'
 import { hashPassword, comparePassword } from '../utils/passwordUtils.js'
 import { BadRequestError, UnauthenticatedError } from '../errors/customErrors.js'
+import Order from '../models/OrderModel.js'; // Ensure models are imported
+import shoppingListModel from '../models/shoppingListModel.js';
+import Reminder from '../models/ReminderModel.js';
 
 
 
@@ -10,7 +13,7 @@ import { BadRequestError, UnauthenticatedError } from '../errors/customErrors.js
 // GET ALL USERS CONTROLLER
 export const getAllUsers = async (req, res) => {
     const users = await User.find({})
-    res.status(StatusCodes.OK).json({ users })
+    res.status(StatusCodes.OK).json({ users, count: users.length })
 }
 
 // SHOW CURRENT USER CONTROLLER
@@ -24,7 +27,7 @@ export const showCurrentUser = async (req, res) => {
 // GET SINGLE USER CONTROLLER
 export const getUser = async (req, res) => {
     // note you can write the code in a single line, as seen below.
-    const user = await User.findById(req.params.id)
+    const user = await User.findById(req.params.id).populate('orders').populate('shoppingLists').populate('reminders');
     res.status(StatusCodes.OK).json({ user })
 }
 
