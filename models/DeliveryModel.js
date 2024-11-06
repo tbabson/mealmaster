@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import { DELIVERY } from "../utils/constants.js"
+import _default from "http-status-codes";
 
 // Delivery Schema
 const DeliverySchema = new mongoose.Schema({
@@ -19,8 +21,8 @@ const DeliverySchema = new mongoose.Schema({
     },
     deliveryStatus: {
         type: String,
-        enum: ['Scheduled', 'Out for Delivery', 'Delivered', 'Failed'],
-        default: 'Scheduled',
+        enum: Object.values(DELIVERY),
+        default: DELIVERY.SCHEDULED,
     },
     trackingNumber: {
         type: String,

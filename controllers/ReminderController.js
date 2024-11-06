@@ -2,7 +2,7 @@ import Reminder from '../models/ReminderModel.js';
 import Subscription from '../models/SubscriptionModel.js';
 import { StatusCodes } from 'http-status-codes';
 import Meal from '../models/MealModel.js'; // Assuming a Meal model exists
-import nodemailer from 'nodemailer';
+//import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
 import webPush from 'web-push';
 import dotenv from 'dotenv';
@@ -10,16 +10,16 @@ dotenv.config();
 
 
 // Email setup for Nodemailer
-const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,// false for port 587
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-});
+// const transporter = nodemailer.createTransport({
+//     service: 'Gmail',
+//     host: 'smtp.gmail.com',
+//     port: 465,
+//     secure: true,// false for port 587
+//     auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_PASS,
+//     },
+// });
 
 
 // VAPID key configuration
@@ -173,39 +173,39 @@ export const createReminder = async (req, res) => {
 // @desc    Send email reminder
 // @route   POST /api/reminders/send-email/:id
 
-export const sendEmailReminder = async (req, res) => {
-    const { id } = req.params;
+// export const sendEmailReminder = async (req, res) => {
+//     const { id } = req.params;
 
-    try {
-        const reminder = await Reminder.findById(id).populate([
-            { path: 'user', select: 'email fullName' },
-            { path: 'meal', select: 'name' },
-        ]);
+//     try {
+//         const reminder = await Reminder.findById(id).populate([
+//             { path: 'user', select: 'email fullName' },
+//             { path: 'meal', select: 'name' },
+//         ]);
 
-        if (!reminder) {
-            return res
-                .status(StatusCodes.NOT_FOUND)
-                .json({ message: 'Reminder not found' });
-        }
+//         if (!reminder) {
+//             return res
+//                 .status(StatusCodes.NOT_FOUND)
+//                 .json({ message: 'Reminder not found' });
+//         }
 
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: reminder.user.email,
-            subject: `Meal Reminder: ${reminder.meal.name}`,
-            text: `Hello ${reminder.user.fullName}, just a reminder to prepare your meal: ${reminder.meal.name} at ${reminder.reminderTime}.`,
-        };
+//         const mailOptions = {
+//             from: process.env.EMAIL_USER,
+//             to: reminder.user.email,
+//             subject: `Meal Reminder: ${reminder.meal.name}`,
+//             text: `Hello ${reminder.user.fullName}, just a reminder to prepare your meal: ${reminder.meal.name} at ${reminder.reminderTime}.`,
+//         };
 
-        // Send email and wait for the response
-        await transporter.sendMail(mailOptions);
-        console.log(`Email sent for reminder ${id}`);
-        return res.status(StatusCodes.OK).json({ message: 'Email reminder sent' });
-    } catch (error) {
-        console.error('Error sending email:', error);
-        return res
-            .status(StatusCodes.INTERNAL_SERVER_ERROR)
-            .json({ message: error.message });
-    }
-};
+//         // Send email and wait for the response
+//         await transporter.sendMail(mailOptions);
+//         console.log(`Email sent for reminder ${id}`);
+//         return res.status(StatusCodes.OK).json({ message: 'Email reminder sent' });
+//     } catch (error) {
+//         console.error('Error sending email:', error);
+//         return res
+//             .status(StatusCodes.INTERNAL_SERVER_ERROR)
+//             .json({ message: error.message });
+//     }
+// };
 
 
 

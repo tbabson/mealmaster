@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { hashPassword, comparePassword } from '../utils/passwordUtils.js'
 import { BadRequestError, UnauthenticatedError } from '../errors/customErrors.js'
 import Order from '../models/OrderModel.js'; // Ensure models are imported
-import shoppingListModel from '../models/shoppingListModel.js';
+import ShoppingList from '../models/shoppingListModel.js';
 import Reminder from '../models/ReminderModel.js';
 
 
@@ -26,10 +26,30 @@ export const showCurrentUser = async (req, res) => {
 
 // GET SINGLE USER CONTROLLER
 export const getUser = async (req, res) => {
-    // note you can write the code in a single line, as seen below.
-    const user = await User.findById(req.params.id).populate('orders').populate('shoppingLists').populate('reminders');
-    res.status(StatusCodes.OK).json({ user })
-}
+    try {
+        // Fetch the user
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' });
+        }
+
+        // Fetch only the documents created by the user
+        const orders = await Order.find({ user: user._id });
+        const shoppingLists = await ShoppingList.find({ user: user._id });
+        const reminders = await Reminder.find({ user: user._id });
+
+        // Send the response with user and related documents
+        res.status(StatusCodes.OK).json({
+            user,
+            orders,
+            shoppingLists,
+            reminders,
+        });
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "An error occurred", error });
+    }
+};
 
 // EDIT USER CONTROLLER
 export const updateUser = async (req, res) => {

@@ -16,9 +16,24 @@ const UserSchema = new mongoose.Schema({
     required: [true, 'Please provide a password'],
     minlength: 6,
   },
-  orders: [{ type: Schema.Types.ObjectId, ref: 'Order' }],
-  shoppingLists: [{ type: Schema.Types.ObjectId, ref: 'ShoppingList' }],
-  reminders: [{ type: Schema.Types.ObjectId, ref: 'Reminder' }],
+  orders: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Order',
+    },
+  ],
+  shoppingLists: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ShoppingList',
+    },
+  ],
+  reminders: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Reminder',
+    },
+  ],
   role: {
     type: String,
     enum: ['user', 'admin'],
@@ -32,22 +47,6 @@ UserSchema.methods.toJSON = function () {
   return obj
 }
 
-
-UserSchema.virtual('orders', {
-  ref: 'Orders', localField: '_id', foreignField: 'user',
-  justOne: false,
-  // match: { rating: 5 },
-})
-UserSchema.virtual('shoppingLists', {
-  ref: 'ShoppingLists', localField: '_id', foreignField: 'user',
-  justOne: false,
-  // match: { rating: 5 },
-})
-UserSchema.virtual('reminders', {
-  ref: 'Reminders', localField: '_id', foreignField: 'user',
-  justOne: false,
-  // match: { rating: 5 },
-})
 
 // // Password hash middleware
 // UserSchema.pre('save', async function () {

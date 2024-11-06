@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import { ORDERS } from "../utils/constants.js"
+import _default from "http-status-codes";
 
 // Order Item Schema to represent products within an order
 const OrderItemSchema = new mongoose.Schema({
@@ -31,8 +33,8 @@ const OrderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', 'Processed', 'Delivered', 'Cancelled'],
-        default: 'Pending',
+        enum: Object.values(ORDERS),
+        default: ORDERS.PENDING,
     },
     delivery: {
         type: mongoose.Schema.Types.ObjectId,

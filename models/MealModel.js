@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import { MEAL, CUISINE } from "../utils/constants.js"
+import _default from "http-status-codes";
 
 const MealSchema = new mongoose.Schema(
   {
@@ -8,12 +10,14 @@ const MealSchema = new mongoose.Schema(
     },
     mealType: {
       type: String,
-      enum: ['Breakfast', 'Lunch', 'Dinner', 'Snack'],
+      enum: Object.values(MEAL),
+      default: MEAL.BREAKFAST,
       required: [true, 'Please provide the meal type'],
     },
     cuisine: {
       type: String,
-      enum: ['Nigeria', 'America', 'French', 'Uk'],
+      enum: Object.values(CUISINE),
+      default: CUISINE.NIGERIA,
       required: [true, 'Please specify the cuisine type'],
     },
     ingredients: [

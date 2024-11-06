@@ -302,25 +302,8 @@
 import cron from 'node-cron';
 import schedule from 'node-schedule';
 import Reminder from '../models/ReminderModel.js';
-import { StatusCodes } from 'http-status-codes';
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
-dotenv.config();
+import { transporter } from '../utils/transporter.js';
 import moment from 'moment-timezone';
-
-// Configure email transporter
-const transporter = nodemailer.createTransport({
-  service: 'Gmail',
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,// false for port 587
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
-
-
 
 // Function to send email reminder
 const sendEmailReminder = async (reminder) => {
