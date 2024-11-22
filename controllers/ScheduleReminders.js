@@ -300,25 +300,106 @@
 
 
 import cron from 'node-cron';
+import dotenv from 'dotenv';
+dotenv.config();
 import schedule from 'node-schedule';
 import Reminder from '../models/ReminderModel.js';
 import { transporter } from '../utils/transporter.js';
 import moment from 'moment-timezone';
+import { google } from 'googleapis';
+import fs from 'fs';
+import readline from 'readline'
+
+// Load client secrets from a local file
+//const CREDENTIALS_PATH = '../utils/credentials.json'; // Path to Google API credentials file
+//const TOKEN_PATH = '../utils/token.json'; // Path where OAuth tokens will be saved
+
+// Set up OAuth2 client
+const authClient = new google.auth.OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  process.env.GOOGLE_REDIRECT_URI
+);
+
+// Load tokens if they exist
+const loadSavedToken = () => {
+  try {
+    const token = fs.readFileSync(TOKEN_PATH, 'utf-8');
+    authClient.setCredentials(JSON.parse(token));
+  } catch (err) {
+    console.error('Error loading token:', err);
+  }
+};
+
+// Save new tokens to disk
+const saveToken = (token) => {
+  fs.writeFileSync(TOKEN_PATH, JSON.stringify(token));
+  console.log('Token stored to', TOKEN_PATH);
+};
+
+// Function to authenticate with Google Calendar API
+export const authenticateGoogleAPI = async () => {
+  const authUrl = authClient.generateAuthUrl({
+    access_type: 'offline',
+    scope: ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events'],
+  });
+  console.log('Authorize this app by visiting this URL:', authUrl);
+
+  // Prompt for auth code
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  rl.question('Enter the authorization code from that page here: ', async (authCode) => {
+    rl.close();
+
+    // Exchange the authorization code for an access token
+    const { tokens } = await authClient.getToken(authCode);
+    authClient.setCredentials(tokens);
+    saveToken(tokens);  // Save token for later use
+    console.log('Successfully authenticated and saved tokens!');
+  });
+};
 
 // Function to send email reminder
-const sendEmailReminder = async (reminder) => {
-  console.log(`Preparing to send email reminder for reminder ID: ${reminder._id}`);
+const sendEmailReminder = async (reminderId) => {
   try {
+    // Find the reminder and populate meal and user details
+    const reminder = await Reminder.findById(reminderId)
+      .populate({
+        path: 'meal',
+        select: 'name picture ingredients preparationSteps', // Only fetch necessary fields
+        populate: { path: 'ingredients', select: 'name' } // Fetch ingredient names
+      })
+      .populate('user', 'email fullName'); // Populate user email and full name
+
+    if (!reminder) {
+      console.error(`Reminder with ID ${reminderId} not found.`);
+      return false;
+    }
+
+    // Extract meal and user details
+    const { meal, user, reminderTime } = reminder;
+    const ingredientNames = meal.ingredients.map(ingredient => ingredient.name).join(', ');
+
+    // Configure email content
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: reminder.user.email,
-      subject: `Meal Reminder: ${reminder.meal.name}`,
-      text: `Hello ${reminder.user.fullName}, just a reminder to prepare your meal: ${reminder.meal.name} at ${reminder.reminderTime}.`
+      to: user.email,
+      subject: `Meal Reminder: ${meal.name}`,
+      text: `Hello ${user.fullName},\nJust a reminder to prepare your meal: ${meal.name}.\n
+      Image: ${meal.picture}\n
+      Ingredients: ${ingredientNames}\n
+      Preparation Steps: ${meal.preparationSteps.join(', ')}\n
+      Scheduled Time: ${reminderTime}\nEnjoy your meal!`
     };
 
+    // Send email
     await transporter.sendMail(mailOptions);
-    console.log(`Email sent for reminder ${reminder._id}`);
+    console.log(`Email sent for reminder`);
     return true;
+
   } catch (error) {
     console.error('Error sending email:', error);
     return false;
@@ -341,10 +422,38 @@ const sendPushNotification = async (reminder) => {
 const syncWithCalendar = async (reminder) => {
   try {
     // Your calendar sync logic here
-    console.log(`Calendar synced for reminder ${reminder._id}`);
+    // Authenticate or use saved token
+    loadSavedToken();
+
+    const calendar = google.calendar({ version: 'v3', auth: authClient });
+
+    // Calendar event details
+    const event = {
+      summary: `Meal Reminder: ${reminder.meal.name}`,
+      description: `It's time to prepare your meal: ${reminder.meal.name}`,
+      start: {
+        dateTime: reminder.reminderTime.toISOString(),
+        timeZone: 'UTC',
+      },
+      end: {
+        dateTime: new Date(new Date(reminder.reminderTime).getTime() + 60 * 60 * 1000).toISOString(), // 1-hour duration
+        timeZone: 'UTC',
+      },
+    };
+
+    // Insert the event into the calendar
+    const calendarEvent = await calendar.events.insert({
+      calendarId: 'primary', // Main user calendar
+      resource: event,
+    });
+
+    console.log(`Calendar synced for reminder ${reminder._id}: Event ID: ${calendarEvent.data.id}`);
     return true;
+
+    // console.log(`Calendar synced for reminder ${reminder._id}`);
+    // return true;
   } catch (error) {
-    console.error('Error syncing with calendar:', error);
+    //console.error('Error syncing with calendar:', error);
     return false;
   }
 };
@@ -421,7 +530,7 @@ export const scheduleReminders = () => {
   // Run every minute
   schedule.scheduleJob('* * * * *', async () => {
     const now = moment().tz('Africa/Lagos').toDate();
-    console.log('Cron job triggered at', now);
+    //console.log('Cron job triggered at', now);
     try {
       // Find all due reminders within the next minute that haven't been notified
       const dueReminders = await Reminder.find({

@@ -521,3 +521,215 @@ cron.schedule('* * * * *', async () => {
     });
   }; // Send email reminder
   router.post('/reminders/send-email/:id', authenticateUser, sendEmailReminder);
+
+
+
+
+
+  import { google } from 'googleapis';
+  import fs from 'fs';
+
+  // Load client secrets from a local file
+  const CREDENTIALS_PATH = 'path/to/credentials.json'; // Path to Google API credentials file
+  const TOKEN_PATH = 'path/to/token.json'; // Path where OAuth tokens will be saved
+
+  // Set up OAuth2 client
+  const authClient = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI
+  );
+
+  // Load tokens if they exist
+  const loadSavedToken = () => {
+    try {
+      const token = fs.readFileSync(TOKEN_PATH, 'utf-8');
+      authClient.setCredentials(JSON.parse(token));
+    } catch (err) {
+      console.error('Error loading token:', err);
+    }
+  };
+
+  // Save new tokens to disk
+  const saveToken = (token) => {
+    fs.writeFileSync(TOKEN_PATH, JSON.stringify(token));
+    console.log('Token stored to', TOKEN_PATH);
+  };
+
+  // Function to authenticate with Google Calendar API
+  const authenticateGoogleAPI = async () => {
+    const authUrl = authClient.generateAuthUrl({
+      access_type: 'offline',
+      scope: ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar/events'],
+    });
+    console.log('Authorize this app by visiting this URL:', authUrl);
+
+    // Exchange code for tokens (if necessary)
+    authClient.getToken(authCode, (err, token) => {
+      if (err) {
+        console.error('Error retrieving access token', err);
+        return;
+      }
+      authClient.setCredentials(token);
+      saveToken(token);
+    });
+  };
+
+  // Function to add an event to Google Calendar
+  const syncWithCalendar = async (reminder) => {
+    try {
+      // Authenticate or use saved token
+      loadSavedToken();
+
+      const calendar = google.calendar({ version: 'v3', auth: authClient });
+
+      // Calendar event details
+      const event = {
+        summary: `Meal Reminder: ${reminder.meal.name}`,
+        description: `It's time to prepare your meal: ${reminder.meal.name}`,
+        start: {
+          dateTime: reminder.reminderTime.toISOString(),
+          timeZone: 'UTC',
+        },
+        end: {
+          dateTime: new Date(new Date(reminder.reminderTime).getTime() + 60 * 60 * 1000).toISOString(), // 1-hour duration
+          timeZone: 'UTC',
+        },
+      };
+
+      // Insert the event into the calendar
+      const calendarEvent = await calendar.events.insert({
+        calendarId: 'primary', // Main user calendar
+        resource: event,
+      });
+
+      console.log(`Calendar synced for reminder ${reminder._id}: Event ID: ${calendarEvent.data.id}`);
+      return true;
+
+    } catch (error) {
+      console.error('Error syncing with calendar:', error);
+      return false;
+    }
+  };
+
+
+
+  //////  GOOGLE SYNC CALENDAR //////
+  import { google } from 'googleapis';
+  import { StatusCodes } from 'http-status-codes';
+
+  // Google Calendar API setup
+  const calendar = google.calendar({ version: 'v3' });
+  const calendarId = process.env.GOOGLE_CALENDAR_ID;
+
+  // Function to sync with Google Calendar
+  const syncWithCalendar = async (reminder) => {
+    try {
+      const event = {
+        summary: `Meal Reminder: ${reminder.meal.name}`,
+        description: `Hello ${reminder.user.fullName}, just a reminder to prepare your meal: ${reminder.meal.name} at ${reminder.reminderTime}.`,
+        start: {
+          dateTime: reminder.reminderTime.toISOString(),
+        },
+        end: {
+          dateTime: new Date(reminder.reminderTime.getTime() + 60 * 60 * 1000).toISOString(), // 1 hour event
+        },
+      };
+
+      await calendar.events.insert({
+        calendarId: calendarId,
+        resource: event,
+      });
+
+      console.log(`Calendar synced for reminder ${reminder._id}`);
+      return true;
+    } catch (error) {
+      console.error('Error syncing with Google Calendar:', error);
+      return false;
+    }
+  };
+
+  //////  GOOGLE SYNC CALENDAR2 //////
+  import cron from 'node-cron';
+  import Reminder from '../models/ReminderModel.js';
+  import { StatusCodes } from 'http-status-codes';
+  import nodemailer from 'nodemailer';
+  import { google } from 'googleapis';
+
+  // Configure Google Calendar API
+  const calendar = google.calendar({ version: 'v3' });
+  const auth = new google.auth.GoogleAuth({
+    credentials: {
+      client_email: process.env.GOOGLE_CLIENT_EMAIL,
+      private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n')
+    },
+    scopes: ['https://www.googleapis.com/auth/calendar']
+  });
+
+  // Function to sync with calendar
+  const syncWithCalendar = async (reminder) => {
+    try {
+      // Set up the event details
+      const event = {
+        summary: `Meal Reminder: ${reminder.meal.name}`,
+        description: `Hello ${reminder.user.fullName}, just a reminder to prepare your meal: ${reminder.meal.name} at ${reminder.reminderTime}.`,
+        start: {
+          dateTime: reminder.reminderTime.toISOString()
+        },
+        end: {
+          dateTime: new Date(reminder.reminderTime.getTime() + 30 * 60000).toISOString() // 30-minute event
+        }
+      };
+
+      // Create the calendar event
+      await calendar.events.insert({
+        auth: await auth.getClient(),
+        calendarId: 'primary',
+        resource: event
+      });
+
+      console.log(`Calendar synced for reminder ${reminder._id}`);
+      return true;
+    } catch (error) {
+      console.error('Error syncing with calendar:', error);
+      return false;
+    }
+  };
+
+
+
+
+
+To get the `GOOGLE_CALENDAR_ID` for your Google Calendar, follow these steps:
+
+  1. ** Create a Google Cloud Platform project **:
+  - Go to the Google Cloud Console(https://console.cloud.google.com/).
+    - Create a new project or select an existing one.
+
+2. ** Enable the Google Calendar API **:
+    - In the Google Cloud Console, navigate to the "APIs & Services" section.
+   - Click on "Library" and search for "Google Calendar API".
+   - Click on the "Google Calendar API" and then click "Enable" to enable the API for your project.
+
+3. ** Set up OAuth credentials **:
+  - In the "APIs & Services" section, go to the "Credentials" tab.
+   - Click on "Create credentials" and select "OAuth client ID".
+   - Choose the application type(e.g., "Desktop app" or "Web application") and provide the necessary information.
+   - Once the OAuth client ID is created, make note of the "Client ID" and "Client secret".
+
+4. ** Get the Calendar ID **:
+  - Go to the Google Calendar web interface(https://calendar.google.com/).
+    - Click on the calendar you want to use for your reminders.
+   - Click on the three - dot menu next to the calendar and select "Settings and sharing".
+   - Scroll down to the "Integrate calendar" section and copy the "Calendar ID" value.
+
+5. ** Set the environment variables **:
+  - In your application, set the following environment variables:
+  - `GOOGLE_CALENDAR_ID`: The Calendar ID you copied in the previous step.
+     - `GOOGLE_CLIENT_ID`: The Client ID you obtained in step 3.
+    - `GOOGLE_CLIENT_SECRET`: The Client secret you obtained in step 3.
+
+  Now, your application can use the `GOOGLE_CALENDAR_ID` environment variable to sync reminders with the specified Google Calendar.
+
+Remember to also follow the steps to set up OAuth consent and configure the necessary scopes for your Google Cloud Platform project to allow your application to access the Google Calendar API.
+

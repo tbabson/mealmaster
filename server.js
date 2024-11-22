@@ -9,7 +9,7 @@ import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import cloudinary from 'cloudinary';
 import { initializeReminderSystem } from './controllers/ScheduleReminders.js'
-//import { scheduleReminders } from './controllers/ScheduleReminders.js';
+//import { authenticateGoogleAPI } from './controllers/ScheduleReminders.js';
 
 //CUSTOM IMPORTS
 //routers
@@ -37,6 +37,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 initializeReminderSystem(); // Start the reminder scheduler
+//authenticateGoogleAPI()
 
 app.use(express.json());
 app.use(cookieParser());
