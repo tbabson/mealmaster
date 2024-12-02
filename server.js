@@ -48,13 +48,13 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/meals', mealRouter);
-app.use('/api/v1', ingredientRouter);
-app.use('/api/v1', preparationRouter);
-app.use('/api/v1/', shoppingListsRouter);
-app.use('/api/v1/', ordersRouter);
-app.use('/api/v1', reminderRoutes);
-app.use('/api/v1', reviewRoutes);
-app.use('/api/v1', userRoutes);
+app.use('/api/v1/ingredients', ingredientRouter);
+app.use('/api/v1/preparationSteps', preparationRouter);
+app.use('/api/v1/shoppingLists', shoppingListsRouter);
+app.use('/api/v1/orders', ordersRouter);
+app.use('/api/v1/reminders', reminderRoutes);
+app.use('/api/v1/reviews', reviewRoutes);
+app.use('/api/v1/users', userRoutes);
 
 app.use(errorHandlerMiddleware);
 

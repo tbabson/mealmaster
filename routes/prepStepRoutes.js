@@ -14,15 +14,15 @@ import {
 
 
 // Routes
-router.post('/preparationsteps', authenticateUser,
+router.post('/preparationSteps', authenticateUser,
     authorizePermissions('admin'), createPreparationStep); // Create a new preparation step
-router.get('/preparationsteps', authenticateUser,
+router.get('/', authenticateUser,
     authorizePermissions('admin'), getPreparationSteps); // Get all preparation steps (with optional skill level filter)
-router.get('/preparationsteps/:id', authenticateUser,
+router.get('/:id', authenticateUser,
     authorizePermissions('admin'), getPreparationStepById); // Get a single preparation step by ID
-router.patch('/preparationsteps/:id', authenticateUser,
+router.patch('/:id', authenticateUser,
     authorizePermissions('admin'), updatePreparationStep); // Update a preparation step
-router.delete('/preparationsteps/:id', authenticateUser,
+router.delete('/:id', authenticateUser,
     authorizePermissions('admin'), deletePreparationStep); // Delete a preparation step
 
 export default router;

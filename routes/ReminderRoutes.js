@@ -8,24 +8,24 @@ import {
 const router = express.Router();
 
 // Create a new reminder
-router.post('/reminders', authenticateUser, createReminder);
+router.post('/', authenticateUser, createReminder);
 
 // Send email reminder
 //router.post('/reminders/send-email/:id', authenticateUser, sendEmailReminder);
 
 // Send push notification
-router.post('/reminders/send-push/:id', authenticateUser, sendPushNotification);
+router.post('/send-push/:id', authenticateUser, sendPushNotification);
 
 // Send push notification
-router.post('/reminders/subscribe', authenticateUser, savePushSubscription);
+router.post('/subscribe', authenticateUser, savePushSubscription);
 
 // Sync reminder with calendar
-router.post('/reminders/calendar-sync/:id', authenticateUser, syncWithCalendar);
+router.post('/calendar-sync/:id', authenticateUser, syncWithCalendar);
 
 // Get all user reminders
 router.get('/reminders', authenticateUser, authorizePermissions('admin'), getUserReminders);
 
 // Update a reminder
-router.patch('/reminders/:id', authenticateUser, updateReminder);
+router.patch('/:id', authenticateUser, updateReminder);
 
 export default router;

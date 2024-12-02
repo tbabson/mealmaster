@@ -14,17 +14,17 @@ import {
 const router = express.Router();
 
 // Order routes
-router.post('/orders', authenticateUser, placeOrder); // Place a new order
-router.get('/orders', authenticateUser, getUserOrders); // Get all user orders
-router.get('/orders/:id', authenticateUser, getOrderById); // Get order by ID
-router.delete('/orders/:id', authenticateUser, cancelOrder); // Cancel an order
+router.post('/', authenticateUser, placeOrder); // Place a new order
+router.get('/', authenticateUser, getUserOrders); // Get all user orders
+router.get('/:id', authenticateUser, getOrderById); // Get order by ID
+router.delete('/:id', authenticateUser, cancelOrder); // Cancel an order
 
 ////DELIVERY ROUTES////
 
 // Route to update tracking status
-router.patch('/orders/:id/delivery/tracking', authenticateUser, authorizePermissions('admin'), updateTrackingStatus);
+router.patch('/:id/delivery/tracking', authenticateUser, authorizePermissions('admin'), updateTrackingStatus);
 
-router.get('/orders/:id/delivery/tracking', authenticateUser, getTrackingUpdates); // Get tracking updates
+router.get('/:id/delivery/tracking', authenticateUser, getTrackingUpdates); // Get tracking updates
 
 
 

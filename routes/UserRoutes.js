@@ -8,12 +8,12 @@ import { authenticateUser, authorizePermissions } from "../middleware/authMiddle
 //import { validateUserPasswordChange } from "../middleware/validationMiddleware.js";
 
 
-router.patch('/users/changeUserPassword', authenticateUser, changeUserPassword);
-router.get('/users', authenticateUser, authorizePermissions('admin'), getAllUsers);
-router.get('/users/currentUser', authenticateUser, showCurrentUser);
-router.get('/users/:id', authenticateUser, authorizePermissions("admin"), getUser);
-router.delete('/users/:id', authenticateUser, authorizePermissions("admin"), deleteUser);
-router.patch('/users/:id', authenticateUser, updateUser)
+router.patch('/changeUserPassword', authenticateUser, changeUserPassword);
+router.get('/', authenticateUser, authorizePermissions('admin'), getAllUsers);
+router.get('/currentUser', authenticateUser, showCurrentUser);
+router.get('/:id', authenticateUser, authorizePermissions("admin"), getUser);
+router.delete('/:id', authenticateUser, authorizePermissions("admin"), deleteUser);
+router.patch('/:id', authenticateUser, updateUser)
 
 
 //validateUpdateUserInput,

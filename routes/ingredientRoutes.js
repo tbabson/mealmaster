@@ -11,11 +11,11 @@ import { authenticateUser, authorizePermissions } from "../middleware/authMiddle
 
 
 // Ingredient routes
-router.post('/ingredients', authenticateUser, authorizePermissions("admin"), createIngredient); // Add a new ingredient
-router.get('/ingredients', getAllIngredients); // Get all ingredients
-router.get('/ingredients/:id', getIngredientById); // Get ingredient by ID
-router.patch('/ingredients/:id', authenticateUser, authorizePermissions("admin"), updateIngredient); // Update an ingredient
-router.delete('/ingredients/:id', authenticateUser, authorizePermissions("admin"), deleteIngredient); // Delete an ingredient
+router.post('/', authenticateUser, authorizePermissions("admin"), createIngredient); // Add a new ingredient
+router.get('/', getAllIngredients); // Get all ingredients
+router.get('/:id', getIngredientById); // Get ingredient by ID
+router.patch('/:id', authenticateUser, authorizePermissions("admin"), updateIngredient); // Update an ingredient
+router.delete('/:id', authenticateUser, authorizePermissions("admin"), deleteIngredient); // Delete an ingredient
 
 
 

@@ -17,6 +17,7 @@ import {
   AddMeal,
   UpdateMeal,
   DeleteMeal,
+  Landing,
 } from "./pages";
 
 const router = createBrowserRouter([
@@ -27,6 +28,11 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
+        element: <Landing />,
+        errorElement: <Error />,
+      },
+      {
+        path: "meals",
         element: <Meals />,
         errorElement: <Error />,
       },
@@ -61,12 +67,10 @@ const router = createBrowserRouter([
     path: "login",
     element: <Login />,
     errorElement: <Error />,
-    action: loginAction(store),
   },
   {
     path: "register",
     element: <Register />,
-    action: registerAction,
     errorElement: <Error />,
   },
   {

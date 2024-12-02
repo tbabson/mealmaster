@@ -7,12 +7,12 @@ import { createReview, getAllReviews, getSingleReview, updateReview, deleteRevie
 import { authenticateUser } from "../middleware/authMiddleware.js";
 
 
-router.post('/reviews', authenticateUser, createReview)
-router.get('/reviews', authenticateUser, getAllReviews);
+router.post('/', authenticateUser, createReview)
+router.get('/', authenticateUser, getAllReviews);
 
-router.get('/reviews/:id', authenticateUser, getSingleReview)
-router.patch('/reviews/:id', authenticateUser, updateReview)
-router.delete('/reviews/:id', authenticateUser, deleteReview)
+router.get('/:id', authenticateUser, getSingleReview)
+router.patch('/:id', authenticateUser, updateReview)
+router.delete('/:id', authenticateUser, deleteReview)
 
 
 export default router
