@@ -1,12 +1,12 @@
 import Wrapper from "../assets/wrappers/currentUser";
 
-const currentUser = () => {
+const CurrentUser = () => {
   return (
     <Wrapper>
       <div className="currentUser">
-        <p>welcome Babatunde Taiwo</p>
+        <p>welcome babatunde taiwo</p>
       </div>
     </Wrapper>
   );
 };
-export default currentUser;
+export default CurrentUser;
