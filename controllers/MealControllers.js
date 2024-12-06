@@ -1,13 +1,15 @@
 import Meal from '../models/MealModel.js';
 import { StatusCodes } from 'http-status-codes';
 import cloudinary from 'cloudinary';
-import { promises as fs } from 'fs';
+import fs from 'fs/promises';
 import { NotFoundError } from '../errors/customErrors.js';
 
 
 export const createMeal = async (req, res) => {
     try {
-        const { name, mealType, ingredients, cuisine, preparationSteps } = req.body;
+        const { name, mealType, ingredients, cuisine, dietaryPreferences, preparationSteps, isRecommended } = req.body;
+        console.log(req.body);
+        console.log('Uploaded file details:', req.file);
 
         // Check if the image file is present
         if (!req.file) {
@@ -22,6 +24,7 @@ export const createMeal = async (req, res) => {
             use_filename: true,
         });
 
+
         // Remove local file after upload
         await fs.unlink(req.file.path);
 
@@ -29,9 +32,9 @@ export const createMeal = async (req, res) => {
         const meal = await Meal.create({
             name,
             mealType,
-            cuisine,
-            preparationSteps,
-            picture: result.secure_url, // Use Cloudinary URL for the image
+            cuisine, dietaryPreferences,
+            preparationSteps, isRecommended,
+            image: result.secure_url, // Use Cloudinary URL for the image
             cloudinaryId: result.public_id, // Save Cloudinary public ID
             createdBy: req.user.userId, // Ensure you're properly using user info
         });
@@ -57,13 +60,16 @@ export const createMeal = async (req, res) => {
 export const getAllMeals = async (req, res) => {
     try {
         const meals = await Meal.find({});
-        res.status(StatusCodes.OK).json({ meals, count: meals.length });
+        res.status(StatusCodes.OK).json({ meals, count: meals.length })
+        console.log(meals);
+        ;
     } catch (error) {
         res
             .status(StatusCodes.INTERNAL_SERVER_ERROR)
             .json({ message: error.message });
     }
 };
+
 
 // @desc    Get meal by ID
 // @route   GET /api/meals/:id

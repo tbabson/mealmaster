@@ -1,23 +1,6 @@
-import { Form, redirect, useNavigation, Link } from "react-router-dom";
+import { Form, useNavigation, Link } from "react-router-dom";
 import Wrapper from "../assets/wrappers/RegisterAndLoginPage";
 import { FormRow, Logo } from "../components";
-import customFetch from "../utils/customFetch";
-import { toast } from "react-toastify";
-
-//This is for actions
-export const action = async ({ request }) => {
-  const formData = await request.formData();
-  const data = Object.fromEntries(formData);
-
-  try {
-    await customFetch.post("/auth/register", data);
-    toast.success("Registration successful");
-    return redirect("/login");
-  } catch (error) {
-    toast.error(error?.response?.data.msg);
-    return error;
-  }
-};
 
 //This is to change the meal according to the time of the day
 const Register = () => {

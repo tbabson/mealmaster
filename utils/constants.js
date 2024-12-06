@@ -6,6 +6,7 @@ export const MEAL = {
     JUNK: 'Junk',
     SNACK: 'Snack',
 }
+
 export const CUISINE = {
     NIGERIA: 'Nigeria',
     AMERICA: 'America',
@@ -13,6 +14,14 @@ export const CUISINE = {
     UK: 'UK',
     GHANA: 'Ghana',
     SA: 'South-africa',
+}
+
+export const DIETARY = {
+    VEGAN: 'vegan',
+    VEGETARIAN: 'vegetarian',
+    GLUTENFREE: 'gluten-free',
+    HALAL: 'halal',
+    KOSHER: 'kosher',
 }
 
 export const SORT_BY = {

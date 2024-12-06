@@ -20,8 +20,8 @@ import {
   Landing,
 } from "./pages";
 
-import { action as registerAction } from "./pages/Register";
-import { action as loginAction } from "./pages/Login";
+import { action as registerAction } from "./actions/RegisterAction";
+import { action as loginAction } from "./actions/LoginAction";
 
 const router = createBrowserRouter([
   {
@@ -89,15 +89,15 @@ const router = createBrowserRouter([
     errorElement: <Error />,
     children: [
       {
-        path: "addFood",
+        path: "addMeal",
         element: <AddMeal />,
       },
       {
-        path: "updateFood",
+        path: "updateMeal",
         element: <UpdateMeal />,
       },
       {
-        path: "deleteFood",
+        path: "deleteMeal",
         element: <DeleteMeal />,
       },
     ],

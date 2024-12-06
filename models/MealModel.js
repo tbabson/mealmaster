@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { MEAL, CUISINE } from "../utils/constants.js"
+import { MEAL, CUISINE, DIETARY } from "../utils/constants.js"
 import _default from "http-status-codes";
 
 const MealSchema = new mongoose.Schema(
@@ -20,6 +20,13 @@ const MealSchema = new mongoose.Schema(
       default: CUISINE.NIGERIA,
       required: [true, 'Please specify the cuisine type'],
     },
+
+    dietaryPreferences: {
+      type: [String],
+      enum: Object.values(DIETARY),
+      default: "none",
+    },
+
     ingredients: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -34,7 +41,13 @@ const MealSchema = new mongoose.Schema(
         required: [false, 'Please provide preparation Step for the meal'],
       },
     ],
-    picture: {
+
+    isRecommended: {
+      type: Boolean,
+      default: false,
+    },
+
+    image: {
       type: String, // URL for the image stored in Cloudinary
       required: [false, 'Please upload a meal image'],
     },

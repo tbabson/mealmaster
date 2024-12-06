@@ -18,7 +18,7 @@ import {
 
 router.post(
   '/',
-  upload.single('picture'),
+  upload.single('image'),
   authenticateUser,
   authorizePermissions('admin'),
   createMeal
@@ -31,7 +31,7 @@ router.get('/:id', getMealById); // Get meal by ID
 
 router.patch(
   '/:id',
-  upload.single('picture'),
+  upload.single('image'),
   authenticateUser,
   authorizePermissions('admin'),
   updateMeal
