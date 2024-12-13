@@ -14,7 +14,7 @@ import {
 
 
 // Routes
-router.post('/preparationSteps', authenticateUser,
+router.post('/', authenticateUser,
     authorizePermissions('admin'), createPreparationStep); // Create a new preparation step
 router.get('/', authenticateUser,
     authorizePermissions('admin'), getPreparationSteps); // Get all preparation steps (with optional skill level filter)

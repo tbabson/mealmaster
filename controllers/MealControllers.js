@@ -2,15 +2,15 @@ import Meal from '../models/MealModel.js';
 import { StatusCodes } from 'http-status-codes';
 import cloudinary from 'cloudinary';
 import fs from 'fs/promises';
+import path from 'path'
 import { NotFoundError } from '../errors/customErrors.js';
+
+
 
 
 export const createMeal = async (req, res) => {
     try {
         const { name, mealType, ingredients, cuisine, dietaryPreferences, preparationSteps, isRecommended } = req.body;
-        console.log(req.body);
-        console.log('Uploaded file details:', req.file);
-
         // Check if the image file is present
         if (!req.file) {
             return res
@@ -26,7 +26,10 @@ export const createMeal = async (req, res) => {
 
 
         // Remove local file after upload
-        await fs.unlink(req.file.path);
+        //await fs.unlink(req.file.path);
+        const absolutePath = path.resolve(req.file.path);
+        await fs.unlink(absolutePath);
+
 
         // Create the new meal in the database without the ingredients first
         const meal = await Meal.create({
@@ -47,7 +50,7 @@ export const createMeal = async (req, res) => {
         );
 
         // Respond with the created meal
-        const updatedMeal = await Meal.findById(meal._id).populate('ingredients'); // Optionally populate ingredients
+        const updatedMeal = await Meal.findById(meal._id).populate('ingredients').populate('preparationSteps'); // Optionally populate ingredients
         res.status(StatusCodes.CREATED).json({ meal: updatedMeal });
     } catch (error) {
         // Generic error handler
@@ -61,8 +64,6 @@ export const getAllMeals = async (req, res) => {
     try {
         const meals = await Meal.find({});
         res.status(StatusCodes.OK).json({ meals, count: meals.length })
-        console.log(meals);
-        ;
     } catch (error) {
         res
             .status(StatusCodes.INTERNAL_SERVER_ERROR)

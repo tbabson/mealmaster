@@ -1,11 +1,10 @@
 import { Outlet } from "react-router-dom";
-import { CurrentUser } from "../components";
+import { Navbar } from "../components";
 
 const HomeLayout = () => {
   return (
     <div>
-      <CurrentUser />
-      <nav>navbar</nav>
+      <Navbar />
       <Outlet />
     </div>
   );

@@ -11,7 +11,7 @@ const StepSchema = new mongoose.Schema({
     },
     duration: {
         type: String, // e.g., '5 minutes'
-        required: true,
+        required: false,
     },
 });
 
@@ -23,12 +23,12 @@ const PreparationStepSchema = new mongoose.Schema({
     }],
     description: {
         type: String,
-        required: [true, 'Description is required'],
+        required: [false, 'Description is required'],
     },
     skillLevel: {
         type: String,
         enum: ['Beginner', 'Intermediate', 'Advanced'],
-        required: true,
+        required: false,
         default: 'Beginner',
     },
     ingredients: [{

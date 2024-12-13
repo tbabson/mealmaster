@@ -1,6 +1,6 @@
 //PACKAGE IMPORTS
 import * as dotenv from 'dotenv';
-dotenv.config();
+
 import express from 'express';
 const app = express();
 import 'express-async-errors';
@@ -29,28 +29,28 @@ import userRoutes from './routes/UserRoutes.js';
 //Middleware
 import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
 
+dotenv.config();
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-}
-
 initializeReminderSystem(); // Start the reminder scheduler
 //authenticateGoogleAPI()
 
 app.use(cors())
-
 app.use(express.json());
 app.use(cookieParser());
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
 app.get('/', (req, res) => {
   res.send('hello world');
 });
-
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/meals', mealRouter);
 app.use('/api/v1/ingredients', ingredientRouter);
@@ -69,6 +69,7 @@ try {
   await mongoose.connect(process.env.MONGO_URL);
   app.listen(port, '0.0.0.0', () => {
     console.log(`server running on PORT ${port}...`);
+
   });
 } catch (error) {
   console.log(error);

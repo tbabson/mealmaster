@@ -1,4 +1,11 @@
+import { CurrentUser } from "../components";
+
 const Meals = () => {
-  return <h1>Meals</h1>;
+  return (
+    <div className="">
+      <CurrentUser />
+      <h1>Meals</h1>;
+    </div>
+  );
 };
 export default Meals;

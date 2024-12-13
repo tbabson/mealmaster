@@ -17,6 +17,7 @@ export const CUISINE = {
 }
 
 export const DIETARY = {
+    NONE: 'none',
     VEGAN: 'vegan',
     VEGETARIAN: 'vegetarian',
     GLUTENFREE: 'gluten-free',

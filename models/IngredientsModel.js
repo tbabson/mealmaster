@@ -8,11 +8,11 @@ const SubstitutionSchema = new mongoose.Schema({
   },
   quantity: {
     type: Number,
-    required: [true, 'Quantity is required'],
+    required: [false, 'Quantity is required'],
   },
   unit: {
     type: String, // E.g., grams, liters
-    required: [true, 'Unit is required'],
+    required: [false, 'Unit is required'],
   },
 });
 

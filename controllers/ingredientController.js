@@ -60,8 +60,8 @@ export const getIngredientById = async (req, res) => {
 // @desc    Update an ingredient
 // @route   PUT /api/ingredients/:id
 export const updateIngredient = async (req, res) => {
-  const { id } = req.params;
-  const { name, quantity, unit, substitutions, meal } = req.body;
+  const { id } = req.params; // Ingredient ID
+  const { name, quantity, unit, substitutions, price, meal: newMealId } = req.body;
 
   try {
     // Find the ingredient by ID
@@ -74,36 +74,51 @@ export const updateIngredient = async (req, res) => {
     ingredient.name = name || ingredient.name;
     ingredient.quantity = quantity || ingredient.quantity;
     ingredient.unit = unit || ingredient.unit;
+    ingredient.price = price || ingredient.price;
     ingredient.substitutions = substitutions || ingredient.substitutions;
 
     // Save the updated ingredient
     await ingredient.save();
 
-    // Check if a meal ID is provided for updating the Meal document
-    if (meal) {
-      // Update the meal's ingredients to include the updated ingredient's ID
+    // Check if a new meal ID is provided
+    if (newMealId) {
+      // Remove the ingredient ID from its current meal's ingredients array
+      if (ingredient.meal && ingredient.meal.toString() !== newMealId) {
+        const previousMeal = await Meal.findById(ingredient.meal);
+        if (previousMeal) {
+          previousMeal.ingredients.pull(ingredient._id);
+          await previousMeal.save();
+        }
+      }
+
+      // Add the ingredient ID to the new meal's ingredients array
       const updatedMeal = await Meal.findByIdAndUpdate(
-        meal, // The meal ID provided in the request
-        { $addToSet: { ingredients: ingredient._id } }, // Use $addToSet to avoid duplicates
+        newMealId,
+        { $addToSet: { ingredients: ingredient._id } }, // Add only if not already present
         { new: true } // Return the updated meal
       );
 
       if (!updatedMeal) {
-        throw new NotFoundError('Meal not found');
+        throw new NotFoundError('New meal not found');
       }
 
-      // Optionally populate the updated meal's ingredients for the response
-      const populatedMeal = await Meal.findById(updatedMeal._id)
+      // Update the ingredient's `meal` field
+      ingredient.meal = newMealId;
+      await ingredient.save();
 
-      return res.status(StatusCodes.OK).json({ ingredient, meal: populatedMeal });
+      // Optionally populate the updated meal's ingredients for the response
+      const populatedMeal = await Meal.findById(newMealId).populate('ingredients');
+
+      return res.status(StatusCodes.OK).json({ ingredient });
     }
 
-    // Respond with the updated ingredient only if no meal ID is provided
+    // Respond with the updated ingredient only if no new meal ID is provided
     res.status(StatusCodes.OK).json({ ingredient });
   } catch (error) {
     throw new BadRequestError(error.message);
   }
 };
+
 
 // @desc    Delete an ingredient
 // @route   DELETE /api/ingredients/:id
