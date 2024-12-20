@@ -20,7 +20,6 @@ const Wrapper = styled.nav`
   .logo {
     width: 200px;
     height: auto;
-    margin-top: 0.5rem;
   }
 
 @media (max-width: 800px){
@@ -44,6 +43,7 @@ const Wrapper = styled.nav`
     border: none;
     cursor: pointer;
     transition: var(--transition);
+    padding: 0;
   }
 
 .nav-links{
@@ -52,9 +52,10 @@ z-index: 1200;
 }
 
 a.nav-link{
-      padding-bottom: 0.5rem;
-      display:flex;
-      justify-content: flex-end;
+       padding-bottom: 0;
+          margin-bottom: 0;
+          display: inline-block;
+          height: 10%;
       
 }
 
@@ -63,12 +64,15 @@ a.nav-link{
     color: var(--secondary-900);
   }
   .nav-links-container {
+    overflow: hidden;
+    transition: var(--transition);
     position: absolute;  // Change this from relative to absolute
-    top: 100%;  // Position it right below the navbar
+    //bottom: 5%;  // Position it above the nav toggle
     left: 0;
-    right: 40px;
+    right: 30px;
     background: var(--transparent-background);  // Add background
     overflow: hidden;
+    margin-top: -3rem;
     transition: var(--transition);
     max-height: 0;  // Change height to max-height
   }
@@ -83,6 +87,7 @@ a.nav-link{
     padding: 1rem 0;
     align-items: flex-end;
     height: 300px;
+    width: 98%;
   }
   .nav-link {
     font-weight: 600;
@@ -93,7 +98,7 @@ a.nav-link{
   .nav-link:hover {
     color: var(--secondary-900);
   }
-  .nav-link span {
+  /* .nav-link span {
     font-weight: 500;
     color: var(--primary-900);
     background-color: var(--white);
@@ -105,13 +110,13 @@ a.nav-link{
   .nav-link span:hover {
     color: var(--white);
     background: var(--primary-900);
-  }
+  } */
   .active {
     color: var(--secondary-900);
   }
-  .active span {
+  /* .active span {
     color: var(--secondary-900);
-  }
+  } */
 
 
   @media (min-width: 800px) {
@@ -121,30 +126,40 @@ a.nav-link{
     .nav-links-container {
            position: static;  // Reset position for larger screens
       max-height: none;  // Reset max-height
-      overflow: visible;
+      overflow: none;
       background: none;  // Remove background
-      margin-top: 0;
-      display: flex;
-      justify-content: flex-end;
-      margin-top: -3.5rem;
+      margin-top: -8.5rem;
     }
-    /* .nav-display {
-        display: flex;
-    justify-content: space-between;
-    align-items: center; 
-  } */
 .nav-link {
     margin-top: 8px;
   }
 
-    .nav-links {
-      margin-top: -20px;
-      flex-direction: row;
-      justify-items: center;
-      align-items: normal;
-      gap: 0.8rem;
-    }
+  .logo {
+    margin-top: -1.5rem;
   }
+
+.nav-links {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+       margin-top: -10px;
+       align-items: normal;
+      gap: 0.8rem;
+      height: 50%;
+    }
+
+
+    /* .a.nav-link{
+          padding-bottom: 0;
+          margin-bottom: 0;
+          display: inline-block;
+    } */
+
+}
+
+
+    
+  
 `
 
 export default Wrapper
