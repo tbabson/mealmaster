@@ -6,15 +6,21 @@ const Hero = () => {
     <Wrapper>
       <div className="hero">
         <div className="hero-content">
+          <div className="hero-image">
+            <img
+              src="https://res.cloudinary.com/dwrmehhg3/image/upload/v1734953363/mealmaster/lsldkvataufcy4d0knd2.webp"
+              alt="cook"
+            />
+          </div>
           <h1 className="hero-title">
-            Cook, Schedule, Shop. All in One Place!
+            Cook, Schedule & Shop. All in One Place!
           </h1>
           <p className="hero-description">
-            Your ultimate kitchen assistant is just a click away.
+            Your ultimate kitchen assistant is just <br />a click away.
           </p>
           <div className="hero-button">
             <button type="button" className="btn cook-btn">
-              <Link to="/meals">Cook Now!</Link>
+              <Link to="/meals">Start Cooking!</Link>
             </button>
           </div>
         </div>
