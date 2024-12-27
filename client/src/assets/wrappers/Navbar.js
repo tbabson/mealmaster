@@ -5,8 +5,8 @@ const Wrapper = styled.nav`
   position: relative;
 
   .nav-center {
-    width: 80%;
-    max-width: 80%;
+    width: 90%;
+    //max-width: 80%;
     margin: 0 auto;
     padding: 1rem;
   }
@@ -25,7 +25,7 @@ const Wrapper = styled.nav`
 @media (max-width: 800px){
 .nav-center {
     width: 90%;
-    max-width: 90%;
+    //max-width: 90%;
     margin: 0 auto;
     padding: 0.5rem;
   }
@@ -88,12 +88,16 @@ a.nav-link{
     align-items: flex-end;
     height: 300px;
     width: 98%;
+    
   }
   .nav-link {
     font-weight: 600;
     color: var(--primary-900);
     transition: var(--transition);
     letter-spacing: var(--letter-spacing);
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
   }
   .nav-link:hover {
     color: var(--secondary-900);
@@ -132,6 +136,7 @@ a.nav-link{
     }
 .nav-link {
     margin-top: 8px;
+     background-color: rgba(255, 255, 255, 0);
   }
 
   .logo {
@@ -144,8 +149,8 @@ a.nav-link{
       justify-content: flex-end;
        margin-top: -10px;
        align-items: normal;
-      gap: 0.8rem;
       height: 50%;
+      margin-left: 2rem;
     }
 
 

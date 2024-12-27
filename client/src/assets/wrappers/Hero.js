@@ -20,6 +20,8 @@ const Wrapper = styled.div`
         align-items: center;
         padding: 2rem;
         text-align: center;
+        width: 90%;
+        margin: 0 auto;
     }
     
     .hero-image img {
@@ -75,17 +77,23 @@ position: relative;
         color: var(--grey-500);
     }
 
-    @media (min-width: 800px) {
+    .cook-btn:hover{
+    scale: 1.05;
+    }
+
+    @media (min-width: 700px) {
     .hero-content{
         display: flex;
         flex-direction: row;
         justify-content: center;
         align-items: center;
         text-align: left;
+        width: 90%;
+        margin: 0 auto;
     }
 
     .hero-image img {
-    margin-top: 20rem;
+    margin-top: 15rem;
     max-width: 100%; /* Scales down the image to fit its container */
     height: auto; /* Maintains the aspect ratio */
     border-radius: var(--border-radius);
@@ -98,9 +106,10 @@ position: relative;
     }
 
     .hero-title{
-        margin: 20rem 0 1rem;
+        margin: 14rem 0 1rem;
         padding-left: 2rem;
     }
+
 
     .hero-description{
         padding-left: 2rem;
@@ -108,10 +117,64 @@ position: relative;
     }
 
     .cook-btn{
-        margin-top: 2rem;
+        margin-top: 1rem;
     }
 
 }
+
+ @media (min-width: 1024px){
+
+    .hero-content{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        text-align: left;
+        width: 90%;
+        height: 100vh;
+        margin: 0 auto;
+    }
+
+
+    .hero-image img {
+    margin: 12rem 0 0 0;
+    max-width: 100%; /* Scales down the image to fit its container */
+    height: auto; /* Maintains the aspect ratio */
+    border-radius: var(--border-radius);
+    object-fit: contain;
+    transition: transform 0.3s;
+    }
+
+    .hero-title{
+        font-size: 3rem;
+        line-height: 4rem;
+        width: 100%;
+       
+        margin-top: 12rem;
+    }
+
+
+    .hero-description{
+        text-align: left;
+        font-size: 1.5rem;
+        width: 80%;
+
+        line-height: 2rem;
+    }
+
+    .hero-button{
+margin-top: -4rem;
+    }
+
+    .cook-btn{
+        margin-top: 1rem;
+        width: 40%;
+        height: 2.5rem;
+        font-size: 1.2rem;
+    }
+
+
+ }
 
 
 `;
