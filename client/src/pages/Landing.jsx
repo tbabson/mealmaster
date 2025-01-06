@@ -4,7 +4,7 @@ const Landing = () => {
   return (
     <div className="landing">
       <Hero />
-      <div className="landing-sections">
+      {/* <div className="landing-sections">
         <div className="section1">
           <img src="" alt="" />
           <div className="section1-writeup">
@@ -33,7 +33,7 @@ const Landing = () => {
             <p>Get fresh, quality ingredients delivered to your door.</p>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

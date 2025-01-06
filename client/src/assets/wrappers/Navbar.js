@@ -32,7 +32,7 @@ const Wrapper = styled.nav`
  .logo {
     width: 130px;
     height: auto;
-    margin-top: 0.5rem;
+    margin-top: -0.5rem;
   }
 }
 
@@ -44,6 +44,7 @@ const Wrapper = styled.nav`
     cursor: pointer;
     transition: var(--transition);
     padding: 0;
+    margin-top: -0.8rem;
   }
 
 .nav-links{
@@ -95,26 +96,14 @@ a.nav-link{
     color: var(--primary-900);
     transition: var(--transition);
     letter-spacing: var(--letter-spacing);
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.9);
     padding: 0.5rem 1rem;
     border-radius: 6px;
   }
   .nav-link:hover {
     color: var(--secondary-900);
   }
-  /* .nav-link span {
-    font-weight: 500;
-    color: var(--primary-900);
-    background-color: var(--white);
-    padding: 0.4rem 0.7rem;
-    transition: var(--transition);
-    letter-spacing: var(--letter-spacing);
-    border-radius: var(--border-radius);
-  }
-  .nav-link span:hover {
-    color: var(--white);
-    background: var(--primary-900);
-  } */
+ 
   .active {
     color: var(--secondary-900);
   }
