@@ -1,9 +1,11 @@
-import { Hero } from "../components";
+import { Hero, RecommendedMeals } from "../components";
 
 const Landing = () => {
   return (
     <div className="landing">
       <Hero />
+      <RecommendedMeals />
+
       {/* <div className="landing-sections">
         <div className="section1">
           <img src="" alt="" />

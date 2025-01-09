@@ -7,7 +7,7 @@ const Wrapper = styled.div`
         flex-direction: column;
         justify-content: center; /* Centers content vertically */
         align-items: center;
-        margin-top: -10.5rem;
+        margin-top: -8rem;
         background-image: linear-gradient(to bottom, rgba(255, 247, 230, 0.5),rgba(255, 247, 230, 0.9)50%),url('https://res.cloudinary.com/dwrmehhg3/image/upload/v1734945930/mealmaster/cbketscux7nfrvgtikfq.webp');
         background-repeat: no-repeat;
         background-size: cover;
@@ -29,7 +29,7 @@ const Wrapper = styled.div`
     }
     
     .hero-image img {
-        margin-top: 9rem;
+        margin-top: 6rem;
         max-width: 100%; /* Scales down the image to fit its container */
         height: auto; /* Maintains the aspect ratio */
         border-radius: var(--border-radius);
@@ -65,13 +65,13 @@ const Wrapper = styled.div`
         width: auto; 
     }
 
-
     .hero-button{
     display: flex;
     justify-content: center; /* Centers horizontally */
     align-items: center;    /* Centers vertically */
-    }    
-
+    margin-top: -1rem;
+    }
+    
     .cook-btn a{
         text-decoration: none;
         color: var(--grey-500);
@@ -81,11 +81,13 @@ const Wrapper = styled.div`
     scale: 1.05;
     }
 
-    @media (min-width: 700px) {
+    @media (min-width: 800px) {
 
     .hero{
-    height: 100vh;
+        height: 100vh;
+        margin-top: -7rem;
     }
+    
 
     .hero-content{
         display: flex;
@@ -98,7 +100,7 @@ const Wrapper = styled.div`
     }
 
     .hero-image img {
-    margin-top: 15rem;
+    margin-top: 7rem;
     max-width: 100%; /* Scales down the image to fit its container */
     height: auto; /* Maintains the aspect ratio */
     border-radius: var(--border-radius);
@@ -111,7 +113,7 @@ const Wrapper = styled.div`
     }
 
     .hero-title{
-        margin: 14rem 0 1rem;
+        margin: 8rem 0 1rem;
         padding-left: 2rem;
     }
 
@@ -131,6 +133,7 @@ const Wrapper = styled.div`
 
 .hero{
     height: 100vh;
+    margin-top: -7rem;
 }
 
 
@@ -146,7 +149,7 @@ const Wrapper = styled.div`
 
 
     .hero-image img {
-    margin: 12rem 0 0 0;
+    margin: 7rem 0 0 0;
     max-width: 100%; /* Scales down the image to fit its container */
     height: auto; /* Maintains the aspect ratio */
     border-radius: var(--border-radius);
@@ -159,7 +162,7 @@ const Wrapper = styled.div`
         line-height: 4rem;
         width: 100%;
        
-        margin: 12rem 0 0 0;
+        margin: 7rem 0 0 0;
     }
 
 
@@ -176,6 +179,7 @@ const Wrapper = styled.div`
     font-size: 1rem;
     border: none;
     transition: transform 0.3s;
+    margin-top: 1.5rem;
     }
 
 

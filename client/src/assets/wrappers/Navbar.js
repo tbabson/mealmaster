@@ -32,7 +32,7 @@ const Wrapper = styled.nav`
  .logo {
     width: 130px;
     height: auto;
-    margin-top: -0.5rem;
+    margin-top: -1rem;
   }
 }
 
@@ -44,7 +44,7 @@ const Wrapper = styled.nav`
     cursor: pointer;
     transition: var(--transition);
     padding: 0;
-    margin-top: -0.8rem;
+    margin-top: -2rem;
   }
 
 .nav-links{

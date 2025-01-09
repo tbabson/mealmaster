@@ -20,8 +20,12 @@ import {
   Landing,
 } from "./pages";
 
-import { action as registerAction } from "./actions/RegisterAction";
-import { action as loginAction } from "./actions/LoginAction";
+//Actions
+import { action as registerAction } from "./actionsAndLoaders/RegisterAction";
+import { action as loginAction } from "./actionsAndLoaders/LoginAction";
+
+//Loaders
+import { loader as recommendedAction } from "./actionsAndLoaders/ReccomendedLoaders";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +36,7 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Landing />,
+        loader: recommendedAction,
         errorElement: <Error />,
       },
       {
