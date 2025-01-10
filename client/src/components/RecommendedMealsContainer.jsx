@@ -1,36 +1,56 @@
 import { Link, useLoaderData } from "react-router-dom";
 import Wrapper from "../assets/wrappers/RecommendedMealsContainer";
+import { useState, useEffect } from "react";
 
 const RecommendedMealsContainer = () => {
   const { meals } = useLoaderData(); // meals is an array
+  const [shuffledMeals, setShuffledMeals] = useState([]);
+  const [mealType, setMealType] = useState("");
 
-  // Get the current hour
-  const currentHour = new Date().getHours();
+  // Function to determine meal type based on the time of day
+  const getMealType = () => {
+    const currentHour = new Date().getHours();
+    if (currentHour >= 6 && currentHour < 12) return "Breakfast";
+    if (currentHour >= 12 && currentHour < 17) return "Lunch";
+    return "Dinner";
+  };
 
-  // Determine mealType based on the time of the day
-  let mealType;
-  if (currentHour >= 6 && currentHour < 12) {
-    mealType = "Breakfast";
-  } else if (currentHour >= 12 && currentHour < 17) {
-    mealType = "Lunch";
-  } else {
-    mealType = "Dinner";
-  }
+  // Function to shuffle an array
+  const shuffleArray = (array) => {
+    return array.sort(() => Math.random() - 0.5);
+  };
 
-  // Filter meals with recommended set to true and match mealType
-  const recommendedMeals = meals.meals.filter(
-    (meal) => meal.isRecommended === true && meal.mealType === mealType
-  );
+  useEffect(() => {
+    // Get current meal type
+    const type = getMealType();
+    setMealType(type);
 
-  if (!recommendedMeals || recommendedMeals.length === 0) {
+    // Filter meals based on meal type and recommendation status
+    const filteredMeals = meals.meals.filter(
+      (meal) => meal.isRecommended === true && meal.mealType === type
+    );
+
+    // Shuffle meals
+    setShuffledMeals(shuffleArray(filteredMeals));
+
+    // Set an interval to reshuffle meals every 30 minutes
+    const interval = setInterval(() => {
+      setShuffledMeals(shuffleArray(filteredMeals));
+    }, 30 * 60 * 1000); // 30 minutes in milliseconds
+
+    // Clear interval when component unmounts
+    return () => clearInterval(interval);
+  }, [meals]);
+
+  if (!shuffledMeals || shuffledMeals.length === 0) {
     return <p>No recommended meals available for {mealType}</p>;
   }
 
   return (
     <Wrapper>
       <div className="recommended-meals-container">
-        <h3>Recommended {mealType} Meals</h3>
-        {recommendedMeals.map((meal) => {
+        {/* <h3>Recommended {mealType} Meals</h3> */}
+        {shuffledMeals.map((meal) => {
           const { _id, image, name, cuisine } = meal;
           return (
             <Link key={_id} to={`/meals/${_id}`} className="recommended-meal">

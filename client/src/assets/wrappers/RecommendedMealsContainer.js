@@ -9,7 +9,7 @@ const Wrapper = styled.div`
     /* justify-content: center;
     align-items: center;  */
     flex-direction: column;
-    
+
 }
 
 .recommended-meals-container h3{
@@ -45,7 +45,7 @@ const Wrapper = styled.div`
     text-transform: capitalize;
     font-family: "Roboto", sans-serif;
 }
-    
+
 .recommended-meal img {
         //margin-top: 6rem;
         max-width: 90%; /* Scales down the image to fit its container */
@@ -64,8 +64,101 @@ const Wrapper = styled.div`
     /* justify-content: center;
     align-items: center;  */
     flex-direction: row;
-    
+
 }
+     }
+
+     @media (min-width: 1024px){
+.recommended-meals-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    width: 90%;
+    //grid-gap: 20px;
+
+  }
+
+  .recommended-meal {
+    position: relative;
+    overflow: hidden;
+    //border-radius: 10px;
+    //box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    cursor: pointer;
+  }
+
+  .recommended-meal img {
+
+        border-radius: 0;
+
+
+    }
+
+  .recommended-meal:hover {
+    transform: scale(1.05);
+  }
+
+  figure {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    outline: none;
+    padding: 0;
+  }
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .meal-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 17px;
+    width: 90%;
+    height: 100%;
+    background: rgba(254, 253, 232, 0.6);
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .recommended-meal:hover .meal-details {
+    opacity: 1;
+  }
+
+  h3 {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: #333;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 1.2rem;
+    margin: 0;
+  }
+
+  /* @media (max-width: 1024px) {
+    .recommended-meals-container {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+  } */
      }
 
 
