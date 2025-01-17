@@ -4,8 +4,8 @@ const Landing = () => {
   return (
     <div className="landing">
       <Hero />
-      <RecommendedMeals />
       <LandingSection />
+      <RecommendedMeals />
     </div>
   );
 };

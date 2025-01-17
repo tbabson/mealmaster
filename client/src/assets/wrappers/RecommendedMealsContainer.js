@@ -21,12 +21,20 @@ const Wrapper = styled.div`
     color: var(--accent-600);
 }
 
-.recommended-meal{
-        margin: 1rem auto;
-    }
+.recommended-meal {
+    margin: 1rem auto;
+    background-color: var(--grey-600);
+    max-width: 90%; /* Ensure the container adapts to the image width */
+    display: inline-block; /* Matches the size of its child elements */
+    padding: 0; /* Removes unnecessary spacing */
+    border-radius: var(--border-radius);
+    overflow: hidden; /* Ensures content stays within the container */
+  }
 
 .meal-details{
     text-decoration: none;
+    padding: 0.7rem;
+
 }
 
 .meal-details h2{
@@ -47,13 +55,11 @@ const Wrapper = styled.div`
 }
 
 .recommended-meal img {
-        //margin-top: 6rem;
-        max-width: 90%; /* Scales down the image to fit its container */
-        height: auto; /* Maintains the aspect ratio */
-        border-radius: var(--border-radius);
-        object-fit: contain;
-        transition: transform 0.3s;
-    }
+    max-width: 100%; /* Scales the image to fit the container's width */
+    height: auto; /* Maintains aspect ratio */
+    object-fit: cover; /* Ensures the image covers its container */
+    transition: transform 0.3s;
+  }
 
 
      @media (min-width: 800px){
@@ -64,7 +70,9 @@ const Wrapper = styled.div`
     /* justify-content: center;
     align-items: center;  */
     flex-direction: row;
-
+}
+.recommended-meal{
+    margin: 0 0.5rem 1.5rem;
 }
      }
 
@@ -80,7 +88,7 @@ const Wrapper = styled.div`
   .recommended-meal {
     position: relative;
     overflow: hidden;
-    //border-radius: 10px;
+    border-radius: 0;
     //box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease-in-out;
     cursor: pointer;
@@ -121,10 +129,10 @@ const Wrapper = styled.div`
     align-items: center;
     position: absolute;
     top: 0;
-    left: 17px;
-    width: 90%;
+    left: 0px;
+    width: 100%;
     height: 100%;
-    background: rgba(254, 253, 232, 0.6);
+    background: rgba(254, 253, 232, 0.7);
     color: white;
     opacity: 0;
     transition: opacity 0.3s ease-in-out;

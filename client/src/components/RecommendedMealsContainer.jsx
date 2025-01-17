@@ -31,11 +31,11 @@ const RecommendedMealsContainer = () => {
     );
 
     // Shuffle meals
-    setShuffledMeals(shuffleArray(filteredMeals));
+    setShuffledMeals(shuffleArray(filteredMeals).slice(0, 5)); // Limit to 5 meals
 
     // Set an interval to reshuffle meals every 30 minutes
     const interval = setInterval(() => {
-      setShuffledMeals(shuffleArray(filteredMeals));
+      setShuffledMeals(shuffleArray(filteredMeals).slice(0, 5)); // Limit to 5 meals
     }, 30 * 60 * 1000); // 30 minutes in milliseconds
 
     // Clear interval when component unmounts
