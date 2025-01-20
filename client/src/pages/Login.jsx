@@ -38,18 +38,8 @@ const Login = () => {
           <div className="registerForm form">
             <h3>Log In</h3>
             <Form method="post">
-              <FormRow
-                type="email"
-                name="email"
-                labelText="Email"
-                defaultValue="tbabson20@gmail.com"
-              />
-              <FormRow
-                type="password"
-                name="password"
-                labelText="Password"
-                defaultValue="secret123"
-              />
+              <FormRow type="email" name="email" labelText="Email" />
+              <FormRow type="password" name="password" labelText="Password" />
               <button
                 type="submit"
                 disabled={isSubmitting}

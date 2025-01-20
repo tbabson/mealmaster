@@ -3,7 +3,6 @@ import { StatusCodes } from 'http-status-codes';
 import cloudinary from 'cloudinary';
 import fs from 'fs/promises';
 import path from 'path'
-import { NotFoundError } from '../errors/customErrors.js';
 
 
 

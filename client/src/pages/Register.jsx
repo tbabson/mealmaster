@@ -39,18 +39,8 @@ const Register = () => {
           <div className="registerForm form">
             <h3>Sign up</h3>
             <Form method="post">
-              <FormRow
-                type="text"
-                name="fullName"
-                labelText="Full Name"
-                defaultValue="John Doe"
-              />
-              <FormRow
-                type="email"
-                name="email"
-                labelText="Email"
-                defaultValue="123@gmail.com"
-              />
+              <FormRow type="text" name="fullName" labelText="Full Name" />
+              <FormRow type="email" name="email" labelText="Email" />
               <FormRow
                 type="password"
                 name="password"
