@@ -38,7 +38,7 @@ const Wrapper = styled.nav`
 
   .nav-toggle {
     font-size: 2rem;
-    color: var(--primary-900);
+    color: var(--primary-600);
     background: none;
     border: none;
     cursor: pointer;
@@ -62,7 +62,7 @@ a.nav-link{
 
 
   .nav-toggle:hover {
-    color: var(--secondary-900);
+    color: var(--secondary-500);
   }
   .nav-links-container {
     overflow: hidden;
@@ -93,7 +93,7 @@ a.nav-link{
   }
   .nav-link {
     font-weight: 600;
-    color: var(--primary-900);
+    color: var(--primary-600);
     transition: var(--transition);
     letter-spacing: var(--letter-spacing);
     background-color: rgba(255, 255, 255, 0.9);
@@ -101,11 +101,11 @@ a.nav-link{
     border-radius: 6px;
   }
   .nav-link:hover {
-    color: var(--secondary-900);
+    color: var(--secondary-600);
   }
  
   .active {
-    color: var(--secondary-900);
+    color: var(--secondary-600);
   }
   /* .active span {
     color: var(--secondary-900);
