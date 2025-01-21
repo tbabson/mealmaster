@@ -22,7 +22,7 @@ const LandingSection = () => {
               <p>Learn step-by-step how to prepare mouthwatering meals.</p>
             </div>
           </div>
-          <div class="single-line-border"></div>
+          <div class="divider"></div>
 
           <div className="section">
             <img
@@ -34,7 +34,7 @@ const LandingSection = () => {
               <p>Set reminders and keep your kitchen game strong.</p>
             </div>
           </div>
-          <div class="single-line-border"></div>
+          <div class="divider"></div>
 
           <div className="section">
             <img
@@ -46,7 +46,7 @@ const LandingSection = () => {
               <p>Plan your meals effortlessly and stay on track.</p>
             </div>
           </div>
-          <div class="single-line-border"></div>
+          <div class="divider"></div>
 
           <div className="section">
             <img

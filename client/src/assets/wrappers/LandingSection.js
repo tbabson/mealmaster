@@ -62,24 +62,55 @@ const Wrapper = styled.div`
     line-height: 1.3rem;
 }
 
-.single-line-border {
+.divider {
   border: 1px solid #ff5722;
   width: 80vw;
+  max-width: 90vw;
   text-align: center;  
-  margin: 1.5rem 0 0 2.8rem;
+   margin: 1rem auto 1rem;
 }
 
- @media (min-width: 700px){
-    .section-container{
-        
-    }
+ @media (min-width: 700px) {
+  .section-container {
+    display: grid;
+    grid-template-columns: 1fr; /* Single column layout for sections */
+    gap: 2rem; /* Space between sections */
+    width: 90%;
+    margin: 0 auto;
+  }
 
-    .section{
-    display:flex;
-    flex-direction: row;
-    }
-    
- }
+  .section {
+    display: flex;
+    flex-direction: row; /* Stack content vertically */
+    align-items: center; /* Center align items horizontally */
+    justify-content: center; /* Center align items vertically */
+    width: 80%; /* Take 100% of the parent container */
+    text-align: left; /* Center text alignment */
+    margin: 0 auto; /* Center horizontally */
+    padding: 0 1rem; /* Add spacing inside */
+  }
+
+  .section img {
+    max-width: 50%; /* Scale image to fit the container */
+    width: 40%; /* Ensure image takes up full width of container */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 1rem; /* Add spacing below image */
+  }
+
+  .section-writeup {
+    width: 50%; /* Ensure text takes up full width of the section */
+    padding: 0 1rem; /* Add some padding for readability */
+    margin-left: 0.5rem; /* Add spacing between image and text */
+  }
+
+  .divider {
+    border: 1px solid #ff5722;
+    width: 80%;
+    margin: 1rem auto; /* Center divider */
+  }
+}
+
+
 
 
 
