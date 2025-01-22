@@ -134,6 +134,14 @@ const Wrapper = styled.div`
     line-height: 1.5; /* Adjust this value as needed */
   }
 
+    .section-writeup h3 {
+    font-size: 2.2rem;
+  }
+
+  .section-writeup p {
+    font-size: 1.2rem;
+  }
+
 
 
 }
