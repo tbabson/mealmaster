@@ -50,12 +50,40 @@ html {
   --accent-900: #724511;
   --accent-950: #432405;
 
+  /* blue grey */
+  --blue-grey-50: #f8fafc;
+  --blue-grey-100: #f1f5f9;
+  --blue-grey-200: #e2e8f0;
+  --blue-grey-300: #cbd5e1;
+  --blue-grey-400: #94a3b8;
+  --blue-grey-500: #64748b;
+  --blue-grey-600: #475569;
+  --blue-grey-700: #334155;
+  --blue-grey-800: #1e293b;
+  --blue-grey-900: #0f172a;
+
   /* grey */
-  --grey-500: #fff7e6;
-  --grey-600: #f2f2f2;
-  --grey-700: #999999;
-  --grey-800: #666666;
-  --grey-900: #333333;
+  --grey-50: #f9f9f9;
+  --grey-100: #ececec;
+  --grey-200: #dfdfdf;
+  --grey-300: #d2d2d2;
+  --grey-400: #c6c6c6;
+  --grey-500: #b9b9b9;
+  --grey-600: #acacac;
+  --grey-700: #9f9f9f;
+  --grey-800: #939393;
+  --grey-900: #868686;
+  --grey-1000: #797979;
+  --grey-2000: #6c6c6c;
+  --grey-3000: #606060;
+  --grey-4000: #535353;
+  --grey-5000: #464646;
+  --grey-6000: #393939;
+  --grey-7000: #2d2d2d;
+  --grey-8000: #202020;
+  --grey-9000: #131313;
+  --grey-10000: #060606;
+
   /* rest of the colors */
   --black: #222;
   --white: #fff;
@@ -96,7 +124,7 @@ html {
 }
 
 body {
-  background: var(--grey-500);
+  background: var(--grey-50);
   color: var(--grey-900);
   font-family: "Poppins", sans-serif;
   font-weight: 400;

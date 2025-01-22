@@ -23,7 +23,7 @@ const Wrapper = styled.div`
 
 .recommended-meal {
     margin: 1rem auto;
-    background-color: var(--grey-600);
+    background-color: var(--grey-100);
     max-width: 90%; /* Ensure the container adapts to the image width */
     display: inline-block; /* Matches the size of its child elements */
     padding: 0; /* Removes unnecessary spacing */

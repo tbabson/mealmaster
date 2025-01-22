@@ -8,13 +8,16 @@ const Wrapper = styled.div`
         justify-content: center; /* Centers content vertically */
         align-items: center;
         margin-top: -8rem;
-        background-image: linear-gradient(to bottom, rgba(255, 247, 230, 0.5),rgba(255, 247, 230, 0.9)50%),url('https://res.cloudinary.com/dwrmehhg3/image/upload/v1734945930/mealmaster/cbketscux7nfrvgtikfq.webp');
+        background-image: linear-gradient(to bottom, rgba(249, 249, 249, 0.5),rgba(249, 249, 249, 0.9)50%),url('https://res.cloudinary.com/dwrmehhg3/image/upload/v1734945930/mealmaster/cbketscux7nfrvgtikfq.webp');
         background-repeat: no-repeat;
         background-size: cover;
         background-position: center;
         z-index: 500;
         background-attachment: fixed;
         width: 100%;
+        @media (max-width: 768px) {
+      background-attachment: scroll;
+    }
     }
     
     .hero-content{
@@ -29,8 +32,8 @@ const Wrapper = styled.div`
     }
     
     .hero-image img {
-        margin-top: 6rem;
-        max-width: 100%; /* Scales down the image to fit its container */
+        margin-top: 5rem;
+        max-width: 90%; /* Scales down the image to fit its container */
         height: auto; /* Maintains the aspect ratio */
         border-radius: var(--border-radius);
         object-fit: contain;
@@ -43,6 +46,7 @@ const Wrapper = styled.div`
     
     .hero-writeup{
         position: relative;
+        max-width: 100%;
     }
     
     .hero-title{
@@ -78,7 +82,7 @@ const Wrapper = styled.div`
     }
 
     .cook-btn:hover{
-    scale: 1.05;
+    transform: scale(1.05);
     }
 
     @media (min-width: 800px) {
@@ -161,7 +165,7 @@ const Wrapper = styled.div`
         font-size: 3rem;
         line-height: 4rem;
         width: 100%;
-       
+       line-height: 1.2;
         margin: 7rem 0 0 0;
     }
 
@@ -171,7 +175,7 @@ const Wrapper = styled.div`
         font-size: 1.5rem;
         width: 80%;
         margin: 0 0 0 0;
-        line-height: 2rem;
+        line-height: 1.2;
     }
 
     .cook-btn {

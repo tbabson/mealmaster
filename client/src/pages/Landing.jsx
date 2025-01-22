@@ -1,4 +1,4 @@
-import { Hero, RecommendedMeals, LandingSection } from "../components";
+import { Hero, RecommendedMeals, LandingSection, Footer } from "../components";
 
 const Landing = () => {
   return (
@@ -6,6 +6,7 @@ const Landing = () => {
       <Hero />
       <LandingSection />
       <RecommendedMeals />
+      <Footer />
     </div>
   );
 };
