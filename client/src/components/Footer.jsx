@@ -25,7 +25,7 @@ const Footer = () => {
                 placeholder="Enter your email"
                 className="footer-input"
               />
-              <button type="submit" className="footer-button">
+              <button type="submit" className="btn-footer">
                 subscribe
               </button>
             </Form>
@@ -53,22 +53,37 @@ const Footer = () => {
               <h3 className="footer-title">Talk to us</h3>
             </div>
             <div className="footer-logo">
-              <Link to="/">
+              <Link to="/" className="logo">
                 <Logo />
               </Link>
 
-              <IoCall />
-              <p>+234 703 5689 102</p>
-              <MdEmail />
-              <p>Email: info@mealmaster.com</p>
-              <MdLocationOn />
-              <p>151, Acme road, Ogba, Lagos.</p>
+              <p>
+                <IoCall className="icon" />
+                +234 703 5689 102
+              </p>
+
+              <p>
+                <MdEmail className="icon" />
+                Email: info@mealmaster.com
+              </p>
+
+              <p>
+                <MdLocationOn className="icon" />
+                151, Acme road, Ogba, Lagos.
+              </p>
             </div>
-            <div className="social-media">
+          </div>
+          <div className="divider"></div>
+          <div className="social-media">
+            <Link to="www.facebook.com">
               <FaFacebook />
+            </Link>
+            <Link to="www.instagram.com">
               <PiInstagramLogoFill />
+            </Link>
+            <Link to="www.x.com">
               <AiFillTwitterCircle />
-            </div>
+            </Link>
           </div>
         </div>
       </div>
