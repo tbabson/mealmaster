@@ -20,10 +20,14 @@ const Footer = () => {
               inbox. Subscribe for our newsletter now.
             </p>
             <Form className="footer-form">
+              <label htmlFor="email" className="sr-only"></label>
               <input
+                id="email"
                 type="email"
                 placeholder="Enter your email"
                 className="footer-input"
+                aria-label="Email address"
+                required
               />
               <button type="submit" className="btn-footer">
                 subscribe
@@ -73,16 +77,44 @@ const Footer = () => {
               </p>
             </div>
           </div>
-          <div className="divider"></div>
+        </div>
+        <div className="divider"></div>
+        <div className="footer-bottom">
+          <div className="rite-reserved">
+            <p>&copy; 2025 MealMaster. All rights reserved.</p>
+          </div>
           <div className="social-media">
-            <Link to="www.facebook.com">
+            <Link
+              to="https://www.facebook.com"
+              aria-label="Visit our Facebook page"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <FaFacebook />
             </Link>
-            <Link to="www.instagram.com">
+            <Link
+              to="https://www.instagram.com"
+              aria-label="Visit our Instagram page"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <PiInstagramLogoFill />
             </Link>
-            <Link to="www.x.com">
+            <Link
+              to="https://www.x.com"
+              aria-label="Visit our Twitter page"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <AiFillTwitterCircle />
+            </Link>
+          </div>
+          <div className="terms-conditions">
+            <Link to="/#" className="terms-link">
+              Terms & Conditions
+            </Link>
+            <Link to="/#" className="terms-link">
+              Privacy Policy
             </Link>
           </div>
         </div>
