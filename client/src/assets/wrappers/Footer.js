@@ -144,14 +144,7 @@ const Wrapper = styled.div`
 }
 
 @media (max-width: 1024px) {
-.footer{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr;
-    align-items: center;
-    width: 90%;
-    margin: 3rem auto;
-    gap: 3.5rem;
+    
 }
 
 
