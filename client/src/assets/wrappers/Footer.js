@@ -3,7 +3,7 @@ import styled from "styled-components";
 const Wrapper = styled.div`
 .footer-container{
     background: linear-gradient(90deg, #0e2510, #275429);
-    padding: 2rem 2rem;
+    padding: 1rem 2rem;
     width: 100%;
 }
 
@@ -12,15 +12,15 @@ const Wrapper = styled.div`
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
     align-items: center;
-    width: 90%;
-    margin: 3rem auto;
-    gap: 3.5rem;
+    max-width: 90%;
+    margin: 2rem auto;
+    gap: 2rem;
 }
 
 .footer-section{
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
 }
 
 .footer-title{
@@ -78,7 +78,6 @@ const Wrapper = styled.div`
     color: var(--primary-200);
     font-size: 1rem;
     text-decoration: none;
-    margin: 0.5rem 0;
     transition: color 0.3s ease;
 }
 
@@ -109,7 +108,7 @@ const Wrapper = styled.div`
 }
 
 .divider{
-    border: 1px solid var(--primary-500);
+    border: 1px solid var(--primary-300);
     width: 100%;
     margin: 2rem auto;
 }
@@ -159,14 +158,23 @@ const Wrapper = styled.div`
 
 
 @media (min-width: 800px) {
+  .footer-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* background-color: var(--primary-100); */
+    /* padding: 3rem 0; */
+  }
+
   .footer {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Three equal columns */
     grid-template-rows: auto; /* Adjusts rows based on content */
     align-items: flex-start; /* Align items to the top */
     justify-content: center; /* Center grid items horizontally */
-    width: 80%;
-    margin: 3rem auto;
+    max-width: 80%;
+    margin: 1rem auto;
     gap: 3.5rem; /* Space between grid items */
   }
 
@@ -181,7 +189,7 @@ const Wrapper = styled.div`
   .footer-menu {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
     justify-content: center;
     align-items: center;
     text-align: center;
@@ -207,19 +215,13 @@ const Wrapper = styled.div`
   }
 
   .footer-contact .logo {
-    margin-bottom: -3rem;
+    margin-top: -4rem;
+    margin-bottom: -3.5rem;
   }
 
   .footer-contact .icon {
     font-size: 1.2rem;
     color: var(--primary-500); /* Icon color */
-  }
-
-  .divider {
-    grid-column: span 3; /* Spans the entire width of the grid */
-    height: 1px;
-    background-color: var(--grey-300);
-    margin: 2rem 0;
   }
 
   .footer-form {
@@ -248,12 +250,19 @@ const Wrapper = styled.div`
     background-color: var(--primary-500);
   }
 
-  .footer-bottom {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr; /* Divide into three equal columns */
+.footer-bottom {
+  display: flex;
+  flex-direction: row;
   align-items: center; /* Align items vertically */
-  justify-content: space-between; /* Even spacing */
+  justify-content: space-around; /* Even spacing */
 }
+
+  .divider {
+    border-top: 1px solid var(--grey-300);
+    margin: 2rem 0;
+    max-width: 90%;
+  }
+
 
 .social-media {
     grid-column: span 3; /* Spans all three columns */
@@ -280,18 +289,19 @@ const Wrapper = styled.div`
 @media (min-width: 1024px) {
   .footer-container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     background-color: var(--primary-100);
-    padding: 3rem 0;
+    /* padding: 3rem 0; */
   }
 
-  .footer {
+    .footer {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
-    max-width: 1200px;
-    width: 100%;
+    /* max-width: 1200px; */
+    max-width: 80%;
   }
 
   .footer-section {
@@ -304,13 +314,13 @@ const Wrapper = styled.div`
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--primary-600);
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
 
   .footer-writeup {
     font-size: 1rem;
     color: var(--primary-200);
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .footer-form {
@@ -342,7 +352,6 @@ const Wrapper = styled.div`
   }
 
   .footer-link {
-    margin-bottom: 0.5rem;
     text-decoration: none;
     color: var(--primary-200);
     font-size: 1rem;
@@ -376,19 +385,19 @@ const Wrapper = styled.div`
     font-size: 1.25rem;
     color: var(--primary-500);
   }
+  
+  .divider {
+    border-top: 1px solid var(--primary-300);
+    margin: 2rem 0;
+    max-width: 90%;
+  }
 
     .footer-bottom {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr; /* Divide into three equal columns */
+  display: flex;
+  flex-direction: row;
   align-items: center; /* Align items vertically */
-  justify-content: space-between; /* Even spacing */
+  justify-content: space-around; /* Even spacing */
 }
-
-  .divider {
-    grid-column: 1 / -1;
-    border-top: 1px solid var(--grey-300);
-    margin: 2rem 0;
-  }
 
   .social-media {
     grid-column: 1 / -1;
