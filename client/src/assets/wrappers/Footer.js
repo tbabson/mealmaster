@@ -108,7 +108,7 @@ const Wrapper = styled.div`
 }
 
 .divider{
-    border: 1px solid var(--primary-300);
+    border: 1px solid var(--primary-800);
     width: 100%;
     margin: 2rem auto;
 }
@@ -258,7 +258,7 @@ const Wrapper = styled.div`
 }
 
   .divider {
-    border-top: 1px solid var(--grey-300);
+    border: 1px solid var(--grey-800);
     margin: 2rem 0;
     max-width: 90%;
   }
@@ -387,7 +387,7 @@ const Wrapper = styled.div`
   }
   
   .divider {
-    border-top: 1px solid var(--primary-300);
+    border: 1px solid var(--primary-800);
     margin: 2rem 0;
     max-width: 90%;
   }
