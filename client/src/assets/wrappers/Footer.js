@@ -404,7 +404,7 @@ const Wrapper = styled.div`
   }
 
   .social-media a:hover {
-    color: var(--primary-300);
+    color: var(--primary-400);
   }
 }
 
