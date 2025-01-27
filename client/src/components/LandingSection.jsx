@@ -22,19 +22,19 @@ const LandingSection = () => {
               <p>Learn step-by-step how to prepare mouthwatering meals.</p>
             </div>
           </div>
-          <div class="divider"></div>
+          <div className="divider"></div>
 
           <div className="section">
-            <img
-              src="https://res.cloudinary.com/dwrmehhg3/image/upload/v1736522927/mealmaster/dfxva3bhy0ockesdqbzq.jpg"
-              alt="cooking reminder"
-            />
             <div className="section-writeup">
               <h3>Never Miss a Cooking Moment!</h3>
               <p>Set reminders and keep your kitchen game strong.</p>
             </div>
+            <img
+              src="https://res.cloudinary.com/dwrmehhg3/image/upload/v1736522927/mealmaster/dfxva3bhy0ockesdqbzq.jpg"
+              alt="cooking reminder"
+            />
           </div>
-          <div class="divider"></div>
+          <div className="divider"></div>
 
           <div className="section">
             <img
@@ -46,17 +46,17 @@ const LandingSection = () => {
               <p>Plan your meals effortlessly and stay on track.</p>
             </div>
           </div>
-          <div class="divider"></div>
+          <div className="divider"></div>
 
           <div className="section">
-            <img
-              src="https://res.cloudinary.com/dwrmehhg3/image/upload/v1736524922/mealmaster/nythkwt83jo1bmwhwnqf.jpg"
-              alt="Shop ingredients"
-            />
             <div className="section-writeup">
               <h3>Shop Ingredients Without the Hassle!</h3>
               <p>Get fresh, quality ingredients delivered to your door.</p>
             </div>
+            <img
+              src="https://res.cloudinary.com/dwrmehhg3/image/upload/v1736524922/mealmaster/nythkwt83jo1bmwhwnqf.jpg"
+              alt="Shop ingredients"
+            />
           </div>
         </div>
       </div>

@@ -25,7 +25,8 @@ import { action as registerAction } from "./actionsAndLoaders/RegisterAction";
 import { action as loginAction } from "./actionsAndLoaders/LoginAction";
 
 //Loaders
-import { loader as recommendedAction } from "./actionsAndLoaders/ReccomendedLoaders";
+import { loader as recommendedLoader } from "./actionsAndLoaders/ReccomendedLoaders";
+import { loader as currentUserLoader } from "./actionsAndLoaders/CurrentUserLoader";
 
 const router = createBrowserRouter([
   {
@@ -36,12 +37,13 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Landing />,
-        loader: recommendedAction,
+        loader: recommendedLoader,
         errorElement: <Error />,
       },
       {
         path: "meals",
         element: <Meals />,
+        loader: currentUserLoader,
         errorElement: <Error />,
       },
       {

@@ -26,7 +26,8 @@ const Wrapper = styled.div`
   width: 100%;
   max-width: 400px;
   height: auto;
-  border: 3px solid var(--white);
+  border: 2px solid var(--white);
+  border-radius: var(--border-radius);
   box-shadow: var(--shadow-5);
   margin: 0;
 }
@@ -141,6 +142,7 @@ const Wrapper = styled.div`
   .section-writeup p {
     font-size: 1.2rem;
   }
+
 
 
 

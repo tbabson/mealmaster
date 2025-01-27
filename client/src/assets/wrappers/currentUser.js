@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
 .currentUser{
-    background: var(--grey-900);
+    background: var(--grey-8000);
     display: flex;
     flex-direction: column;
     align-items: flex-end;
