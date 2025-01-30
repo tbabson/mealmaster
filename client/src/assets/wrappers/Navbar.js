@@ -36,6 +36,12 @@ const Wrapper = styled.nav`
   }
 }
 
+/* .button .nav-toggle{
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+} */
+
   .nav-toggle {
     font-size: 2rem;
     color: var(--primary-600);

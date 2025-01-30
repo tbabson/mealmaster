@@ -1,6 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 import { useState } from "react";
-import { Logo } from "../components";
+import { CurrentUser, Logo } from "../components";
 import { IoMenu, IoClose } from "react-icons/io5";
 import Wrapper from "../assets/wrappers/Navbar";
 
@@ -14,6 +14,7 @@ const Navbar = () => {
   return (
     <Wrapper>
       <nav>
+        <CurrentUser />
         <div className="nav-center">
           <div className="nav-display">
             <div className="logo">

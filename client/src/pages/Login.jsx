@@ -50,7 +50,6 @@ const Login = () => {
 
               <div className="forgetPassword">
                 <p>
-                  <br />
                   <Link to="/changePassword" className="member-btn">
                     Forgot Password?
                   </Link>

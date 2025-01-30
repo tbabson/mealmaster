@@ -1,35 +1,40 @@
 import styled from 'styled-components'
 
 const Wrapper = styled.section`
+.section{
+max-width: 100%
+}
+
 .registerContainer{
-    display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
+  max-width: 80%;
   margin: auto;
   overflow: hidden
 }
 
 .caption{
-    width: 100vw;
-  max-width: var(--fixed-width);
-  margin: 4rem auto -1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+    max-width: 80%;
+  margin: 0 auto;
   text-align: center;
 }
 
 .logo{
+  margin-top: 0;
     width: 12rem;
     height: auto;
 }
 
 .caption p{
+  margin-top: 0;
 color: var(--primary-900);
 line-height: 20px;
 }
 
 .caption p span{
-color: var(--secondary-900);
+color: var(--secondary-600);
 font-weight: 800;
 }
 
@@ -41,7 +46,7 @@ font-weight: 800;
 }
 
 .form {
-  width: 100vw;
+  width: 80%;
   max-width: var(--fixed-width);
   background: var(--grey-500);
   border-radius: 10px;
@@ -85,21 +90,21 @@ font-weight: 800;
 }
 
 .forgetPassword p {
-    margin-top: -0.4rem 0 -0.5rem;
+    margin: 1rem auto;
     text-align: center;
     line-height: 1.5;
-    color: var(--primary-900)
+    color: var(--primary-600)
   } 
 
 .member p {
     margin-top: -0.4rem;
     text-align: center;
     line-height: 1.5;
-    color: var(--primary-900)
+    color: var(--primary-600)
   } 
   
   .member-btn {
-    color: var(--secondary-900);
+    color: var(--secondary-700);
     margin-left: 0.25rem;
     font-weight: 600;
   }

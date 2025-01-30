@@ -7,7 +7,9 @@ export const loader = async () => {
         //console.log("Loader response:", data); // Debug
         return { user: data.user }; // Return the user object
     } catch (error) {
-        toast.error(error?.response?.data?.msg || "Failed to fetch user data");
+        toast.error("user not login" || error?.response?.data?.msg);
         return { user: null }; // Handle errors gracefully
     }
 };
+
+

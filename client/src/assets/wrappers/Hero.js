@@ -128,7 +128,6 @@ const Wrapper = styled.div`
   animation-delay: 1.4s;
 }
 
-    
 
     .hero-description {
         font-size: 1.2rem;
@@ -238,7 +237,7 @@ const Wrapper = styled.div`
         line-height: 4rem;
         width: 80%;
        line-height: 1.2;
-        margin: 7rem 0 0 0;
+        margin: 6rem auto 2rem;
     }
 
 
@@ -246,7 +245,7 @@ const Wrapper = styled.div`
         text-align: center;
         font-size: 1.5rem;
         width: 80%;
-        margin: 0 0 0 0;
+        margin: 0 auto;
         line-height: 1.2;
     }
 
@@ -256,6 +255,7 @@ const Wrapper = styled.div`
     border: none;
     transition: transform 0.3s;
     margin-top: 1.5rem;
+    margin: 1rem auto;
     }
 
 
