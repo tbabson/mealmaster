@@ -60,7 +60,8 @@ const Footer = () => {
               <Link to="/" className="logo">
                 <Logo />
               </Link>
-
+            </div>
+            <div className="footer-text">
               <p>
                 <IoCall className="icon" />
                 +234 703 5689 102

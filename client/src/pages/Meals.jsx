@@ -1,26 +1,21 @@
-// import { createContext, useContext, useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import customFetch from "../utils/customFetch";
-// import { CurrentUser } from "../components";
+import { SearchContainer } from "../components";
+import { useLoaderData } from "react-router-dom";
+import { useContext, createContext } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { allMealsQuery } from "../actionsAndLoaders/MealsLoader";
 
-//const MealsContext = createContext();
+const AllMealsContext = createContext();
 
 const Meals = () => {
-  // const navigate = useNavigate();
-
-  // const logoutUser = async () => {
-  //   navigate("/");
-  //   await customFetch.get("/auth/logout");
-  //   toast.success("Logging out...");
-  // };
-
+  const { searchValues } = useLoaderData();
+  const { data } = useQuery(allMealsQuery(searchValues));
   return (
-    <div className="">
-      {/* <CurrentUser /> */}
-      <h1>Meals</h1>;
-    </div>
+    <AllMealsContext.Provider value={{ data, searchValues }}>
+      <SearchContainer />
+    </AllMealsContext.Provider>
   );
 };
 
-// export const useMealsContext = () => useContext(MealsContext);
+export const useAllMealsContext = () => useContext(AllMealsContext);
+
 export default Meals;

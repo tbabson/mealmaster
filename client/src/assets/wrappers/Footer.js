@@ -93,14 +93,15 @@ const Wrapper = styled.div`
 }
 
 .logo{
-    width: 20rem;
+    width: 8rem;
     height: auto;
-    margin: -3rem -1.8rem -3.6rem;
+    //margin: -3rem -1.8rem -3.6rem;
 }
 
-.footer-logo p{
+.footer-text p{
     font-size: 1rem;
     color: var(--primary-200);
+    margin-bottom: 0.5rem;
 }
 
 .icon{
@@ -157,7 +158,7 @@ const Wrapper = styled.div`
 }
 
 
-@media (min-width: 800px) {
+@media (min-width: 768px) {
   .footer-container {
     display: flex;
     flex-direction: column;
@@ -206,17 +207,19 @@ const Wrapper = styled.div`
     color: var(--primary-800); /* Darker shade on hover */
   }
 
-  .footer-contact p {
+  .logo{
+    width: 10rem;
+    height: auto;
+    margin: -1rem 0 -0.6rem;
+}
+
+  .footer-text p {
     display: flex;
     align-items: center;
     gap: 0.5rem; /* Space between the icon and text */
     font-size: 1rem;
     color: var(--primary-200);
-  }
-
-  .footer-contact .logo {
-    margin-top: -4rem;
-    margin-bottom: -3.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .footer-contact .icon {
@@ -365,19 +368,14 @@ const Wrapper = styled.div`
   .footer-contact {
     display: flex;
     flex-direction: column;
+   
   }
 
-  .footer-logo {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    color: var(--grey-700);
-  }
-
-  .footer-logo p {
+  .footer-text p {
     display: flex;
     align-items: center;
     font-size: 1rem;
+    margin-bottom: 0.8rem;
   }
 
   .footer-logo .icon {

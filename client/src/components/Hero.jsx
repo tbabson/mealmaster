@@ -6,12 +6,6 @@ const Hero = () => {
     <Wrapper>
       <div className="hero">
         <div className="hero-content">
-          <div className="hero-image">
-            {/* <img
-              src="https://res.cloudinary.com/dwrmehhg3/image/upload/v1734953363/mealmaster/lsldkvataufcy4d0knd2.webp"
-              alt="cook"
-            /> */}
-          </div>
           <div className="hero-writeup">
             <h1 className="hero-title">
               <span>Cook,</span> <span>Schedule</span> <span>&</span>
@@ -19,14 +13,20 @@ const Hero = () => {
               <span>One</span> <span>Place!</span>
             </h1>
             <p className="hero-description">
-              Your ultimate kitchen assistant is just a click away.
+              Your ultimate meal assistant is just a click away.
             </p>
+            <div className="hero-button">
+              <button type="button" className="btn cook-btn">
+                <Link to="/meals">Start Cooking!</Link>
+              </button>
+            </div>
           </div>
-        </div>
-        <div className="hero-button">
-          <button type="button" className="btn cook-btn">
-            <Link to="/meals">Start Cooking!</Link>
-          </button>
+          <div className="hero-image">
+            <img
+              src="https://res.cloudinary.com/dwrmehhg3/image/upload/v1738673515/mealmaster/clwzrye8budtmhdco0af.png"
+              alt="cook"
+            />
+          </div>
         </div>
       </div>
     </Wrapper>

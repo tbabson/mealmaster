@@ -1,4 +1,5 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import {
   HomeLayout,
@@ -26,7 +27,15 @@ import { action as loginAction } from "./actionsAndLoaders/LoginAction";
 
 //Loaders
 import { loader as recommendedLoader } from "./actionsAndLoaders/ReccomendedLoaders";
-// import { loader as currentUserLoader } from "./actionsAndLoaders/CurrentUserLoader";
+import { loader as mealsLoader } from "./actionsAndLoaders/MealsLoader";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 10,
+    },
+  },
+});
 
 const router = createBrowserRouter([
   {
@@ -44,7 +53,7 @@ const router = createBrowserRouter([
       {
         path: "meals",
         element: <Meals />,
-        // loader: currentUserLoader,
+        loader: mealsLoader(queryClient),
         errorElement: <Error />,
       },
       {
@@ -113,7 +122,11 @@ const router = createBrowserRouter([
 ]);
 
 const App = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
 };
 
 export default App;
