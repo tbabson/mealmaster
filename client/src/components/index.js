@@ -11,3 +11,6 @@ export { default as RecommendedMealsContainer } from './RecommendedMealsContaine
 export { default as LandingSection } from './LandingSection'
 export { default as Footer } from './Footer'
 export { default as SearchContainer } from './SearchContainer'
+export { default as MealContainer } from './MealContainer'
+export { default as Meal } from './Meal'
+export { default as PageBtnContainer } from './PageBtnContainer'

@@ -1,14 +1,15 @@
 import customFetch from "../utils/customFetch";
 
 export const allMealsQuery = (params) => {
-    const { meal, cuisine, sort_by, dietary, page } = params;
+    const { name, country, mealType, sort, dietary, page } = params;
     return {
         queryKey: [
             "meals",
-            meal ?? "all",
-            cuisine ?? "all",
-            sort_by ?? "newest",
+            name ?? "",
+            country ?? "",
+            mealType ?? "all",
             dietary ?? "all",
+            sort ?? "newest",
             page ?? 1,
         ],
         queryFn: async () => {
@@ -20,13 +21,14 @@ export const allMealsQuery = (params) => {
     };
 };
 
+
 export const loader =
     (queryClient) =>
         async ({ request }) => {
             const params = Object.fromEntries([
                 ...new URL(request.url).searchParams.entries(),
             ]);
-
             await queryClient.ensureQueryData(allMealsQuery(params));
             return { searchValues: { ...params } };
         };
+

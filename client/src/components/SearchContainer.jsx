@@ -1,16 +1,17 @@
-import { FormRowSelect, SubmitBtn, SectionTitle } from ".";
+import { FormRowSelect, FormRow, SubmitBtn, SectionTitle } from ".";
 import Wrapper from "../assets/wrappers/SearchContainer";
 import { Form, useSubmit, Link } from "react-router-dom";
-import { MEAL, CUISINE, DIETARY, SORT_BY } from "../../../utils/constants";
+import { MEAL, DIETARY, SORT } from "../../../utils/constants";
 import { useAllMealsContext } from "../pages/Meals";
 
 const SearchContainer = () => {
   const { searchValues } = useAllMealsContext();
   const {
-    meal = "all" | "Breakfast",
-    cuisine = "all" | "Nigeria",
-    dietary = "all" | "none",
-    sort_by = "newest",
+    name = "",
+    country = "",
+    mealType = "All",
+    dietary = "All",
+    sort = "newest",
   } = searchValues;
   const submit = useSubmit();
 
@@ -25,37 +26,52 @@ const SearchContainer = () => {
     };
   };
 
+  // Function to reset the form to default values
+  const resetForm = (e) => {
+    e.preventDefault(); // Prevent the default link behavior
+    const form = e.currentTarget.closest("form"); // Get the form element
+    if (form) {
+      form.reset(); // Reset the form fields to their default values
+      submit(form); // Submit the form to update the URL and refetch data
+    }
+  };
+
   return (
     <Wrapper>
       <section className="section">
-        <Form className="form">
+        <Form className="form" action="/meals">
           <SectionTitle
             title="Search for various meals"
             description="Discover the amazing features of Meal Master"
           />
-          <div className="form-row">
+          <div className="formCenter">
+            <FormRow
+              className="formRow-input"
+              type="name"
+              name="name"
+              defaultValue={name}
+              onChange={debounce((form) => {
+                submit(form);
+              })}
+            />
+            <FormRow
+              className="formRow-input"
+              type="country"
+              name="country"
+              defaultValue={country}
+              onChange={debounce((form) => {
+                submit(form);
+              })}
+            />
             <FormRowSelect
               labelText="meal"
-              name="meal"
+              name="mealType"
               list={["all", ...Object.values(MEAL)]}
-              defaultValue={meal}
+              defaultValue={mealType}
               onChange={(e) => {
                 submit(e.currentTarget.form);
               }}
             />
-          </div>
-          <div className="form-row">
-            <FormRowSelect
-              labelText="cuisine"
-              name="cuisine"
-              list={["all", ...Object.values(CUISINE)]}
-              defaultValue={cuisine}
-              onChange={(e) => {
-                submit(e.currentTarget.form);
-              }}
-            />
-          </div>
-          <div className="form-row">
             <FormRowSelect
               labelText="dietary"
               name="dietary"
@@ -65,21 +81,19 @@ const SearchContainer = () => {
                 submit(e.currentTarget.form);
               }}
             />
-          </div>
-          <div className="form-row">
             <FormRowSelect
               labelText="Sort"
-              name="sort_by"
-              list={[...Object.values(SORT_BY)]}
-              defaultValue={sort_by}
+              name="sort"
+              list={[...Object.values(SORT)]}
+              defaultValue={sort}
               onChange={(e) => {
                 submit(e.currentTarget.form);
               }}
             />
+            <Link to="/meals" className="btn form-btn delete-btn">
+              Reset Search
+            </Link>
           </div>
-          <Link to="/meals" className="btn form-btn delete-btn">
-            Reset Search
-          </Link>
         </Form>
       </section>
     </Wrapper>

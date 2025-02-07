@@ -34,8 +34,13 @@ const Wrapper = styled.div`
   cursor: pointer;
 }
 
+.formRow-input{
+  cursor: text;
+}
+
 .form-row {
   margin-bottom: 1rem;
+  outline: none;
 }
 
 

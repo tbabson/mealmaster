@@ -3,13 +3,14 @@ import { StatusCodes } from 'http-status-codes';
 import cloudinary from 'cloudinary';
 import fs from 'fs/promises';
 import path from 'path'
+import { query } from 'express';
 
 
 
 
 export const createMeal = async (req, res) => {
     try {
-        const { name, mealType, ingredients, cuisine, dietaryPreferences, preparationSteps, isRecommended } = req.body;
+        const { name, mealType, ingredients, country, dietary, preparationSteps, isRecommended } = req.body;
         // Check if the image file is present
         if (!req.file) {
             return res
@@ -34,7 +35,7 @@ export const createMeal = async (req, res) => {
         const meal = await Meal.create({
             name,
             mealType,
-            cuisine, dietaryPreferences,
+            country, dietary,
             preparationSteps, isRecommended,
             image: result.secure_url, // Use Cloudinary URL for the image
             cloudinaryId: result.public_id, // Save Cloudinary public ID
@@ -60,9 +61,53 @@ export const createMeal = async (req, res) => {
 // @desc    Get all meals
 // @route   GET /api/meals
 export const getAllMeals = async (req, res) => {
+    const { name, country, mealType, dietary, sort } = req.query
+
+    const queryObject = {}
+
+    if (name) {
+        queryObject.$or = [
+            { name: { $regex: name, $options: 'i' } },
+        ]
+    }
+
+    if (country) {
+        queryObject.$or = [
+            { country: { $regex: country, $options: 'i' } },
+        ]
+    }
+
+
+    if (mealType && mealType !== 'all') {
+        queryObject.mealType = mealType
+    }
+
+    if (dietary && dietary !== 'all') {
+        queryObject.dietary = dietary
+    }
+
+    const sortOptions = {
+        newest: '-createdAt',
+        oldest: 'createdAt',
+        'a-z': 'name',
+        'z-a': '-name',
+    }
+
+    const sortKey = sortOptions[sort] || sortOptions.newest;
+
+    // setup pagination
+
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || 10
+    const skip = (page - 1) * limit
+
     try {
-        const meals = await Meal.find({});
-        res.status(StatusCodes.OK).json({ meals, count: meals.length })
+        const meals = await Meal.find(queryObject).sort(sortKey).skip(skip).limit(limit)
+
+        const totalMeals = await Meal.countDocuments(queryObject)
+        const numOfPages = Math.ceil(totalMeals / limit)
+
+        res.status(StatusCodes.OK).json({ totalMeals, numOfPages, currentPage: page, meals, count: meals.length })
     } catch (error) {
         res
             .status(StatusCodes.INTERNAL_SERVER_ERROR)
