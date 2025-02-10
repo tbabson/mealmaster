@@ -14,6 +14,16 @@ html {
 
 :root {
   /* colors */
+
+  --primary: #28842b;
+  --darkest: #143315;
+  --dark: #507352;
+  --medium: #87a887;
+  --light: #daf2da;
+  --lightest: #f4faf4;
+
+  --secondary: #ff5722;
+
   --primary-50: #f3faf3;
   --primary-100: #e3f5e3;
   --primary-200: #c8eac9;

@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
 .currentUser{
-    background: var(--grey-8000);
+    background: var(--darkest);
     width: 100vw;
    
 }
@@ -17,36 +17,38 @@ const Wrapper = styled.div`
 }
 
 .currentUserContainer p{
-    color: var(--grey-500);
+    color: var(--light);
     text-transform: capitalize;
     font-size: var(--small-text);
 }
 
 .login-btn {
-  background-color:var(--secondary-500);
-  color: white;
+  background-color:var(--transparent);
+  color: var(--light);
   border: none;
   padding: 5px 10px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
+  text-decoration: underline;
 }
 .logout-btn {
-  background-color:var(--secondary-500);
-  color: white;
+  background-color:var(--transparent);
+  color: var(--light);
   border: none;
   padding: 5px 10px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
+  text-decoration: underline;
 }
 
 .login-btn:hover {
-  background-color:var(--primary-400);
+  color: var(--light);
 }
 
 .logout-btn:hover {
-  background-color:var(--primary-400);
+  color: var(--light);
 }
 
 

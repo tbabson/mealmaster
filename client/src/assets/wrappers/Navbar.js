@@ -25,7 +25,7 @@ const Wrapper = styled.nav`
 
   .nav-toggle {
     font-size: 2rem;
-    color: var(--primary-600);
+    color: var(--primary);
     background: none;
     border: none;
     cursor: pointer;
@@ -62,7 +62,7 @@ const Wrapper = styled.nav`
 
   .nav-link {
     font-weight: 600;
-    color: var(--primary-600);
+    color: var(--lightest);
     transition: var(--transition);
     letter-spacing: var(--letter-spacing);
     background-color: rgba(255, 255, 255, 0.9);
@@ -73,12 +73,12 @@ const Wrapper = styled.nav`
   }
 
   .nav-link:hover {
-    color: var(--secondary-600);
+    color: var(--primary);
     transform: scale(1.05);
   }
 
   .active {
-    color: var(--secondary-600);
+    color: var(--primary);
   }
 
   /* For screens 768px and above */
@@ -100,12 +100,16 @@ const Wrapper = styled.nav`
     .nav-links {
       flex-direction: row;
       align-items: center;
+      background: rgba(244, 250, 244, 0.5);
+      border-radius: 30px;
+      padding: 0 0.5rem ;
+      margin-top: 0.5rem;
       //gap: 1rem;
     }
 
     .nav-link {
       background-color: transparent;
-      padding: 0.5rem 1rem;
+      padding: 0.5rem 0.5rem;
     }
   }
 `

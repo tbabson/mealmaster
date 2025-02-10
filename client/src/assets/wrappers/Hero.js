@@ -8,10 +8,10 @@ const Wrapper = styled.div`
     align-items: center;
     background-image: linear-gradient(
         to top,
-        rgba(249, 249, 249, 0.8),
-        rgba(249, 249, 249, 0.8) 70%
+        rgba(249, 249, 249, 0),
+        rgba(249, 249, 249, 0) 70%
       ),
-      url("https://res.cloudinary.com/dwrmehhg3/image/upload/v1734953363/mealmaster/lsldkvataufcy4d0knd2.webp");
+      url("https://res.cloudinary.com/dwrmehhg3/image/upload/v1739197458/mealmaster/leewvncyfi1ghunkl0wy.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -22,6 +22,13 @@ const Wrapper = styled.div`
     @media (max-width: 768px) {
       background-attachment: scroll;
       padding: 1rem;
+      min-height: 100vh;
+      background-image: linear-gradient(
+        to top,
+        rgba(249, 249, 249, 0),
+        rgba(249, 249, 249, 0) 70%
+      ),
+      url("https://res.cloudinary.com/dwrmehhg3/image/upload/v1739199710/mealmaster/tszab0fn3rnp6heorq69.jpg");
     }
   }
 
@@ -55,13 +62,14 @@ const Wrapper = styled.div`
     text-align: left;
 
     @media (max-width: 768px) {
+      margin: 9rem auto 1rem;
       align-items: left;
       text-align: left;
+      max-width: 100%;
     }
     
     @media (min-width: 768px) {
-      align-items: flex-end;
-      text-align: right;
+      max-width: 100%;
     }
     
   }
@@ -80,70 +88,72 @@ const Wrapper = styled.div`
   .hero-title {
     font-family: "Roboto", serif;
     font-weight: 900;
-    color: var(--primary-800);
+    color: var(--darkest);
     font-size: 2.5rem;
     line-height: 1;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
     display: flex;
     flex-wrap: wrap;
     
 
-    span {
+    /* span {
       display: inline-block;
       animation: slideInEach 0.8s ease-out forwards;
       opacity: 0;
-    }
+    } */
 
     @media (min-width: 768px) {
-      font-size: 3rem;
+      font-size: 2rem;
       line-height: 1.3;
-      text-align: right;
+      margin-bottom: 0.5rem;
     }
 
     @media (min-width: 1024px) {
-      font-size: 3.5rem;
+      font-size: 2.5rem;
     }
   }
 
   /* Staggered animation delays */
-  ${Array.from({ length: 8 }).map(
+  /* ${Array.from({ length: 8 }).map(
   (_, i) => `
     .hero-title span:nth-child(${i + 1}) {
       animation-delay: ${i * 0.15}s;
     }
   `
-)}
+)} */
 
   .hero-description {
-    font-size: 1.1rem;
-    color: var(--secondary-600);
-    margin-bottom: 0.8rem;
-    line-height: 1.6;
+    font-size: 1rem;
+    color: var(--darkest);
+    margin-bottom: 0.3rem;
+    line-height: 1.2;
     max-width: 500px;
 
     @media (min-width: 768px) {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
     }
 
     @media (min-width: 1024px) {
-      font-size: 1.4rem;
+      font-size: 1.5rem;
     }
   }
 
   .hero-button {
     .btn {
-      padding: 0.75rem 2rem;
+      padding: 0.75rem 1rem;
       font-size: 1rem;
-      background-color: var(--secondary-500);
-      color: var(--white);
+      background-color: var(--primary);
+      color: var(--lightest);
       border: none;
       border-radius: var(--border-radius);
       transition: all 0.3s ease;
       cursor: pointer;
+      margin-top: 1rem;
 
       &:hover {
         transform: scale(1.05);
-        background-color: var(--primary-600);
+        background-color: var(--light);
+        color: var(--primary);
       }
 
       a {
@@ -174,7 +184,7 @@ const Wrapper = styled.div`
   @media (max-width: 480px) {
     .hero-title {
       font-size: 2rem;
-      gap: 0.25rem;
+      //gap: 0.25rem;
     }
 
     .hero-description {
@@ -182,8 +192,9 @@ const Wrapper = styled.div`
     }
 
     .hero-button .btn {
-      padding: 0.5rem 1.5rem;
+      padding: 0.5rem 1rem;
       font-size: 0.9rem;
+      margin-top: 0.5rem;
     }
   }
 `
