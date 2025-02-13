@@ -44,11 +44,11 @@ const Wrapper = styled.div`
 }
 
 .login-btn:hover {
-  color: var(--light);
+  color: var(--dark);
 }
 
 .logout-btn:hover {
-  color: var(--light);
+  color: var(--dark);
 }
 
 

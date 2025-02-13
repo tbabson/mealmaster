@@ -36,11 +36,11 @@ const Footer = () => {
           </div>
           <div className="footer-section footer-menu">
             <h3 className="footer-title">Menu</h3>
+            {/* <NavLink to="/" className="footer-link">
+              Home
+            </NavLink> */}
             <NavLink to="/" className="footer-link">
               Home
-            </NavLink>
-            <NavLink to="/meals" className="footer-link">
-              Meals
             </NavLink>
             <NavLink to="/cart" className="footer-link">
               Cart

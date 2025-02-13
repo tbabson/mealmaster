@@ -7,7 +7,7 @@ const Hero = () => {
       <div className="hero">
         <div className="hero-content">
           <div className="hero-writeup">
-            <p className="hero-description">
+            <p className="hero-question">
               Tired of eating the same food all the time? We got you covered!
             </p>
             <h1 className="hero-title">

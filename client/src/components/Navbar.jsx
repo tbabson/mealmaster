@@ -30,11 +30,11 @@ const Navbar = () => {
             className={`nav-links-container ${isMenuOpen ? "show-menu" : ""}`}
           >
             <div className="nav-links">
+              {/* <NavLink to="/" className="nav-link" onClick={toggleMenu}>
+                Home
+              </NavLink> */}
               <NavLink to="/" className="nav-link" onClick={toggleMenu}>
                 Home
-              </NavLink>
-              <NavLink to="/meals" className="nav-link" onClick={toggleMenu}>
-                Meals
               </NavLink>
               <NavLink to="/cart" className="nav-link" onClick={toggleMenu}>
                 Cart

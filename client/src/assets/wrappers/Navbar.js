@@ -33,7 +33,7 @@ const Wrapper = styled.nav`
   }
 
   .nav-toggle:hover {
-    color: var(--secondary-500);
+    color: var(--medium);
   }
 
   .nav-links-container {
@@ -65,7 +65,7 @@ const Wrapper = styled.nav`
     color: var(--lightest);
     transition: var(--transition);
     letter-spacing: var(--letter-spacing);
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.4);
     padding: 0.5rem 1rem;
     border-radius: 6px;
     width: 80%;
@@ -100,7 +100,7 @@ const Wrapper = styled.nav`
     .nav-links {
       flex-direction: row;
       align-items: center;
-      background: rgba(244, 250, 244, 0.5);
+      background: rgba(80, 115, 82, 0.5);
       border-radius: 30px;
       padding: 0 0.5rem ;
       margin-top: 0.5rem;

@@ -1,9 +1,11 @@
-import { Link, useLoaderData } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Wrapper from "../assets/wrappers/RecommendedMealsContainer";
 import { useState, useEffect } from "react";
+import { useAllMealsContext } from "../pages/Meals";
 
 const RecommendedMealsContainer = () => {
-  const { meals } = useLoaderData(); // meals is an array
+  const { data } = useAllMealsContext();
+  const { meals } = data;
   const [shuffledMeals, setShuffledMeals] = useState([]);
   const [mealType, setMealType] = useState("");
 
@@ -26,7 +28,7 @@ const RecommendedMealsContainer = () => {
     setMealType(type);
 
     // Filter meals based on meal type and recommendation status
-    const filteredMeals = meals.meals.filter(
+    const filteredMeals = meals.filter(
       (meal) => meal.isRecommended === true && meal.mealType === type
     );
 

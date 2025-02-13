@@ -18,7 +18,6 @@ import {
   AddMeal,
   UpdateMeal,
   DeleteMeal,
-  Landing,
 } from "./pages";
 
 //Actions
@@ -26,7 +25,6 @@ import { action as registerAction } from "./actionsAndLoaders/RegisterAction";
 import { action as loginAction } from "./actionsAndLoaders/LoginAction";
 
 //Loaders
-import { loader as recommendedLoader } from "./actionsAndLoaders/ReccomendedLoaders";
 import { loader as mealsLoader } from "./actionsAndLoaders/MealsLoader";
 
 const queryClient = new QueryClient({
@@ -45,13 +43,6 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Landing />,
-        loader: recommendedLoader,
-
-        errorElement: <Error />,
-      },
-      {
-        path: "meals",
         element: <Meals />,
         loader: mealsLoader(queryClient),
         errorElement: <Error />,

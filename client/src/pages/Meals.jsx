@@ -1,4 +1,9 @@
-import { MealContainer, SearchContainer } from "../components";
+import {
+  MealContainer,
+  SearchContainer,
+  RecommendedMeals,
+  ImageSlider,
+} from "../components";
 import { useLoaderData } from "react-router-dom";
 import { useContext, createContext } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -10,13 +15,15 @@ const Meals = () => {
   const { searchValues } = useLoaderData();
   const query = allMealsQuery(searchValues);
 
-  console.log("Query Key:", query.queryKey);
+  // console.log("Query Key:", query.queryKey);z
 
   const { data } = useQuery(query);
 
   return (
     <AllMealsContext.Provider value={{ data, searchValues }}>
+      <ImageSlider />
       <SearchContainer />
+      <RecommendedMeals />
       <MealContainer />
     </AllMealsContext.Provider>
   );

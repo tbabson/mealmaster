@@ -1,11 +1,11 @@
-import { Hero, RecommendedMeals, LandingSection } from "../components";
+import { Hero, LandingSection } from "../components";
 
 const Landing = () => {
   return (
     <div className="landing">
       <Hero />
       <LandingSection />
-      <RecommendedMeals />
+      {/* <RecommendedMeals /> */}
     </div>
   );
 };

@@ -7,9 +7,6 @@ import { toast } from "react-toastify";
 //import { useMealsContext } from "../pages/Meals";
 
 const CurrentUser = () => {
-  //const { user } = useLoaderData();
-  //const { logoutUser } = useMealsContext();
-  //const submit = useSubmit(); // Hook to programmatically submit forms or actions
   const navigate = useNavigate(); // Hook to navigate programmatically
   const [isLoggedOut, setIsLoggedOut] = useState(false); // State to track if user is logged out
   const [user, setUser] = useState(null);
@@ -85,3 +82,37 @@ const CurrentUser = () => {
 };
 
 export default CurrentUser;
+
+// import { useNavigate } from "react-router-dom";
+// import Wrapper from "../assets/wrappers/currentUser";
+// import { useAuth } from "../utils/AuthContext";
+
+// const CurrentUser = () => {
+//   const { user, logoutUser } = useAuth();
+//   const navigate = useNavigate();
+
+//   const handleLoginRedirect = () => {
+//     navigate("/login");
+//   };
+
+//   return (
+//     <Wrapper>
+//       <div className="currentUser">
+//         <div className="currentUserContainer">
+//           <p className="user-name">Welcome, {user?.fullName || "Guest"}!</p>
+//           {user ? (
+//             <button onClick={logoutUser} className="logout-btn">
+//               Logout
+//             </button>
+//           ) : (
+//             <button onClick={handleLoginRedirect} className="login-btn">
+//               Login
+//             </button>
+//           )}
+//         </div>
+//       </div>
+//     </Wrapper>
+//   );
+// };
+
+// export default CurrentUser;

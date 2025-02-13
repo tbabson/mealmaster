@@ -5,7 +5,7 @@ const Wrapper = styled.div`
 .landing-sections {
   margin: 0 auto 1.5rem;
   width: 100%;
-  background-color: var(--white);
+  background-color: var(--lightest);
   padding: 1rem 0 2rem;
 }
 
