@@ -4,7 +4,20 @@ import styled from "styled-components";
 
 const Wrapper = styled.nav`
   background: var(--transparent-background);
-  position: relative;
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1500;
+  transition: background 0.3s ease-in-out;
+
+  @media (max-width: 768px){    
+    /* Add background when scrolled */
+    &.scrolled {
+      background: rgba(218, 242, 218, 0.85); /* Darker background */
+      box-shadow: 0 4px 6px rgba(218, 242, 218, 0.2);
+    }
+  }
 
   .nav-center {
     width: 90%;
@@ -62,10 +75,10 @@ const Wrapper = styled.nav`
 
   .nav-link {
     font-weight: 600;
-    color: var(--lightest);
+    color: var(--primary);
     transition: var(--transition);
     letter-spacing: var(--letter-spacing);
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.8);
     padding: 0.5rem 1rem;
     border-radius: 6px;
     width: 80%;
@@ -73,12 +86,12 @@ const Wrapper = styled.nav`
   }
 
   .nav-link:hover {
-    color: var(--primary);
+    color: var(--dark);
     transform: scale(1.05);
   }
 
   .active {
-    color: var(--primary);
+    color: var(--darkest);
   }
 
   /* For screens 768px and above */
@@ -100,7 +113,7 @@ const Wrapper = styled.nav`
     .nav-links {
       flex-direction: row;
       align-items: center;
-      background: rgba(80, 115, 82, 0.5);
+      background: rgba(218, 242, 218, 0.95);
       border-radius: 30px;
       padding: 0 0.5rem ;
       margin-top: 0.5rem;

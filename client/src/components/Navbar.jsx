@@ -1,18 +1,35 @@
 import { Link, NavLink } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CurrentUser, Logo } from "../components";
 import { IoMenu, IoClose } from "react-icons/io5";
 import Wrapper from "../assets/wrappers/Navbar";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  // Handle Scroll Effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <Wrapper>
+    <Wrapper className={scrolled ? "scrolled" : ""}>
       <nav>
         <CurrentUser />
         <div className="nav-center">

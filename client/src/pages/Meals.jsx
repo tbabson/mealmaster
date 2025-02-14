@@ -23,8 +23,8 @@ const Meals = () => {
     <AllMealsContext.Provider value={{ data, searchValues }}>
       <ImageSlider />
       <SearchContainer />
-      <RecommendedMeals />
       <MealContainer />
+      <RecommendedMeals />
     </AllMealsContext.Provider>
   );
 };
