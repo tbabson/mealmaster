@@ -13,7 +13,7 @@ a{
     box-shadow: var(--shadow-1);
     transition: 0.3s;
     animation: fadeIn 1s;
-    height: 430px;
+    height: 450px;
     flex-direction: column;
     background: var(--white);
     overflow: hidden;
