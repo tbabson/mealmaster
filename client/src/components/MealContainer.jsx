@@ -4,8 +4,8 @@ import Wrapper from "../assets/wrappers/MealContainer";
 
 const MealContainer = () => {
   const { data } = useAllMealsContext();
-
   const { meals, totalMeals, numOfPages } = data;
+
   if (meals.length === 0) {
     return (
       <Wrapper>
@@ -23,7 +23,7 @@ const MealContainer = () => {
           return <Meal key={meal._id} {...meal} />;
         })}
       </div>
-      {numOfPages > 1 && <PageBtnContainer />}
+      {numOfPages > 1 && <PageBtnContainer className="pagination" />}
     </Wrapper>
   );
 };
