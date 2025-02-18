@@ -26,6 +26,7 @@ import { action as loginAction } from "./actionsAndLoaders/LoginAction";
 
 //Loaders
 import { loader as mealsLoader } from "./actionsAndLoaders/MealsLoader";
+import { loader as singleMealLoader } from "./actionsAndLoaders/SingleMealLoader";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +57,7 @@ const router = createBrowserRouter([
       {
         path: "meals/:id",
         element: <SingleMeal />,
+        loader: singleMealLoader,
         errorElement: <Error />,
       },
       {
