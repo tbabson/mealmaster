@@ -220,7 +220,7 @@ ul {
   display: inline-block;
 }
 .btn:hover {
-  background: var(--primary-500);
+  background: var(--darkest);
   box-shadow: var(--shadow-1);
   transform: scale(1.03);
 }
