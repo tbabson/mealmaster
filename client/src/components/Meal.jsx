@@ -24,13 +24,12 @@ const Meal = ({ _id, image, name, mealType, country, dietary }) => {
                 {country}
               </p>
               <p className="dietary">
-                {" "}
                 <IoMdNutrition className="icon" /> {dietary}
               </p>
             </div>
             <div className="mealOption">
-              <p> Ingredients</p>
-              <p> How to prepare</p>
+              <p> Ingredients...</p>
+              <p> How to prepare...</p>
             </div>
           </div>
         </Link>

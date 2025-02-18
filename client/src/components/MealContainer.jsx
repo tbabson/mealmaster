@@ -15,9 +15,11 @@ const MealContainer = () => {
   }
   return (
     <Wrapper>
-      <h5>
-        {totalMeals} meal{meals.length > 1 && "s"} found
-      </h5>
+      <div className="foodCount">
+        <h5>
+          {totalMeals} meal{meals.length > 1 && "s"} found
+        </h5>
+      </div>
       <div className="meals">
         {meals.map((meal) => {
           return <Meal key={meal._id} {...meal} />;

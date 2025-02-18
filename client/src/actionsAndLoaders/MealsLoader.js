@@ -1,6 +1,8 @@
 import customFetch from "../utils/customFetch";
 
 export const allMealsQuery = (params) => {
+
+
     const { name, country, mealType, sort, dietary, page } = params;
     return {
         queryKey: [
@@ -28,6 +30,7 @@ export const loader =
             const params = Object.fromEntries([
                 ...new URL(request.url).searchParams.entries(),
             ]);
+
             await queryClient.ensureQueryData(allMealsQuery(params));
             return { searchValues: { ...params } };
         };

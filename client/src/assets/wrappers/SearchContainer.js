@@ -67,7 +67,7 @@ const Wrapper = styled.div`
   width: 100%;
   padding: 0.375rem 0.75rem;
   border-radius: var(--border-radius);
-  background: var(--primary);
+  background: var(--dark);
   border: 1.5px solid var(--darkest);
   color: var(--white);
   cursor: pointer;

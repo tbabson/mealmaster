@@ -48,6 +48,12 @@ const router = createBrowserRouter([
         errorElement: <Error />,
       },
       {
+        path: "/meals",
+        element: <Meals />,
+        loader: mealsLoader(queryClient),
+        errorElement: <Error />,
+      },
+      {
         path: "meals/:id",
         element: <SingleMeal />,
         errorElement: <Error />,
@@ -101,11 +107,11 @@ const router = createBrowserRouter([
         element: <AddMeal />,
       },
       {
-        path: "updateMeal",
+        path: "updateMeal/:id",
         element: <UpdateMeal />,
       },
       {
-        path: "deleteMeal",
+        path: "deleteMeal/:id",
         element: <DeleteMeal />,
       },
     ],

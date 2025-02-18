@@ -15,8 +15,6 @@ const Meals = () => {
   const { searchValues } = useLoaderData();
   const query = allMealsQuery(searchValues);
 
-  // console.log("Query Key:", query.queryKey);z
-
   const { data } = useQuery(query);
 
   return (
