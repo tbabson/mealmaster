@@ -2,7 +2,6 @@ import customFetch from "../utils/customFetch";
 
 export const allMealsQuery = (params) => {
 
-
     const { name, country, mealType, sort, dietary, page } = params;
     return {
         queryKey: [

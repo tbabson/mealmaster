@@ -23,6 +23,7 @@ import {
 //Actions
 import { action as registerAction } from "./actionsAndLoaders/RegisterAction";
 import { action as loginAction } from "./actionsAndLoaders/LoginAction";
+import store from "./store";
 
 //Loaders
 import { loader as mealsLoader } from "./actionsAndLoaders/MealsLoader";
@@ -57,7 +58,7 @@ const router = createBrowserRouter([
       {
         path: "meals/:id",
         element: <SingleMeal />,
-        loader: singleMealLoader,
+        loader: singleMealLoader(queryClient),
         errorElement: <Error />,
       },
       {
@@ -85,7 +86,7 @@ const router = createBrowserRouter([
   {
     path: "login",
     element: <Login />,
-    action: loginAction,
+    action: loginAction(queryClient),
     errorElement: <Error />,
   },
   {

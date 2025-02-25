@@ -1,9 +1,14 @@
-import { Meal, PageBtnContainer } from ".";
+import { Meal, PageBtnContainer, Loading } from ".";
 import { useAllMealsContext } from "../pages/Meals";
 import Wrapper from "../assets/wrappers/MealContainer";
 
 const MealContainer = () => {
   const { data } = useAllMealsContext();
+
+  if (!data) {
+    return <Loading />;
+  }
+
   const { meals, totalMeals, numOfPages } = data;
 
   if (meals.length === 0) {
@@ -13,6 +18,7 @@ const MealContainer = () => {
       </Wrapper>
     );
   }
+
   return (
     <Wrapper>
       <div className="foodCount">
@@ -21,9 +27,9 @@ const MealContainer = () => {
         </h5>
       </div>
       <div className="meals">
-        {meals.map((meal) => {
-          return <Meal key={meal._id} {...meal} />;
-        })}
+        {meals.map((meal) => (
+          <Meal key={meal._id} {...meal} />
+        ))}
       </div>
       {numOfPages > 1 && <PageBtnContainer className="pagination" />}
     </Wrapper>

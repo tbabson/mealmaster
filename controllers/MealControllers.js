@@ -8,6 +8,7 @@ import { query } from 'express';
 
 
 
+
 export const createMeal = async (req, res) => {
     try {
         const { name, mealType, ingredients, country, dietary, preparationSteps, isRecommended } = req.body;
@@ -142,6 +143,8 @@ export const getMealById = async (req, res) => {
         // Return the populated meal data
         res.status(StatusCodes.OK).json({ meal });
     } catch (error) {
+        console.log(error);
+
         // Handle any errors that occur during the fetch
         res
             .status(StatusCodes.INTERNAL_SERVER_ERROR)
