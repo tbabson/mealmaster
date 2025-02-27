@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Wrapper from "../assets/wrappers/currentUser";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import customFetch from "../utils/customFetch";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
@@ -10,43 +10,52 @@ const CurrentUser = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
+  // Correctly using the state property name "numItemsInCart"
   const numMealsInCart = useSelector(
     (state) => state.cart?.numItemsInCart || 0
   );
 
   useEffect(() => {
+    let isMounted = true;
     const fetchCurrentUser = async () => {
       try {
         const response = await customFetch.get("/users/currentuser");
-        setUser(response.data.user);
+        if (isMounted) {
+          setUser(response.data.user);
+        }
       } catch (error) {
-        setUser(null);
+        if (isMounted) {
+          setUser(null);
+        }
       }
     };
 
     fetchCurrentUser();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const userName = user?.fullName || "Guest";
 
-  const handleLoginRedirect = () => {
+  const handleLoginRedirect = useCallback(() => {
     navigate("/login");
-  };
+  }, [navigate]);
 
-  const handleRegisterRedirect = () => {
+  const handleRegisterRedirect = useCallback(() => {
     navigate("/register");
-  };
+  }, [navigate]);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await customFetch.get("/auth/logout", { withCredentials: true });
-      setUser(null); // Reset user state
+      setUser(null);
       toast.success("Logout successful");
-      navigate(0); // Refresh page smoothly
+      navigate(0); // Refresh the page
     } catch (error) {
       toast.error(error?.response?.data?.msg || "Something went wrong.");
     }
-  };
+  }, [navigate]);
 
   return (
     <Wrapper>
@@ -80,37 +89,3 @@ const CurrentUser = () => {
 };
 
 export default CurrentUser;
-
-// import { useNavigate } from "react-router-dom";
-// import Wrapper from "../assets/wrappers/currentUser";
-// import { useAuth } from "../utils/AuthContext";
-
-// const CurrentUser = () => {
-//   const { user, logoutUser } = useAuth();
-//   const navigate = useNavigate();
-
-//   const handleLoginRedirect = () => {
-//     navigate("/login");
-//   };
-
-//   return (
-//     <Wrapper>
-//       <div className="currentUser">
-//         <div className="currentUserContainer">
-//           <p className="user-name">Welcome, {user?.fullName || "Guest"}!</p>
-//           {user ? (
-//             <button onClick={logoutUser} className="logout-btn">
-//               Logout
-//             </button>
-//           ) : (
-//             <button onClick={handleLoginRedirect} className="login-btn">
-//               Login
-//             </button>
-//           )}
-//         </div>
-//       </div>
-//     </Wrapper>
-//   );
-// };
-
-// export default CurrentUser;

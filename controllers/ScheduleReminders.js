@@ -555,7 +555,11 @@ export const scheduleReminders = () => {
 
 // Start the reminder scheduler
 export const initializeReminderSystem = () => {
-  console.log('Initializing reminder system...');
-  scheduleReminders();
+  try {
+    console.log('Initializing reminder system...');
+    scheduleReminders();
+  } catch (error) {
+    console.error("Error initializing reminder system:", error.message);
+  }
 };
 
