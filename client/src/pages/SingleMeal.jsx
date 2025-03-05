@@ -1,13 +1,21 @@
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { formatPrice } from "../utils/formatPrice";
 import Wrapper from "../assets/wrappers/SingleMeal";
 import { IoMdStar, IoMdStarOutline } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { addItem } from "../Features/Cart/cartSlice";
 import { Loading } from "../components";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { GiHotMeal } from "react-icons/gi";
+import { FaMapLocationDot } from "react-icons/fa6";
+import { IoMdNutrition } from "react-icons/io";
 
 const SingleMeal = () => {
   const { meal } = useLoaderData();
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   if (!meal) {
     return <Loading />;
@@ -28,9 +36,6 @@ const SingleMeal = () => {
     averageRating,
   } = meal.meal;
 
-  const nairaAmount = formatPrice(price);
-  const dispatch = useDispatch();
-
   const cartMeal = {
     _id,
     name,
@@ -41,6 +46,12 @@ const SingleMeal = () => {
   };
 
   const addToCart = () => {
+    if (!user || !user.user) {
+      toast.error("You need to log in to add items to your cart.");
+      navigate("/login"); // ✅ Redirect to login
+      return;
+    }
+
     dispatch(addItem({ meal: cartMeal }));
   };
 
@@ -67,9 +78,18 @@ const SingleMeal = () => {
             <div className="mealDetail">
               <h1>{name}</h1>
               <div className="mealAndCountry">
-                <p>{mealType}</p>
-                <p>{country}</p>
-                <p>{dietary}</p>
+                <p>
+                  <GiHotMeal className="icon" />
+                  {mealType}
+                </p>
+                <p>
+                  <FaMapLocationDot className="icon" />
+                  {country}
+                </p>
+                <p>
+                  <IoMdNutrition className="icon" />
+                  {dietary}
+                </p>
               </div>
               <div className="averageRating">
                 <div className="spanRating">
@@ -80,10 +100,17 @@ const SingleMeal = () => {
                 </div>
               </div>
 
-              <hr className="hr1" />
+              <div className="buttons">
+                <button onClick={addToCart} className="btn btn-primary">
+                  Add to Cart
+                </button>
+                <button className="btn btn-secondary">Create Reminder</button>
+              </div>
+
+              <div className="divider"></div>
 
               <div className="ingredients">
-                <h3>Ingredients:</h3>
+                <h3>Ingredients</h3>
                 {ingredients.length > 0 ? (
                   <ol>
                     {ingredients.map(
@@ -96,12 +123,15 @@ const SingleMeal = () => {
                         substitutions = [],
                       }) => (
                         <li key={_id}>
-                          <strong>{name}</strong> - {quantity} {unit} (₦
-                          {price ?? "N/A"})
+                          <strong>{name}:</strong>{" "}
+                          <span className="quantity">{quantity}</span>{" "}
+                          <span className="unit">{unit}</span>{" "}
+                          <span className="price">
+                            ({formatPrice(price) ?? "N/A"})
+                          </span>{" "}
                           {substitutions.length > 0 && (
-                            <span>
-                              {" "}
-                              | Substitute:{" "}
+                            <span className="substitutions">
+                              Substitute:{" "}
                               {substitutions.map(({ name }) => name).join(", ")}
                             </span>
                           )}
@@ -114,10 +144,10 @@ const SingleMeal = () => {
                 )}
               </div>
 
-              <hr className="hr1" />
+              <div className="divider"></div>
 
               <div className="howTo">
-                <h3>How to Prepare:</h3>
+                <h3>How to Prepare</h3>
                 {preparationSteps.length > 0 ? (
                   preparationSteps.map(
                     ({ _id, description, skillLevel, steps = [] }) => (
@@ -148,14 +178,14 @@ const SingleMeal = () => {
                 )}
               </div>
 
-              <hr className="hr1" />
-              <div className="amount">{nairaAmount}</div>
+              <div className="divider"></div>
+              {/* <div className="amount">{nairaAmount}</div> */}
 
               <div className="reviews">
-                <h3>Buyers Reviews ({numOfReviews}):</h3>
+                <h3>Buyers Reviews ({numOfReviews})</h3>
                 {reviews.length > 0 ? (
                   reviews.map(({ _id, user, title, comment, rating }) => (
-                    <div key={_id}>
+                    <div key={_id} className="review">
                       <h4>{user.fullName}</h4>
                       <h5>Rating: {renderStars(rating)}</h5>
                       <p>
@@ -167,13 +197,6 @@ const SingleMeal = () => {
                 ) : (
                   <p>No reviews yet.</p>
                 )}
-              </div>
-
-              <div className="buttons">
-                <button onClick={addToCart} className="btn btn-primary">
-                  Add to Cart
-                </button>
-                <button className="btn btn-secondary">Create Reminder</button>
               </div>
             </div>
           </div>

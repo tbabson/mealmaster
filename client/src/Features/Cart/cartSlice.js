@@ -37,7 +37,7 @@ const cartSlice = createSlice({
                 return;
             }
 
-            let existingMeal = state.cartItems.find((i) => i.mealID === meal._id);
+            let existingMeal = state.cartItems.find((i) => i.mealID === meal.mealID);
 
             if (existingMeal) {
                 meal.ingredients.forEach((newIngredient) => {
@@ -52,8 +52,9 @@ const cartSlice = createSlice({
                 });
             } else {
                 state.cartItems.push({
-                    mealID: meal._id,
+                    mealID: meal._id || meal.mealID || `temp-${Date.now()}`, // Ensure unique ID
                     name: meal.name,
+                    image: meal.image,
                     ingredients: meal.ingredients,
                 });
             }
@@ -63,6 +64,7 @@ const cartSlice = createSlice({
             saveCartToCookies(state);
             toast.success("Meal added to cart!");
         },
+
 
         clearCart: (state) => {
             Object.assign(state, defaultState);
