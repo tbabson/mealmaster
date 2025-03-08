@@ -53,6 +53,7 @@ const SingleMeal = () => {
     }
 
     dispatch(addItem({ meal: cartMeal }));
+    console.log({ meal: cartMeal });
   };
 
   const renderStars = (rating) => (

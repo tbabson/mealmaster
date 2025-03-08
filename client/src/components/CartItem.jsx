@@ -3,9 +3,10 @@ import { generateAmountOptions } from "../utils/GenAmountOptions";
 import { useDispatch } from "react-redux";
 import {
   removeIngredient,
-  editItem,
+  updateIngredientQuantity,
   removeMeal,
 } from "../Features/Cart/cartSlice";
+import Wrapper from "../assets/wrappers/CartItem";
 
 const CartItem = ({ meal }) => {
   const dispatch = useDispatch();
@@ -22,7 +23,7 @@ const CartItem = ({ meal }) => {
   const editIngredientHandler = (ingredient, newQuantity) => {
     if (!ingredient || !meal) return;
     dispatch(
-      editItem({
+      updateIngredientQuantity({
         mealID: meal.mealID,
         ingredientName: ingredient.name,
         newQuantity,
@@ -45,35 +46,59 @@ const CartItem = ({ meal }) => {
   const { mealID, name, ingredients, image } = meal;
 
   return (
-    <div className="cart-item" key={mealID}>
-      <img src={image} alt={name} />
-      <h3>{name}</h3>
-      <p>Price: {formatPrice(calculateMealTotal())}</p>
-
-      <ul>
-        {ingredients.map((ingredient) => (
-          <li key={ingredient._id}>
-            {ingredient.name} -
-            <select
-              value={ingredient.quantity}
-              onChange={(e) =>
-                editIngredientHandler(ingredient, Number(e.target.value))
-              }
-            >
-              {generateAmountOptions(10).map((amount) => (
-                <option key={amount} value={amount}>
-                  {amount}
-                </option>
+    <Wrapper>
+      <div className="cartItem">
+        <div className="cartItemContainer">
+          <div className="mealImage">
+            <img src={image} alt={name} />
+          </div>
+          <div className="ingredients">
+            <h3>{name}</h3>
+            <ul>
+              {ingredients.map((ingredient) => (
+                <li key={ingredient._id || ingredient.name}>
+                  <span>
+                    {ingredient.name} - {ingredient.quantity}{" "}
+                    {ingredient.unit || "pcs"}
+                  </span>
+                  <div>
+                    <select
+                      value={ingredient.quantity}
+                      onChange={(e) =>
+                        editIngredientHandler(
+                          ingredient,
+                          Number(e.target.value)
+                        )
+                      }
+                    >
+                      {generateAmountOptions(10).map((amount) => (
+                        <option key={amount} value={amount}>
+                          {amount}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => removeIngredientHandler(ingredient)}
+                      className="removeIngredient"
+                      aria-label="Remove ingredient"
+                    >
+                      -
+                    </button>
+                  </div>
+                </li>
               ))}
-            </select>
-            <button onClick={() => removeIngredientHandler(ingredient)}>
-              Remove
+            </ul>
+            <p>Price: {formatPrice(calculateMealTotal())}</p>
+            <button
+              onClick={() => removeMealHandler(meal)}
+              className="btn btn-primary"
+            >
+              Remove meal
             </button>
-          </li>
-        ))}
-      </ul>
-      <button onClick={() => removeMealHandler(meal)}>Remove meal</button>
-    </div>
+          </div>
+        </div>
+      </div>
+    </Wrapper>
   );
 };
 

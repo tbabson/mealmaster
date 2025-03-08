@@ -1,9 +1,9 @@
-import { Link, Form, useNavigate } from "react-router-dom";
+import { Link, Form, useNavigation } from "react-router-dom";
 import Wrapper from "../assets/wrappers/RegisterAndLoginPage";
 import { FormRow, Logo } from "../components";
 
 const Login = () => {
-  const navigate = useNavigate();
+  const navigation = useNavigation();
 
   const currentHour = new Date().getHours();
   let mealOfDay;
@@ -17,7 +17,7 @@ const Login = () => {
   }
 
   //This is to display submitting while submitting.
-  const isSubmitting = navigate.state === "Submitting";
+  const isSubmitting = navigation.state === "Submitting";
 
   return (
     <Wrapper>

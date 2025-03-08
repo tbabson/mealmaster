@@ -4,12 +4,18 @@ import App from "./App.jsx";
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 import { ToastContainer } from "react-toastify";
-import store from "./store.js";
+// import store from "./store.js";
 import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import store, { persistor } from "./store.js";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <Provider store={store}>
-    <App />
-    <ToastContainer position="top-center" />
-  </Provider>
+  <React.StrictMode>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <App />
+        <ToastContainer position="top-center" />
+      </PersistGate>
+    </Provider>
+  </React.StrictMode>
 );

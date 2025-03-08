@@ -50,7 +50,7 @@ section{
         font-size: 2rem;
         margin-bottom: 1rem;
         line-height: 1.5;
-        color: var(--dark);
+        color: var(--darkest);
         font-weight: 600;
     }
 
@@ -97,7 +97,8 @@ section{
         h3{
             font-size: 1.5rem;
             margin-bottom: 1rem;
-            color: var(--medium);
+            color: var(--darkest);
+            font-weight: 500;
             text-transform: capitalize;
         }
 
@@ -151,7 +152,8 @@ section{
         h3{
             font-size: 1.5rem;
             margin-bottom: 1rem;
-            color: var(--medium);
+            color: var(--darkest);
+            font-weight: 500;
             text-transform: capitalize;
         }
 
@@ -213,14 +215,15 @@ section{
         h3{
             font-size: 1.5rem;
             margin-bottom: 1rem;
-            color: var(--medium);
+            color: var(--darkest);
+            font-weight: 500;
             text-transform: capitalize;
         }
 
         .review{
             margin-bottom: 1rem;
             padding: 1rem;
-            border: 1px solid var(--light);
+            border: 1.5px solid var(--light);
             border-radius: 10px;
 
         h4{

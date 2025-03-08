@@ -26,6 +26,7 @@ import ordersRouter from './routes/OrderRoutes.js';
 import reminderRoutes from './routes/ReminderRoutes.js';
 import reviewRoutes from './routes/ReviewRoutes.js';
 import userRoutes from './routes/UserRoutes.js';
+import cartRoutes from './routes/CartRoutes.js';
 
 //public
 import { dirname } from 'path';
@@ -75,6 +76,7 @@ app.use('/api/v1/orders', ordersRouter);
 app.use('/api/v1/reminders', reminderRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/cart', cartRoutes);
 
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, './client/dist', 'index.html'));
