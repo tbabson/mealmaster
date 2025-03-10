@@ -17,11 +17,26 @@ export const getAllUsers = async (req, res) => {
 }
 
 // SHOW CURRENT USER CONTROLLER
+// export const showCurrentUser = async (req, res) => {
+//     const user = await User.findOne({ _id: req.user.userId })
+//     const userWithoutPassword = user.toJSON()
+//     res.status(StatusCodes.OK).json({ user: userWithoutPassword })
+//     //res.status(StatusCodes.OK).json({ user: req.user });;
+// };
+
 export const showCurrentUser = async (req, res) => {
-    const user = await User.findOne({ _id: req.user.userId })
-    const userWithoutPassword = user.toJSON()
-    res.status(StatusCodes.OK).json({ user: userWithoutPassword })
-    //res.status(StatusCodes.OK).json({ user: req.user });;
+    try {
+        const user = await User.findById(req.user.userId).select("-password");
+        if (!user) {
+            return res.status(StatusCodes.NOT_FOUND).json({ message: "User not found" });
+        }
+        res.status(StatusCodes.OK).json({ user });
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Server error fetching user",
+        });
+    }
 };
 
 // GET SINGLE USER CONTROLLER

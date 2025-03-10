@@ -1,58 +1,82 @@
 import { useNavigate } from "react-router-dom";
 import Wrapper from "../assets/wrappers/currentUser";
-import { useCallback } from "react";
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { IoMdCart } from "react-icons/io";
-import { useCurrentUser } from "../actionsAndLoaders/CurrentUserLoader";
-import { logoutUser } from "../Features/user/userSlice";
+import { fetchCurrentUser, logoutUser } from "../Features/user/userSlice";
 
 const CurrentUser = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, loading } = useCurrentUser();
 
-  // Correctly using the state property name "numItemsInCart"
+  // Get user data and loading state from Redux
+  const { user, loading } = useSelector((state) => state.user);
   const numMealsInCart = useSelector(
     (state) => state.cart?.numItemsInCart || 0
   );
 
-  const userName = user?.fullName || "Guest";
+  // Fetch current user on mount if not available
+  useEffect(() => {
+    if (!user) {
+      dispatch(fetchCurrentUser());
+    }
+  }, [dispatch, user]);
 
-  const handleLoginRedirect = useCallback(() => {
-    navigate("/login");
-  }, [navigate]);
+  const userName = user
+    ? user.fullName || user.name || user.email || "User"
+    : "Guest";
 
-  const handleRegisterRedirect = useCallback(() => {
-    navigate("/register");
-  }, [navigate]);
+  // Navigation handlers
+  const handleLoginRedirect = () => navigate("/login");
+  const handleRegisterRedirect = () => navigate("/register");
+
+  const handleLogout = () => {
+    dispatch(logoutUser())
+      .unwrap()
+      .then(() => navigate("/"))
+      .catch((error) => {
+        console.error("Logout failed:", error);
+        navigate("/");
+      });
+  };
 
   return (
     <Wrapper>
       <div className="currentUser">
         <div className="currentUserContainer">
-          <p className="user-name">Welcome, {userName}!</p>
-          {user ? (
-            <div className="logAndCart">
-              <button
-                onClick={() => dispatch(logoutUser())}
-                className="logout-btn"
-              >
-                Logout
-              </button>
-              <div className="indicator">
-                <IoMdCart />
-                <span>{numMealsInCart}</span>
-              </div>
-            </div>
+          {loading ? (
+            <p>Loading...</p>
           ) : (
-            <div>
-              <button onClick={handleLoginRedirect} className="login-btn">
-                Login
-              </button>
-              <button onClick={handleRegisterRedirect} className="login-btn">
-                Register
-              </button>
-            </div>
+            <>
+              <p className="user-name">Welcome, {userName}!</p>
+              {user ? (
+                <div className="logAndCart">
+                  <button
+                    onClick={handleLogout}
+                    className="logout-btn"
+                    disabled={loading}
+                  >
+                    Logout
+                  </button>
+                  <div className="indicator" onClick={() => navigate("/cart")}>
+                    <IoMdCart />
+                    <span>{numMealsInCart}</span>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <button onClick={handleLoginRedirect} className="login-btn">
+                    Login
+                  </button>
+                  <button
+                    onClick={handleRegisterRedirect}
+                    className="login-btn"
+                  >
+                    Register
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

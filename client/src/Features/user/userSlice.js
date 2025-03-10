@@ -1,6 +1,19 @@
+// userSlice.js - Fixed state management and token handling
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import customFetch from "../../utils/customFetch";
 import { toast } from "react-toastify";
+
+// Parse user from localStorage with error handling
+const getUserFromStorage = () => {
+    try {
+        const user = localStorage.getItem("user");
+        return user ? JSON.parse(user) : null;
+    } catch (error) {
+        console.error("Error parsing user from localStorage:", error);
+        localStorage.removeItem("user"); // Clean up invalid JSON
+        return null;
+    }
+};
 
 // Thunk to fetch the current user
 export const fetchCurrentUser = createAsyncThunk(
@@ -8,10 +21,9 @@ export const fetchCurrentUser = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const { data } = await customFetch.get("/users/currentuser");
-            // console.log("API Response:", data); // Debugging
-            return data.user; // ✅ Ensure we're returning `data.user`
+            return data.user;
         } catch (error) {
-            // console.error("Fetch user error:", error);
+            console.error("Fetch user error:", error.response?.data || error.message);
             return rejectWithValue(error?.response?.data?.msg || "Failed to fetch user");
         }
     }
@@ -23,9 +35,12 @@ export const logoutUser = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             await customFetch.get("/auth/logout");
-            toast.success("Logged out successfully");
-            return null; // Reset user state
+            localStorage.removeItem("user");
+            return null;
         } catch (error) {
+            console.error("Logout error:", error.response?.data || error.message);
+            // Still remove the user from localStorage even if the API call fails
+            localStorage.removeItem("user");
             return rejectWithValue(error?.response?.data?.msg || "Logout failed");
         }
     }
@@ -35,14 +50,20 @@ export const logoutUser = createAsyncThunk(
 const userSlice = createSlice({
     name: "user",
     initialState: {
-        user: JSON.parse(localStorage.getItem("user")) || null, // ✅ Persist user state
+        user: getUserFromStorage(),
         loading: false,
         error: null,
     },
     reducers: {
-        logout(state) {
+        setUser: (state, action) => {
+            state.user = action.payload;
+            if (action.payload) {
+                localStorage.setItem("user", JSON.stringify(action.payload));
+            }
+        },
+        logout: (state) => {
             state.user = null;
-            localStorage.removeItem("user"); // ✅ Clear user on logout
+            localStorage.removeItem("user");
         },
     },
     extraReducers: (builder) => {
@@ -55,26 +76,35 @@ const userSlice = createSlice({
             .addCase(fetchCurrentUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload;
-                localStorage.setItem("user", JSON.stringify(action.payload)); // ✅ Store user in localStorage
+                // Only store in localStorage if we have meaningful data
+                if (action.payload) {
+                    localStorage.setItem("user", JSON.stringify(action.payload));
+                }
             })
             .addCase(fetchCurrentUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
                 state.user = null;
-                // toast.error(action.payload);
             })
 
             // Logout cases
+            .addCase(logoutUser.pending, (state) => {
+                state.loading = true;
+            })
             .addCase(logoutUser.fulfilled, (state) => {
+                state.loading = false;
                 state.user = null;
-                localStorage.removeItem("user");
+                state.error = null;
                 toast.success("Logged out successfully");
             })
             .addCase(logoutUser.rejected, (state, action) => {
-                // toast.error(action.payload);
+                state.loading = false;
+                state.user = null; // Still clear the user even if API call fails
+                state.error = action.payload;
+                toast.error(action.payload || "Error during logout");
             });
     },
 });
 
-
+export const { setUser, logout } = userSlice.actions;
 export default userSlice.reducer;

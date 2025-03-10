@@ -1,14 +1,45 @@
 import { configureStore } from '@reduxjs/toolkit';
 import cartReducer, { syncCart } from './Features/Cart/cartSlice';
 import userReducer from './Features/user/userSlice';
-import { persistStore, persistReducer } from 'redux-persist';
+import { persistStore, persistReducer, createTransform } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+
+// Create a transform to safely serialize and deserialize the cart items
+const CartTransform = createTransform(
+    // transform state on its way to being serialized and persisted
+    (inboundState) => {
+        // Create a safe-to-serialize copy of the state
+        return {
+            ...inboundState,
+            // Add a check to ensure cartItems exists before mapping
+            cartItems: inboundState.cartItems?.map(meal => ({
+                mealID: meal.mealID,
+                name: meal.name,
+                image: meal.image,
+                ingredients: meal.ingredients?.map(ingredient => ({
+                    name: ingredient.name,
+                    quantity: ingredient.quantity,
+                    price: ingredient.price,
+                    unit: ingredient.unit
+                })) || []
+            })) || []
+        };
+    },
+    // transform state being rehydrated
+    (outboundState) => {
+        // Return the state as is when rehydrating
+        return outboundState;
+    },
+    // only apply this transform to cartItems
+    { whitelist: ['cartItems'] }
+);
 
 // Configure persistence for cart
 const cartPersistConfig = {
     key: 'cart',
     storage,
-    whitelist: ['cartItems', 'numItemsInCart', 'cartTotal', 'shipping', 'tax', 'orderTotal'] // only persist these fields
+    whitelist: ['cartItems', 'numItemsInCart', 'cartTotal', 'shipping', 'tax', 'orderTotal'],
+    transforms: [CartTransform]
 };
 
 // Create the persisted reducer
@@ -34,7 +65,7 @@ const cartSyncMiddleware = store => next => action => {
         // Only sync if user is logged in
         if (user?.user?._id) {
             store.dispatch(syncCart({
-                userID: user.user._id,
+                userId: user.user._id,
                 cartItems: cart.cartItems
             }));
         }

@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import CartItem from "./CartItem";
 
 const CartItemList = () => {
-  const cartItems = useSelector((state) => state.cart.cartItems);
+  const cartItems = useSelector((state) => state.cart.cartItems) || [];
   const loading = useSelector((state) => state.cart.loading);
   const error = useSelector((state) => state.cart.error);
 
@@ -11,10 +11,15 @@ const CartItemList = () => {
   }
 
   if (error) {
-    return <p>Error loading cart: {error}</p>;
+    return (
+      <p>
+        Error loading cart:{" "}
+        {typeof error === "string" ? error : "Authentication error"}
+      </p>
+    );
   }
 
-  if (!cartItems || cartItems.length === 0) {
+  if (!Array.isArray(cartItems) || cartItems.length === 0) {
     return <p>Your cart is empty.</p>;
   }
 

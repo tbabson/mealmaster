@@ -56,7 +56,10 @@ initializeReminderSystem(); // Start the reminder scheduler
 //authenticateGoogleAPI()
 
 app.use(express.static(path.resolve(__dirname, 'client/dist')));
-app.use(cors())
+app.use(cors({
+  origin: 'http://localhost:5173', // Your frontend URL
+  credentials: true
+}))
 app.use(express.json());
 app.use(cookieParser());
 app.use(helmet())

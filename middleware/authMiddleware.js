@@ -6,6 +6,8 @@ import { verifyJWT } from '../utils/tokenUtils.js';
 
 export const authenticateUser = (req, res, next) => {
   const { token } = req.cookies;
+  console.log({ token });
+
 
   if (!token) throw new UnauthenticatedError('authentication invalid');
 
@@ -15,7 +17,7 @@ export const authenticateUser = (req, res, next) => {
     next();
   } catch (error) {
     // Clear the token cookie if authentication fails
-    //res.clearCookie("token");
+    res.clearCookie("token");
     throw new UnauthenticatedError('authentication invalid');
   }
 };

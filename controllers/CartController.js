@@ -94,16 +94,29 @@ import { NotFoundError } from "../errors/customErrors.js";
 // ✅ Fetch Cart for Logged-in User
 export const getCart = async (req, res) => {
     try {
+        console.log("getCart called with params:", req.params);
         const { userId } = req.params;
+
+        if (!userId) {
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message: "User ID is required"
+            });
+        }
+
         let cart = await Cart.findOne({ userId });
+        console.log("Cart found:", cart ? "Yes" : "No");
+
         if (!cart) {
             cart = new Cart({ userId, cartItems: [] });
             await cart.save();
         }
+
         res.status(StatusCodes.OK).json(cart);
     } catch (error) {
-        console.error("Error fetching cart:", error);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Server error fetching cart." });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Server error fetching cart.",
+            error: error.message
+        });
     }
 };
 
@@ -130,7 +143,8 @@ export const syncCart = async (req, res) => {
     } catch (error) {
         console.error("Error syncing cart:", error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-            message: "Failed to sync cart."
+            message: "Failed to sync cart.",
+            error: error.message
         });
     }
 };
