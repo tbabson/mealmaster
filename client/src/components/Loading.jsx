@@ -9,4 +9,5 @@ const Loading = () => {
     </Wrapper>
   );
 };
+
 export default Loading;

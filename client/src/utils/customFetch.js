@@ -45,9 +45,9 @@ customFetch.interceptors.response.use(
                 localStorage.removeItem("user");
 
                 // Show a message but do not redirect
-                toast.error("Please log in if needed.");
+                // toast.error("Please log in if needed.");
             } else if (status >= 500) {
-                toast.error("Server error. Please try again later.");
+                toast.error("Server error. Please reload the page.");
             }
         }
         return Promise.reject(error);

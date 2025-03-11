@@ -1,4 +1,4 @@
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate, useNavigation } from "react-router-dom";
 import { formatPrice } from "../utils/formatPrice";
 import Wrapper from "../assets/wrappers/SingleMeal";
 import { IoMdStar, IoMdStarOutline } from "react-icons/io";
@@ -16,9 +16,16 @@ const SingleMeal = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const navigation = useNavigation();
+
+  const isLoading = navigation.state === "loading";
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   if (!meal) {
-    return <Loading />;
+    return <div>No meal data found</div>;
   }
 
   const {
@@ -47,13 +54,14 @@ const SingleMeal = () => {
 
   const addToCart = () => {
     if (!user || !user.user) {
-      toast.error("You need to log in to add items to your cart.");
-      navigate("/login"); // ✅ Redirect to login
+      toast.error("Log in to add items to your cart.");
+
+      const currentPath = window.location.pathname;
+      navigate("/login", { state: { from: currentPath } }); // ✅ Redirect to login
       return;
     }
 
     dispatch(addItem({ meal: cartMeal }));
-    console.log({ meal: cartMeal });
   };
 
   const renderStars = (rating) => (
