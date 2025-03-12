@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Wrapper from "../assets/wrappers/currentUser";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -7,6 +7,7 @@ import { fetchCurrentUser, logoutUser } from "../Features/user/userSlice";
 
 const CurrentUser = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
 
   // Get user data and loading state from Redux
@@ -27,7 +28,9 @@ const CurrentUser = () => {
     : "Guest";
 
   // Navigation handlers
-  const handleLoginRedirect = () => navigate("/login");
+  const handleLoginRedirect = () =>
+    navigate("/login", { state: { from: location.pathname } });
+
   const handleRegisterRedirect = () => navigate("/register");
 
   const handleLogout = () => {
@@ -35,7 +38,6 @@ const CurrentUser = () => {
       .unwrap()
       .then(() => navigate("/"))
       .catch((error) => {
-        console.error("Logout failed:", error);
         navigate("/");
       });
   };

@@ -1,4 +1,9 @@
-import { useLoaderData, useNavigate, useNavigation } from "react-router-dom";
+import {
+  useLoaderData,
+  useNavigate,
+  useNavigation,
+  useLocation,
+} from "react-router-dom";
 import { formatPrice } from "../utils/formatPrice";
 import Wrapper from "../assets/wrappers/SingleMeal";
 import { IoMdStar, IoMdStarOutline } from "react-icons/io";
@@ -17,6 +22,7 @@ const SingleMeal = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const navigation = useNavigation();
+  const location = useLocation();
 
   const isLoading = navigation.state === "loading";
 
@@ -56,8 +62,7 @@ const SingleMeal = () => {
     if (!user || !user.user) {
       toast.error("Log in to add items to your cart.");
 
-      const currentPath = window.location.pathname;
-      navigate("/login", { state: { from: currentPath } }); // ✅ Redirect to login
+      navigate("/login", { state: { from: location.pathname } }); // ✅ Redirect back to the previous page
       return;
     }
 
