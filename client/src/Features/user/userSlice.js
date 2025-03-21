@@ -9,7 +9,6 @@ const getUserFromStorage = () => {
         const user = localStorage.getItem("user");
         return user ? JSON.parse(user) : null;
     } catch (error) {
-        console.error("Error parsing user from localStorage:", error);
         localStorage.removeItem("user"); // Clean up invalid JSON
         return null;
     }
@@ -22,8 +21,8 @@ export const fetchCurrentUser = createAsyncThunk(
         try {
             const { data } = await customFetch.get("/users/currentuser");
             return data.user;
+
         } catch (error) {
-            console.error("Fetch user error:", error.response?.data || error.message);
             return rejectWithValue(error?.response?.data?.msg || "Failed to fetch user");
         }
     }
@@ -38,7 +37,6 @@ export const logoutUser = createAsyncThunk(
             localStorage.removeItem("user");
             return null;
         } catch (error) {
-            console.error("Logout error:", error.response?.data || error.message);
             // Still remove the user from localStorage even if the API call fails
             localStorage.removeItem("user");
             return rejectWithValue(error?.response?.data?.msg || "Logout failed");

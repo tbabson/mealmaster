@@ -1,45 +1,116 @@
 import mongoose from 'mongoose';
-import { ORDERS } from "../utils/constants.js"
-import _default from "http-status-codes";
+import { ORDERS, DELIVERY } from "../utils/constants.js"
 
-// Order Item Schema to represent products within an order
-const OrderItemSchema = new mongoose.Schema({
-    ingredient: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Ingredient', // Reference to Ingredient model
-        required: true,
-    },
-    quantity: {
-        type: Number,
-        required: [true, 'Quantity is required'],
-    },
-    price: {
-        type: Number,
-        required: [true, 'Price is required'],
-    },
-});
 
-// Order Schema
-const OrderSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Reference to User model (assuming user authentication is implemented)
-        required: true,
+const OrderSchema = new mongoose.Schema(
+    {
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true
+        },
+        cartItems: [
+            {
+                mealID: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Meal",
+                    required: true
+                },
+                name: {
+                    type: String,
+                    required: true
+                },
+                image: {
+                    type: String,
+                    default: ''
+                },
+                ingredients: [
+                    {
+                        name: {
+                            type: String,
+                            required: true
+                        },
+                        quantity: {
+                            type: Number,
+                            required: true,
+                            min: 0
+                        },
+                        price: {
+                            type: Number,
+                            required: true,
+                            min: 0
+                        },
+                        unit: {
+                            type: String,
+                            default: 'g'
+                        }
+                    }
+                ]
+            }
+        ],
+        shippingAddress: {
+            fullName: { type: String, required: true },
+            address: { type: String, required: true },
+            city: { type: String, required: true },
+            postalCode: { type: String, required: true },
+            country: { type: String, required: true },
+            phone: { type: String, required: true }
+        },
+        paymentMethod: {
+            type: String,
+            required: true,
+            enum: ['stripe', 'bankTransfer']
+        },
+        paymentResult: {
+            id: { type: String },
+            status: { type: String },
+            update_time: { type: String },
+            email_address: { type: String }
+        },
+        taxPrice: {
+            type: Number,
+            required: true,
+            default: 0.0
+        },
+        shippingPrice: {
+            type: Number,
+            required: true,
+            default: 300 // Matching the cart slice shipping default
+        },
+        totalAmount: {
+            type: Number,
+            required: true
+        },
+        status: {
+            type: String,
+            enum: Object.values(ORDERS),
+            default: ORDERS.PENDING,
+        },
+        isPaid: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        paidAt: {
+            type: Date
+        },
+        deliveryStatus: {
+            type: String,
+            enum: Object.values(DELIVERY),
+            default: DELIVERY.SCHEDULED,
+        },
+        deliveredAt: {
+            type: Date
+        },
+        trackingNumber: {
+            type: String
+        },
+        transactionId: {
+            type: String
+        }
     },
-    items: [OrderItemSchema], // Array of order items
-    totalAmount: {
-        type: Number,
-        required: [true, 'Total amount is required'],
-    },
-    status: {
-        type: String,
-        enum: Object.values(ORDERS),
-        default: ORDERS.PENDING,
-    },
-    delivery: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Delivery', // Reference to Delivery model
-    },
-}, { timestamps: true });
+    { timestamps: true }
+);
 
 export default mongoose.model('Order', OrderSchema);
+

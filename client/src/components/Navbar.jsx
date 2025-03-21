@@ -56,6 +56,9 @@ const Navbar = () => {
               <NavLink to="/cart" className="nav-link" onClick={toggleMenu}>
                 Cart
               </NavLink>
+              <NavLink to="/orders" className="nav-link" onClick={toggleMenu}>
+                Orders
+              </NavLink>
               <NavLink to="/profile" className="nav-link" onClick={toggleMenu}>
                 Profile
               </NavLink>

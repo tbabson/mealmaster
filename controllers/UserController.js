@@ -3,17 +3,49 @@ import { StatusCodes } from 'http-status-codes'
 import { hashPassword, comparePassword } from '../utils/passwordUtils.js'
 import { BadRequestError, UnauthenticatedError } from '../errors/customErrors.js'
 import Order from '../models/OrderModel.js'; // Ensure models are imported
-import ShoppingList from '../models/shoppingListModel.js';
-import Reminder from '../models/ReminderModel.js';
+import Reminder from '../models/ReminderModel.js'
+import Cart from '../models/CartModel.js';
 
 
 
 
 
 // GET ALL USERS CONTROLLER
+// export const getAllUsers = async (req, res) => {
+//     const users = await User.find({})
+//     res.status(StatusCodes.OK).json({ users, count: users.length })
+// }
 export const getAllUsers = async (req, res) => {
-    const users = await User.find({})
-    res.status(StatusCodes.OK).json({ users, count: users.length })
+    try {
+        // Fetch all users and populate orders and reminders
+        const users = await User.find({})
+            .populate('orders')
+            .populate('reminders');
+
+        // Need to handle cartItems separately since Cart references User via userId
+        const usersWithData = await Promise.all(users.map(async (user) => {
+            const userData = user.toObject();
+
+            // Find cart items for this user
+            const cartItems = await Cart.find({ userId: user._id });
+
+            // Add cart items to user data using the correct field name from schema
+            return {
+                ...userData,
+                cartItems
+            };
+        }));
+
+        res.status(StatusCodes.OK).json({
+            users: usersWithData,
+            count: users.length
+        });
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "An error occurred while fetching users",
+            error
+        });
+    }
 }
 
 // SHOW CURRENT USER CONTROLLER
@@ -43,22 +75,26 @@ export const showCurrentUser = async (req, res) => {
 export const getUser = async (req, res) => {
     try {
         // Fetch the user
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.id)
+            .populate('orders')
+            .populate('reminders');
 
         if (!user) {
             return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' });
         }
 
-        // Fetch only the documents created by the user
+        // Fetch cart items separately
+        const cartItems = await Cart.find({ userId: user._id });
+
+        // Fetch other documents
         const orders = await Order.find({ user: user._id });
-        const shoppingLists = await ShoppingList.find({ user: user._id });
         const reminders = await Reminder.find({ user: user._id });
 
         // Send the response with user and related documents
         res.status(StatusCodes.OK).json({
             user,
             orders,
-            shoppingLists,
+            cartItems,
             reminders,
         });
     } catch (error) {

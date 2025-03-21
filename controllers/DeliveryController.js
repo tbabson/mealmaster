@@ -4,29 +4,6 @@ import Order from '../models/OrderModel.js'; // Import the Order model
 import { NotFoundError } from '../errors/customErrors.js';
 
 
-// @desc    Update delivery tracking status
-// @route   PUT /api/delivery/:id/tracking
-// export const updateTrackingStatus = async (req, res) => {
-//     const { id } = req.params;
-//     const { status } = req.body;
-
-//     try {
-//         const delivery = await Delivery.findById(id);
-//         if (!delivery) {
-//             return res.status(StatusCodes.NOT_FOUND).json({ message: 'Delivery not found' });
-//         }
-
-//         // Update the tracking status
-//         delivery.trackingUpdates.push({ status });
-//         delivery.deliveryStatus = status;
-//         await delivery.save();
-
-//         res.status(StatusCodes.OK).json({ delivery });
-//     } catch (error) {
-//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
-//     }
-// };
-
 export const updateTrackingStatus = async (req, res) => {
     const { id: orderId } = req.params;  // The order ID will be passed as a parameter
     const { status } = req.body;

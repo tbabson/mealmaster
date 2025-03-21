@@ -3,23 +3,26 @@ import styled from "styled-components";
 
 const Wrapper = styled.div`
 .section-title{
-margin: 2.5rem auto 1rem;
+margin: 1rem 0;
+width: 100%;
+}
+
+.section-title-container{
 width: 90%;
-
-
+margin: 0 auto;
 }
 
 .section-title h2{
 text-transform: capitalize;
 padding-bottom: 0.5rem;
-color: var(--secondary-600);
+color: var(--secondary);
 font-weight: 600;
 font-size: 1.2rem;
 }
 
 .section-title p{
 //padding: 0.5rem 1rem;
-color: var(--primary-600);
+color: var(--primary);
 font-size: 1rem;
 //font-family: "Roboto", sans-serif;
 }

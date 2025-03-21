@@ -43,7 +43,7 @@ import {
 
 // Cart Routes
 router.get('/:userId', authenticateUser, getCart);
-router.post("/sync", syncCart);  // New endpoint for syncing the entire cart
+router.post("/sync", authenticateUser, syncCart);  // New endpoint for syncing the entire cart
 router.post("/add", authenticateUser, addToCart);  // Kept for backward compatibility
 router.delete("/:userId/remove/:mealID", authenticateUser, removeMeal);
 router.delete("/:userId/remove/:mealID/:ingredientName", authenticateUser, removeIngredient);  // New endpoint

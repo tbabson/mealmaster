@@ -4,8 +4,10 @@ const SectionTitle = ({ title, description }) => {
   return (
     <Wrapper>
       <div className="section-title">
-        <h2>{title}</h2>
-        <p>{description}</p>
+        <div className="section-title-container">
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </div>
       </div>
     </Wrapper>
   );

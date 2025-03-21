@@ -20,7 +20,7 @@ const Cart = () => {
           </div>
           <div className="cartTotals">
             <CartTotals />
-            <Link to="/orders" className="btn btn-primary">
+            <Link to="/checkout" className="btn btn-primary">
               Proceed to Checkout
             </Link>
           </div>

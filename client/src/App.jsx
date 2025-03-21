@@ -23,12 +23,16 @@ import {
   UpdateMeal,
   DeleteMeal,
 } from "./pages";
+import OrderSuccess from "./pages/OrderSuccess";
+
 //Actions
 import { action as registerAction } from "./actionsAndLoaders/RegisterAction";
 import { action as loginAction } from "./actionsAndLoaders/LoginAction";
+
 //Loaders
 import { loader as mealsLoader } from "./actionsAndLoaders/MealsLoader";
 import { loader as singleMealLoader } from "./actionsAndLoaders/SingleMealLoader";
+import { loader as userOrderLoader } from "./actionsAndLoaders/OrderLoader";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,8 +83,13 @@ const router = createBrowserRouter([
         element: <Checkout />,
       },
       {
+        path: "order-success",
+        element: <OrderSuccess />,
+      },
+      {
         path: "orders",
         element: <Orders />,
+        loader: userOrderLoader(queryClient, store),
       },
     ],
   },

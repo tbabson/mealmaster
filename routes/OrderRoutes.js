@@ -1,33 +1,26 @@
-import express from 'express';
+import { Router } from 'express';
+const router = Router();
 import {
     placeOrder,
     getUserOrders,
     getOrderById,
-    cancelOrder,
+    updateOrderStatus,
+    updateDeliveryStatus,
+    updatePaymentStatus,
+    deleteOrder
 } from '../controllers/OrderController.js';
-import { updateTrackingStatus, getTrackingUpdates } from '../controllers/DeliveryController.js';
-import {
-    authenticateUser,
-    authorizePermissions,
-} from '../middleware/authMiddleware.js';
+import { authenticateUser, authorizePermissions } from '../middleware/authMiddleware.js';
 
-const router = express.Router();
+// Order Routes
+router.post('/place', authenticateUser, placeOrder); // Place an order
 
-// Order routes
-router.post('/', authenticateUser, placeOrder); // Place a new order
-router.get('/', authenticateUser, getUserOrders); // Get all user orders
-router.get('/:id', authenticateUser, getOrderById); // Get order by ID
-router.delete('/:id', authenticateUser, cancelOrder); // Cancel an order
+// Use distinct path patterns to avoid conflicts
+router.get('/user/:userId', authenticateUser, getUserOrders); // Get all orders for a user
+router.get('/id/:orderId', authenticateUser, getOrderById); // Get a single order by ID
 
-////DELIVERY ROUTES////
-
-// Route to update tracking status
-router.patch('/:id/delivery/tracking', authenticateUser, authorizePermissions('admin'), updateTrackingStatus);
-
-router.get('/:id/delivery/tracking', authenticateUser, getTrackingUpdates); // Get tracking updates
-
-
+router.patch('/:orderId/status', authenticateUser, authorizePermissions('admin'), updateOrderStatus); // Update order status
+router.patch('/:orderId/delivery', authenticateUser, authorizePermissions('admin'), updateDeliveryStatus); // Update delivery status
+router.patch('/:orderId/payment', authenticateUser, authorizePermissions('admin'), updatePaymentStatus); // Update payment status
+router.delete('/:orderId', authenticateUser, authorizePermissions('admin'), deleteOrder); // Delete an order (admin only)
 
 export default router;
-
-// initiate the shopping list such that it is created based on meal.ingredients and rewrite the shoppinglist schema and controller in accordance to the adjustment.

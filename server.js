@@ -27,6 +27,7 @@ import reminderRoutes from './routes/ReminderRoutes.js';
 import reviewRoutes from './routes/ReviewRoutes.js';
 import userRoutes from './routes/UserRoutes.js';
 import cartRoutes from './routes/CartRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
 
 //public
 import { dirname } from 'path';
@@ -35,6 +36,8 @@ import path from 'path';
 
 //Middleware
 import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
+
+import { handleStripeWebhook } from './controllers/paymentControllers.js';
 
 
 cloudinary.config({
@@ -56,10 +59,24 @@ initializeReminderSystem(); // Start the reminder scheduler
 //authenticateGoogleAPI()
 
 app.use(express.static(path.resolve(__dirname, 'client/dist')));
+// Fix the syntax error
 app.use(cors({
   origin: 'http://localhost:5173', // Your frontend URL
-  credentials: true
-}))
+  credentials: true,
+  // Add these headers to help with CORS
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+
+// IMPORTANT: Add the Stripe webhook route BEFORE the JSON body parser
+// This ensures the raw body is available for Stripe signature verification
+app.post('/api/v1/payment/webhook',
+  express.raw({ type: 'application/json' }),
+  handleStripeWebhook
+);
+
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(helmet())
@@ -80,6 +97,7 @@ app.use('/api/v1/reminders', reminderRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/cart', cartRoutes);
+app.use('/api/v1/payment', paymentRoutes);
 
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, './client/dist', 'index.html'));

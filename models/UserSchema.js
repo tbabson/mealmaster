@@ -22,10 +22,10 @@ const UserSchema = new mongoose.Schema({
       ref: 'Order',
     },
   ],
-  shoppingLists: [
+  cartItems: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'ShoppingList',
+      ref: 'Cart',
     },
   ],
   reminders: [
