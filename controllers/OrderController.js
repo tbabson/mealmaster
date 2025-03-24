@@ -6,12 +6,7 @@ import { ORDERS, DELIVERY } from "../utils/constants.js";
 // ✅ Place an Order
 export const placeOrder = async (req, res) => {
   try {
-    const {
-      userId,
-      shippingAddress,
-      paymentMethod,
-      transactionId
-    } = req.body;
+    const { userId, shippingAddress, paymentMethod, transactionId } = req.body;
 
     if (!userId || !shippingAddress || !paymentMethod) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -35,6 +30,9 @@ export const placeOrder = async (req, res) => {
     const taxPrice = totalAmount * 0.1; // 10% tax rate from cart slice
     const shippingPrice = 300; // Default from cart slice
 
+    // Generate a random tracking number
+    const trackingNumber = `TRACK${Math.floor(Math.random() * 100000)}`;
+
     const order = new Order({
       userId,
       cartItems: cart.cartItems,
@@ -45,7 +43,8 @@ export const placeOrder = async (req, res) => {
       taxPrice,
       shippingPrice,
       status: ORDERS.PENDING,
-      deliveryStatus: DELIVERY.SCHEDULED
+      deliveryStatus: DELIVERY.SCHEDULED,
+      trackingNumber, // Set the tracking number here
     });
 
     await order.save();
@@ -62,6 +61,8 @@ export const placeOrder = async (req, res) => {
     });
   }
 };
+
+
 
 // ✅ Get Orders for a User
 export const getUserOrders = async (req, res) => {

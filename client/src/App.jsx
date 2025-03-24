@@ -15,6 +15,7 @@ import {
   SingleMeal,
   Checkout,
   Orders,
+  SingleOrder,
   Admin,
   ChangePassword,
   Login,
@@ -32,7 +33,8 @@ import { action as loginAction } from "./actionsAndLoaders/LoginAction";
 //Loaders
 import { loader as mealsLoader } from "./actionsAndLoaders/MealsLoader";
 import { loader as singleMealLoader } from "./actionsAndLoaders/SingleMealLoader";
-import { loader as userOrderLoader } from "./actionsAndLoaders/OrderLoader";
+import { loader as ordersLoader } from "./actionsAndLoaders/OrderLoader";
+import { loader as singleOrder } from "./actionsAndLoaders/SingleOrderLoader";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -87,9 +89,14 @@ const router = createBrowserRouter([
         element: <OrderSuccess />,
       },
       {
-        path: "orders",
+        path: "/orders",
         element: <Orders />,
-        loader: userOrderLoader(queryClient, store),
+        loader: ordersLoader(queryClient, store),
+      },
+      {
+        path: "/orders/:orderId",
+        element: <SingleOrder />,
+        loader: singleOrder(queryClient),
       },
     ],
   },

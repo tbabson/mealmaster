@@ -103,7 +103,10 @@ const OrderSchema = new mongoose.Schema(
             type: Date
         },
         trackingNumber: {
-            type: String
+            type: String,
+            default: function () {
+                return `TRACK${Math.floor(Math.random() * 100000)}`;
+            },
         },
         transactionId: {
             type: String

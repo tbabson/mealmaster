@@ -16,7 +16,7 @@ router.post('/place', authenticateUser, placeOrder); // Place an order
 
 // Use distinct path patterns to avoid conflicts
 router.get('/user/:userId', authenticateUser, getUserOrders); // Get all orders for a user
-router.get('/id/:orderId', authenticateUser, getOrderById); // Get a single order by ID
+router.get('/:orderId', authenticateUser, getOrderById); // Get a single order by ID
 
 router.patch('/:orderId/status', authenticateUser, authorizePermissions('admin'), updateOrderStatus); // Update order status
 router.patch('/:orderId/delivery', authenticateUser, authorizePermissions('admin'), updateDeliveryStatus); // Update delivery status
