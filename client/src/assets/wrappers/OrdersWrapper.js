@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 const Wrapper = styled.section`
-  max-width: 1200px;
+  max-width: 90%;
   margin: 0 auto;
   padding: 2rem 1rem;
 
@@ -46,7 +46,7 @@ const Wrapper = styled.section`
 
   .orders-title {
     font-size: 1.8rem;
-    color: #333;
+    color: var(--darkest);
     margin: 0;
   }
 
@@ -59,11 +59,22 @@ const Wrapper = styled.section`
   }
 
   .no-orders {
+    max-width: 100%;
     text-align: center;
     padding: 3rem;
-    background-color: #f9f9f9;
+    background-color: var(--light);
     border-radius: 8px;
     margin: 2rem auto;
+  }
+
+  .no-orders h2{
+    color: var(--dark);
+    margin-bottom: 1rem;
+  }
+  .no-orders p{
+    color: var(--dark);
+    margin-bottom: 1rem;
+    line-height: 1.5;
   }
 
   .orders-grid {

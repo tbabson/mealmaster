@@ -98,7 +98,7 @@ const SingleOrder = () => {
             <span>Delivery Status:</span>
             <span>{order.deliveryStatus}</span>
           </p>
-          <p>
+          <p className="payment-method">
             <span>Payment Method:</span>
             <span>{order.paymentMethod}</span>
           </p>
