@@ -32,9 +32,9 @@ const Orders = () => {
         </div>
         <div className="no-orders">
           <h2>No orders found</h2>
-          <p>You haven't placed any orders yet.</p>
-          <Link to="/meals" className="btn">
-            Browse Meals
+          <p>Sign in to see your order update.</p>
+          <Link to="/login" className="btn">
+            Sign In
           </Link>
         </div>
       </Wrapper>
