@@ -51,8 +51,8 @@ const Wrapper = styled.section`
   }
 
   .orders-count {
-    color: #666;
-    background-color: #f0f0f0;
+    color: var(--dark);
+    background-color: var(--light);
     padding: 0.3rem 0.8rem;
     border-radius: 50px;
     font-size: 0.9rem;
@@ -84,7 +84,7 @@ const Wrapper = styled.section`
   }
 
   .order-card {
-    background-color: #fff;
+    background-color: var(--white);
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
@@ -100,16 +100,17 @@ const Wrapper = styled.section`
     display: flex;
     justify-content: space-between;
     padding: 1.2rem;
-    background-color: #f9f9f9;
+    background-color: var(--light);
     border-bottom: 1px solid #eaeaea;
   }
 
   .order-number {
     font-weight: 600;
+    color: var(--dark);
   }
 
   .order-date {
-    color: #666;
+    color: var(--dark);
     font-size: 0.9rem;
   }
 
@@ -146,7 +147,7 @@ const Wrapper = styled.section`
 
   .items-count {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--dark);
   }
 
   .order-details {
@@ -154,12 +155,13 @@ const Wrapper = styled.section`
     justify-content: space-between;
     align-items: center;
     padding-top: 1rem;
-    border-top: 1px solid #eaeaea;
+    border-top: 1px solid #ff5722;
   }
 
   .order-total {
     font-weight: 600;
     font-size: 1.1rem;
+    color: var(--dark);
   }
 
   .status-badge {
@@ -194,7 +196,7 @@ const Wrapper = styled.section`
   .view-button {
     display: block;
     text-align: center;
-    background-color: #4b70e2;
+    background-color: var(--primary);
     color: white;
     text-decoration: none;
     padding: 0.8rem;
@@ -204,7 +206,7 @@ const Wrapper = styled.section`
     transition: background-color 0.2s;
     
     &:hover {
-      background-color: #3a5bbf;
+      background-color: var(--darkest);
     }
   }
 

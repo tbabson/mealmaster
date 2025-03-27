@@ -9,8 +9,8 @@
 export const formatPrice = (price) => {
     const nairaAmount = new Intl.NumberFormat('en-NG', {
         style: 'currency',
-        currency: 'NGN', // ✅ Fixed currency code
-    }).format(price / 100); // No need for `.toFixed(2)`, Intl handles it
-
+        currency: 'NGN',
+    }).format(price);
     return nairaAmount;
 };
+

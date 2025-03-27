@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import customFetch from "../../utils/customFetch";
 import { toast } from "react-toastify";
+import debounce from "lodash.debounce";
 
 const initialState = {
     cartItems: [],
@@ -11,6 +12,7 @@ const initialState = {
     orderTotal: 0,
     loading: false,
     error: null,
+    lastSyncedCart: [],
 };
 
 // Fetch cart from backend
@@ -24,15 +26,19 @@ export const fetchCart = createAsyncThunk("cart/fetchCart", async (userId, { rej
     }
 });
 
-// Sync cart with backend
-export const syncCart = createAsyncThunk("cart/syncCart", async ({ userId, cartItems }, { rejectWithValue }) => {
-    if (!userId) return rejectWithValue("User ID is required");
+// Sync cart with backend (debounced to prevent frequent calls)
+const debouncedSyncCart = debounce(async ({ userId, cartItems, dispatch }) => {
+    if (!userId) return;
     try {
-        const response = await customFetch.post("/cart/sync", { userId: userId, cartItems });
-        return response.data;
+        await customFetch.post("/cart/sync", { userId, cartItems });
+        dispatch(setLastSyncedCart(cartItems));
     } catch (error) {
-        return rejectWithValue(error.response?.data?.message || "Failed to sync cart");
+        toast.error(error.response?.data?.message || "Failed to sync cart");
     }
+}, 1000);
+
+export const syncCart = createAsyncThunk("cart/syncCart", async ({ userId, cartItems }, { dispatch }) => {
+    debouncedSyncCart({ userId, cartItems, dispatch });
 });
 
 const cartSlice = createSlice({
@@ -65,14 +71,17 @@ const cartSlice = createSlice({
                     ingredients: meal.ingredients,
                 });
             }
+            toast.success("Item added to cart");
             cartSlice.caseReducers.calculateTotals(state);
         },
         removeMeal: (state, action) => {
             state.cartItems = state.cartItems.filter((meal) => meal.mealID !== action.payload.mealID);
+            toast.success("Meal removed from cart");
             cartSlice.caseReducers.calculateTotals(state);
         },
         clearCart: (state) => {
             Object.assign(state, initialState);
+            toast.success("Cart cleared successfully");
         },
         removeIngredient: (state, action) => {
             const { mealID, ingredientName } = action.payload;
@@ -82,6 +91,7 @@ const cartSlice = createSlice({
             if (!meal.ingredients.length) {
                 state.cartItems = state.cartItems.filter((i) => i.mealID !== mealID);
             }
+            toast.success("Ingredient removed from meal");
             cartSlice.caseReducers.calculateTotals(state);
         },
         updateIngredientQuantity: (state, action) => {
@@ -97,6 +107,7 @@ const cartSlice = createSlice({
                     state.cartItems = state.cartItems.filter((i) => i.mealID !== mealID);
                 }
             }
+            toast.success("Ingredient quantity updated");
             cartSlice.caseReducers.calculateTotals(state);
         },
         calculateTotals: (state) => {
@@ -111,7 +122,9 @@ const cartSlice = createSlice({
             state.tax = 0.1 * state.cartTotal;
             state.orderTotal = state.cartTotal + state.shipping + state.tax;
         },
-        triggerSync: () => { },
+        setLastSyncedCart: (state, action) => {
+            state.lastSyncedCart = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -128,21 +141,6 @@ const cartSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
                 toast.error(action.payload || "Failed to load cart");
-            })
-            .addCase(syncCart.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(syncCart.fulfilled, (state, action) => {
-                state.loading = false;
-                if (action.payload?.cartItems) {
-                    state.cartItems = action.payload.cartItems;
-                    cartSlice.caseReducers.calculateTotals(state);
-                }
-            })
-            .addCase(syncCart.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-                toast.error(action.payload || "Failed to sync cart");
             });
     },
 });
@@ -154,6 +152,6 @@ export const {
     removeIngredient,
     updateIngredientQuantity,
     calculateTotals,
-    triggerSync,
+    setLastSyncedCart,
 } = cartSlice.actions;
 export default cartSlice.reducer;
