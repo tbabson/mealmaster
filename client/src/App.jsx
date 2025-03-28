@@ -23,12 +23,14 @@ import {
   AddMeal,
   UpdateMeal,
   DeleteMeal,
+  Reminder,
 } from "./pages";
 import OrderSuccess from "./pages/OrderSuccess";
 
 //Actions
 import { action as registerAction } from "./actionsAndLoaders/RegisterAction";
 import { action as loginAction } from "./actionsAndLoaders/LoginAction";
+// import { action as reminderAction } from "./actionsAndLoaders/ReminderAction";
 
 //Loaders
 import { loader as mealsLoader } from "./actionsAndLoaders/MealsLoader";
@@ -97,6 +99,11 @@ const router = createBrowserRouter([
         path: "/orders/:orderId",
         element: <SingleOrder />,
         loader: singleOrder(queryClient),
+      },
+      {
+        path: "/reminders",
+        element: <Reminder />,
+        // action: reminderAction,
       },
     ],
   },

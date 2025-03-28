@@ -1,6 +1,23 @@
 import styled from "styled-components";
 
 const Wrapper = styled.div`
+.center-title p{
+    text-align: center;
+    margin: 0 auto;
+    margin-top: 5rem;
+}
+
+.login-prompt{
+    width: 90%;
+   text-align: center;
+
+    .btn-primary{        
+        margin-bottom: 2rem;
+    }
+}
+
+
+
 .cartContainer{
     display: grid;
     grid-template-columns: 1fr;
@@ -19,9 +36,8 @@ const Wrapper = styled.div`
     @media (min-width: 1024px){
         grid-template-columns: 2fr 1fr;
     }
+    
 }
-
-
 
 
 `

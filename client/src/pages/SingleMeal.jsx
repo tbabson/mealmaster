@@ -69,6 +69,12 @@ const SingleMeal = () => {
     dispatch(addItem({ meal: cartMeal }));
   };
 
+  // New onClick function for "Create Reminder"
+  const handleCreateReminder = () => {
+    // Redirect to the /reminders route, passing the meal details as state
+    navigate("/reminders", { state: { meal: meal.meal } });
+  };
+
   const renderStars = (rating) => (
     <>
       {Array.from({ length: 5 }, (_, index) =>
@@ -118,7 +124,12 @@ const SingleMeal = () => {
                 <button onClick={addToCart} className="btn btn-primary">
                   Add to Cart
                 </button>
-                <button className="btn btn-secondary">Create Reminder</button>
+                <button
+                  onClick={handleCreateReminder}
+                  className="btn btn-secondary"
+                >
+                  Create Reminder
+                </button>
               </div>
 
               <div className="divider"></div>

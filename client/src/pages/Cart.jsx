@@ -4,10 +4,27 @@ import { Link } from "react-router-dom";
 import Wrapper from "../assets/wrappers/Cart";
 
 const Cart = () => {
-  const numOfMealsInCart = useSelector((state) => state.cart.numItemsInCart);
+  const { numItemsInCart } = useSelector((state) => state.cart);
+  const { user } = useSelector((state) => state.user); // Check if user is logged in
 
-  if (numOfMealsInCart === 0) {
-    return <SectionTitle description="Tour cart is empty" />;
+  if (!user) {
+    return (
+      <Wrapper>
+        <SectionTitle
+          className="center-title"
+          description="Login to add meals to your cart."
+        />
+        <div className="login-prompt">
+          <Link to="/login" className="btn btn-primary">
+            Login
+          </Link>
+        </div>
+      </Wrapper>
+    );
+  }
+
+  if (numItemsInCart === 0) {
+    return <SectionTitle description="Your cart is empty." />;
   }
 
   return (
@@ -29,4 +46,5 @@ const Cart = () => {
     </Wrapper>
   );
 };
+
 export default Cart;

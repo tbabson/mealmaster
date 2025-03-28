@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import cartReducer, { syncCart } from './Features/Cart/cartSlice';
 import userReducer from './Features/user/userSlice';
+import reminderSliceReducer from './Features/Reminder/reminderSlice';
 import { persistStore, persistReducer, createTransform } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
@@ -78,6 +79,7 @@ const store = configureStore({
     reducer: {
         cart: persistedCartReducer, // Use the persisted reducer for cart
         user: userReducer,
+        reminders: reminderSliceReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

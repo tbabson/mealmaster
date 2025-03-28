@@ -1,301 +1,3 @@
-// import cron from 'node-cron';
-// import dotenv from 'dotenv';
-// dotenv.config();
-// import nodemailer from 'nodemailer';
-// import Reminder from '../models/ReminderModel.js';
-// import { StatusCodes } from 'http-status-codes';
-// import {
-//   sendPushNotification,
-//   syncWithCalendar,
-// } from './ReminderController.js';
-// import moment from 'moment-timezone';
-
-// Email setup for Nodemailer
-// export const transporter = nodemailer.createTransport({
-//   service: 'Gmail',
-//   host: 'smtp.gmail.com',
-//   port: 465,
-//   secure: true,// false for port 587
-//   auth: {
-//     user: process.env.EMAIL_USER,
-//     pass: process.env.EMAIL_PASS,
-//   },
-// });
-
-// Function to calculate the next reminder time based on frequency
-// const getNextReminderTime = (currentReminderTime, frequency) => {
-//   const nextTime = new Date(currentReminderTime);
-
-//   switch (frequency) {
-//     case 'daily':
-//       nextTime.setDate(nextTime.getDate() + 1);
-//       break;
-//     case 'weekly':
-//       nextTime.setDate(nextTime.getDate() + 7);
-//       break;
-//     case 'monthly':
-//       nextTime.setMonth(nextTime.getMonth() + 1);
-//       break;
-//     // Add more cases for other frequencies if needed
-//     default:
-//       return null; // For non-recurring reminders
-//   }
-
-//   return nextTime;
-// };
-
-// // Function to check for reminders that are due and trigger notifications
-// export const scheduleReminders = () => {
-//   // Run every minute to check for upcoming reminders
-//   cron.schedule('* * * * *', async () => {
-//     try {
-//       const now = new Date();
-
-//       // Find reminders that are due for notification and haven't been notified yet
-//       const dueReminders = await Reminder.find({
-//         reminderTime: { $lte: new Date(new Date().getTime() + 60000) }, // 1-minute buffer
-//         notified: false,
-//       }).populate(['user', 'meal']);
-
-
-//       // Process each due reminder
-//       for (const reminder of dueReminders) {
-//         // Send the appropriate notification
-//         if (reminder.notificationMethod === 'email') {
-//           await sendEmailReminder({ params: { id: reminder._id } }, { status: () => ({ json: () => { } }) });
-//         } else if (reminder.notificationMethod === 'push') {
-//           await sendPushNotification(
-//             { params: { id: reminder._id } },
-//             { status: () => ({ json: () => {} }) }
-//           );
-//         } else if (reminder.notificationMethod === 'calendar') {
-//           await syncWithCalendar(
-//             { params: { id: reminder._id } },
-//             { status: () => ({ json: () => {} }) }
-//           );
-//         }
-
-//         // If recurring, update the reminderTime to the next occurrence
-//         if (reminder.isRecurring && reminder.recurringFrequency) {
-//           const nextReminderTime = getNextReminderTime(
-//             reminder.reminderTime,
-//             reminder.recurringFrequency
-//           );
-//           if (nextReminderTime) {
-//             reminder.reminderTime = nextReminderTime;
-//           } else {
-//             reminder.isRecurring = false; // Stop recurring if frequency is not recognized
-//           }
-//         } else {
-//           // If non-recurring, mark as notified
-//           reminder.notified = true;
-//         }
-
-//         // Save the updated reminder
-//         await reminder.save();
-//       }
-//     } catch (error) {
-//       console.error('Error processing reminders:', error);
-//     }
-//   });
-// };
-
-
-
-
-// Function to calculate the next reminder time based on frequency
-// Function to calculate the next reminder time based on frequency
-// const getNextReminderTime = (currentReminderTime, frequency) => {
-//   const nextTime = new Date(currentReminderTime);
-
-//   switch (frequency) {
-//     case 'daily':
-//       nextTime.setDate(nextTime.getDate() + 1);
-//       break;
-//     case 'weekly':
-//       nextTime.setDate(nextTime.getDate() + 7);
-//       break;
-//     case 'monthly':
-//       nextTime.setMonth(nextTime.getMonth() + 1);
-//       break;
-//     default:
-//       return null;  // For non-recurring reminders or unknown frequency
-//   }
-
-//   return nextTime;
-// };
-
-
-// // Automatically sends an email and updates the reminder schema after sending
-// const sendEmail = async (reminder) => {
-//   const mailOptions = {
-//     from: process.env.EMAIL_USER,
-//     to: reminder.user.email,
-//     subject: `Meal Reminder: ${reminder.meal.name}`,
-//     text: `Hello ${reminder.user.fullName}, just a reminder to prepare your meal: ${reminder.meal.name} at ${reminder.reminderTime}.`,
-//   };
-
-//   try {
-//     await transporter.sendMail(mailOptions);
-//     console.log(`Email sent for reminder ID: ${reminder._id}`);
-//     reminder.notified = true;
-//     await reminder.save(); // Update the schema after sending the email
-//   } catch (error) {
-//     console.error(`Error sending email for reminder ID ${reminder._id}:`, error);
-//   }
-// }
-
-// // Function to check for reminders that are due and trigger notifications
-// export const scheduleReminders = () => {
-//   // Run every minute to check for upcoming reminders
-//   cron.schedule('* * * * *', async () => {
-//     const now = new Date();
-//     console.log('Cron job triggered at', now);
-
-//     try {
-//       //const now = moment().tz("Africa/Lagos").toDate();
-//       //const now = moment().toDate(); // Current time in server's timezone
-
-//       // Find reminders that are due within the next minute and haven't been notified
-//       const dueReminders = await Reminder.find({
-//         //reminderTime: { $lte: new Date(now.getTime() + 60000) }, // 1-minute buffer
-//         reminderTime: { $lte: now },
-//         notified: false,
-//       }).populate(['user', 'meal']);
-
-//       if (dueReminders.length) {
-//         console.log(`Processing ${dueReminders.length} due reminders at`, now);
-//       }
-
-//       // Process each due reminder
-//       for (const reminder of dueReminders) {
-//         let notificationSent = false;
-
-//         // Check notification method and send the appropriate notification
-//         if (reminder.notificationMethod === 'email') {
-//           notificationSent = await sendEmail(reminder);
-//         } else if (reminder.notificationMethod === 'push') {
-//           await sendPushNotification({ params: { id: reminder._id } }, { status: () => ({ json: () => { } }) });
-//         } else if (reminder.notificationMethod === 'calendar') {
-//           await syncWithCalendar({ params: { id: reminder._id } }, { status: () => ({ json: () => { } }) });
-//         }
-
-
-//         // Update next reminder time if it's a recurring reminder
-//         // Handle recurring reminders by calculating the next reminder time
-//         if (notificationSent) {
-//           if (reminder.isRecurring && reminder.recurringFrequency) {
-//             const nextReminderTime = getNextReminderTime(reminder.reminderTime, reminder.recurringFrequency);
-//             reminder.reminderTime = nextReminderTime || reminder.reminderTime;
-//             reminder.isRecurring = !!nextReminderTime;
-//           } else {
-//             reminder.notified = true;
-//           }
-
-//           // Save the updated reminder
-//           await reminder.save();
-//         }
-//       }
-//     } catch (error) {
-//       console.error('Error processing reminders:', error);
-//     }
-//   });
-// };
-
-
-/////Email setup for Nodemailer//////
-
-// export const transporter = nodemailer.createTransport({
-//   service: 'Gmail',
-//   host: 'smtp.gmail.com',
-//   port: 465,
-//   secure: true,
-//   auth: {
-//     user: process.env.EMAIL_USER,
-//     pass: process.env.EMAIL_PASS,
-//   },
-// });
-
-// // Helper function to calculate the next reminder time based on frequency
-// const getNextReminderTime = (currentReminderTime, frequency) => {
-//   const nextTime = new Date(currentReminderTime);
-
-//   switch (frequency) {
-//     case 'daily':
-//       nextTime.setDate(nextTime.getDate() + 1);
-//       break;
-//     case 'weekly':
-//       nextTime.setDate(nextTime.getDate() + 7);
-//       break;
-//     case 'monthly':
-//       nextTime.setMonth(nextTime.getMonth() + 1);
-//       break;
-//     default:
-//       return null;
-//   }
-
-//   return nextTime;
-// };
-
-// // Function to send email and update reminder as notified
-// const sendEmailReminder = async (reminder) => {
-//   const mailOptions = {
-//     from: process.env.EMAIL_USER,
-//     to: reminder.user.email,
-//     subject: `Meal Reminder: ${reminder.meal.name}`,
-//     text: `Hello ${reminder.user.fullName}, just a reminder to prepare your meal: ${reminder.meal.name} at ${reminder.reminderTime}.`,
-//   };
-
-//   try {
-//     await transporter.sendMail(mailOptions);
-//     console.log(`Email sent for reminder ID: ${reminder._id}`);
-//     reminder.notified = true; // Update notified to true after sending email
-//     await reminder.save(); // Save the updated reminder
-//   } catch (error) {
-//     console.error(`Error sending email for reminder ID ${reminder._id}:`, error);
-//   }
-// };
-
-// // Main function to check for reminders due and send notifications
-// export const scheduleReminders = () => {
-//   cron.schedule('* * * * *', async () => {
-//     const now = moment().tz('Africa/Lagos').toDate();
-//     console.log('Cron job triggered at', now);
-
-//     try {
-//       const dueReminders = await Reminder.find({
-//         reminderTime: { $lte: now },
-//         notified: false,
-//       }).populate(['user', 'meal']);
-
-//       if (dueReminders.length) {
-//         console.log(`Processing ${dueReminders.length} due reminders`);
-//       }
-
-//       for (const reminder of dueReminders) {
-//         // Check notification method and send the appropriate notification
-//         if (reminder.notificationMethod === 'email') {
-//           await sendEmailReminder(reminder);
-//         } else if (reminder.notificationMethod === 'push') {
-//           await sendPushNotification({ params: { id: reminder._id } }, { status: () => ({ json: () => { } }) });
-//         } else if (reminder.notificationMethod === 'calendar') {
-//           await syncWithCalendar({ params: { id: reminder._id } }, { status: () => ({ json: () => { } }) });
-//         }
-
-//         // Update next reminder time if it's a recurring reminder
-//         if (reminder.isRecurring && reminder.recurringFrequency) {
-//           const nextReminderTime = getNextReminderTime(reminder.reminderTime, reminder.recurringFrequency);
-//           reminder.reminderTime = nextReminderTime || reminder.reminderTime;
-//           reminder.isRecurring = !!nextReminderTime;
-//           await reminder.save();
-//         }
-//       }
-//     } catch (error) {
-//       console.error('Error processing reminders:', error);
-//     }
-//   });
-// };
-
 /////NEW CODE//////
 
 
@@ -363,14 +65,22 @@ export const authenticateGoogleAPI = async () => {
 };
 
 // Function to send email reminder
+// Function to send email reminder
+// Function to send email reminder
 const sendEmailReminder = async (reminderId) => {
   try {
-    // Find the reminder and populate meal and user details
+    // Find the reminder and populate meal and user details.
+    // Note: If the steps are embedded (not references) you don't need to populate them,
+    // but if they're referenced, uncomment the nested populate below.
     const reminder = await Reminder.findById(reminderId)
       .populate({
         path: 'meal',
-        select: 'name picture ingredients preparationSteps', // Only fetch necessary fields
-        populate: { path: 'ingredients', select: 'name' } // Fetch ingredient names
+        select: 'name image ingredients preparationSteps', // Fetch necessary fields
+        populate: [
+          { path: 'ingredients', select: 'name' },
+          // Uncomment the next line if 'steps' inside 'preparationSteps' are references
+          // { path: 'preparationSteps.steps', select: 'stepNumber instruction duration' }
+        ]
       })
       .populate('user', 'email fullName'); // Populate user email and full name
 
@@ -379,44 +89,96 @@ const sendEmailReminder = async (reminderId) => {
       return false;
     }
 
-    // Extract meal and user details
+    // Extract meal and user details.
     const { meal, user, reminderTime } = reminder;
-    const ingredientNames = meal.ingredients.map(ingredient => ingredient.name).join(', ');
+    const ingredientNames = meal.ingredients.map(({ name }) => name).join(', ');
 
-    // Configure email content
+    // Check if preparationSteps object and its nested steps array exist and format them.
+    const formattedPreparationSteps =
+      meal.preparationSteps &&
+        meal.preparationSteps.steps &&
+        meal.preparationSteps.steps.length > 0
+        ? meal.preparationSteps.steps.map(({ _id, stepNumber, instruction, duration }) =>
+          `Step ${stepNumber} (ID: ${_id}): ${instruction} (Duration: ${duration})`
+        ).join('\n')
+        : 'No preparation steps provided.';
+
+    // Configure email content with both text and HTML versions.
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: user.email,
       subject: `Meal Reminder: ${meal.name}`,
-      text: `Hello ${user.fullName},\nJust a reminder to prepare your meal: ${meal.name}.\n
-      Image: ${meal.picture}\n
-      Ingredients: ${ingredientNames}\n
-      Preparation Steps: ${meal.preparationSteps.join(', ')}\n
-      Scheduled Time: ${reminderTime}\nEnjoy your meal!`
+      text: `Hello ${user.fullName},
+
+Just a reminder to prepare your meal: ${meal.name}
+
+Meal Details:
+- Image: ${meal.image}
+- Ingredients: ${ingredientNames}
+
+Preparation Steps:
+${formattedPreparationSteps}
+
+Scheduled Time: ${new Date(reminderTime).toLocaleString()}
+
+Enjoy your meal!`,
+      html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h1 style="color: #333;">Meal Reminder: ${meal.name}</h1>
+        
+        <p>Hello ${user.fullName},</p>
+        
+        <p>Just a reminder to prepare your delicious meal.</p>
+        
+        <div style="background-color: #f4f4f4; padding: 15px; border-radius: 5px;">
+          <h2 style="color: #2c3e50;">Meal Details</h2>
+          
+          ${meal.image ? `
+          <div style="text-align: center; margin-bottom: 15px;">
+            <img src="${meal.image}" alt="${meal.name}" style="max-width: 300px; border-radius: 10px;">
+          </div>` : ''}
+          
+          <h3 style="color: #34495e;">Ingredients</h3>
+          <ul style="list-style-type: disc; padding-left: 20px;">
+            ${meal.ingredients.map(({ name }) => `<li>${name}</li>`).join('')}
+          </ul>
+          
+          <h3 style="color: #34495e;">Preparation Steps</h3>
+          <ol style="padding-left: 20px;">
+            ${meal.preparationSteps &&
+          meal.preparationSteps.steps &&
+          meal.preparationSteps.steps.length > 0
+          ? meal.preparationSteps.steps.map(({ _id, stepNumber, instruction, duration }) => `
+              <li>
+                <strong>Step ${stepNumber} (ID: ${_id})</strong>: ${instruction}
+                <span style="color: #7f8c8d; font-style: italic; margin-left: 10px;">(Duration: ${duration})</span>
+              </li>
+            `).join('')
+          : '<li>No preparation steps provided.</li>'}
+          </ol>
+        </div>
+        
+        <p style="margin-top: 15px;">
+          <strong>Scheduled Time:</strong> ${new Date(reminderTime).toLocaleString()}
+        </p>
+        
+        <p style="color: #7f8c8d; font-style: italic;">Enjoy your meal!</p>
+      </body>
+      </html>`
     };
 
-    // Send email
+    // Send email.
     await transporter.sendMail(mailOptions);
     console.log(`Email sent for reminder`);
     return true;
-
   } catch (error) {
     console.error('Error sending email:', error);
     return false;
   }
 };
 
-// Function to send push notification
-const sendPushNotification = async (reminder) => {
-  try {
-    // Your push notification logic here
-    console.log(`Push notification sent for reminder ${reminder._id}`);
-    return true;
-  } catch (error) {
-    console.error('Error sending push notification:', error);
-    return false;
-  }
-};
 
 // Function to sync with calendar
 const syncWithCalendar = async (reminder) => {

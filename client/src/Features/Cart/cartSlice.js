@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import customFetch from "../../utils/customFetch";
 import { toast } from "react-toastify";
 import debounce from "lodash.debounce";
+import { logoutUser } from "../user/userSlice";
 
 const initialState = {
     cartItems: [],
@@ -141,8 +142,12 @@ const cartSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
                 toast.error(action.payload || "Failed to load cart");
+            })
+            .addCase(logoutUser.fulfilled, (state) => {
+                return initialState; // Reset the cart state when user logs out
             });
     },
+
 });
 
 export const {

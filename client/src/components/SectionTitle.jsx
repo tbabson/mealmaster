@@ -1,15 +1,16 @@
 import Wrapper from "../assets/wrappers/SectionTitle";
 
-const SectionTitle = ({ title, description }) => {
+const SectionTitle = ({ title, description, className = "" }) => {
   return (
     <Wrapper>
-      <div className="section-title">
+      <div className={`section-title ${className}`}>
         <div className="section-title-container">
-          <h2>{title}</h2>
-          <p>{description}</p>
+          {title && <h2>{title}</h2>}
+          {description && <p>{description}</p>}
         </div>
       </div>
     </Wrapper>
   );
 };
+
 export default SectionTitle;

@@ -9,19 +9,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 
-// Email setup for Nodemailer
-// const transporter = nodemailer.createTransport({
-//     service: 'Gmail',
-//     host: 'smtp.gmail.com',
-//     port: 465,
-//     secure: true,// false for port 587
-//     auth: {
-//         user: process.env.EMAIL_USER,
-//         pass: process.env.EMAIL_PASS,
-//     },
-// });
-
-
 // VAPID key configuration
 const vapidKeys = {
     publicKey: process.env.VAPID_PUBLIC_KEY,
@@ -33,33 +20,6 @@ webPush.setVapidDetails(
     vapidKeys.publicKey,
     vapidKeys.privateKey
 );
-
-// webPush.setVapidDetails(
-//     'mailto:babatunde.taiwoadekunle@gmail.com',
-//     process.env.VAPID_PUBLIC_KEY,
-//     process.env.VAPID_PRIVATE_KEY
-// );
-
-
-// @desc Save push subscription
-// @route POST /api/reminders/save-subscription/:id
-// export const savePushSubscription = async (req, res) => {
-//     const { id } = req.params;
-//     const { subscription } = req.body;
-
-//     try {
-//         const reminder = await Reminder.findById(id);
-//         if (!reminder) {
-//             return res.status(StatusCodes.NOT_FOUND).json({ message: 'Reminder not found' });
-//         }
-
-//         reminder.pushSubscription = subscription;
-//         await reminder.save();
-//         res.status(StatusCodes.OK).json({ message: 'Push subscription saved successfully' });
-//     } catch (error) {
-//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
-//     }
-// };
 
 
 // Save the push subscription in the database
@@ -134,81 +94,6 @@ export const createReminder = async (req, res) => {
     }
 };
 
-// @desc    Create a new meal reminder
-// @route   POST /api/reminders
-// export const createReminder = async (req, res) => {
-//     const { meal: mealId, reminderTime, notificationMethod, isRecurring, recurringFrequency, healthGoals } = req.body;
-//     const userId = req.user.userId; // Assuming user authentication
-
-//     try {
-//         // Validate or fetch the provided meal
-//         const meal = await Meal.findById(mealId);
-//         if (!meal) {
-//             return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid meal ID provided' });
-//         }
-
-//         // Validate or fetch the provided health goals
-//         const validHealthGoals = await HealthGoal.find({ _id: { $in: healthGoals } });
-//         if (validHealthGoals.length !== healthGoals.length) {
-//             return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid health goals provided' });
-//         }
-
-//         // Create a new reminder
-//         const reminder = await Reminder.create({
-//             user: userId,
-//             meal: meal._id,  // Link the valid meal ID
-//             reminderTime,
-//             notificationMethod,
-//             isRecurring,
-//             recurringFrequency,
-//             healthGoals: validHealthGoals.map(goal => goal._id), // Storing only the IDs of valid health goals
-//         });
-
-//         res.status(StatusCodes.CREATED).json({ reminder });
-//     } catch (error) {
-//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
-//     }
-// };
-
-// @desc    Send email reminder
-// @route   POST /api/reminders/send-email/:id
-
-// export const sendEmailReminder = async (req, res) => {
-//     const { id } = req.params;
-
-//     try {
-//         const reminder = await Reminder.findById(id).populate([
-//             { path: 'user', select: 'email fullName' },
-//             { path: 'meal', select: 'name' },
-//         ]);
-
-//         if (!reminder) {
-//             return res
-//                 .status(StatusCodes.NOT_FOUND)
-//                 .json({ message: 'Reminder not found' });
-//         }
-
-//         const mailOptions = {
-//             from: process.env.EMAIL_USER,
-//             to: reminder.user.email,
-//             subject: `Meal Reminder: ${reminder.meal.name}`,
-//             text: `Hello ${reminder.user.fullName}, just a reminder to prepare your meal: ${reminder.meal.name} at ${reminder.reminderTime}.`,
-//         };
-
-//         // Send email and wait for the response
-//         await transporter.sendMail(mailOptions);
-//         console.log(`Email sent for reminder ${id}`);
-//         return res.status(StatusCodes.OK).json({ message: 'Email reminder sent' });
-//     } catch (error) {
-//         console.error('Error sending email:', error);
-//         return res
-//             .status(StatusCodes.INTERNAL_SERVER_ERROR)
-//             .json({ message: error.message });
-//     }
-// };
-
-
-
 
 // @desc Send push notification
 // @route POST /api/reminders/send-push/:id
@@ -248,32 +133,6 @@ export const sendPushNotification = async (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
-
-
-// @desc    Sync reminder with calendar
-// @route   POST /api/reminders/calendar-sync/:id
-// export const syncWithCalendar = async (req, res) => {
-//     const { id } = req.params;
-
-//     try {
-//         const reminder = await Reminder.findById(id).populate('user meal');
-
-//         if (!reminder) {
-//             return res.status(StatusCodes.NOT_FOUND).json({ message: 'Reminder not found' });
-//         }
-
-//         // Example logic to sync with calendar (i.e., Google Calendar)
-//         // Use Google Calendar API to create an event for this reminder
-//         // This is just a placeholder for now
-//         res.status(StatusCodes.OK).json({ message: 'Reminder synced with calendar' });
-
-//     } catch (error) {
-//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
-//     }
-// };
-
-// Google API setup (you need to configure this with your credentials)
-
 
 
 const oAuth2Client = new google.auth.OAuth2(
@@ -383,6 +242,24 @@ export const updateReminder = async (req, res) => {
         res
             .status(StatusCodes.INTERNAL_SERVER_ERROR)
             .json({ message: error.message });
+    }
+};
+
+// @desc    Delete reminder
+// @route   DELETE /api/reminders/:id  
+export const deleteReminder = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const reminder = await Reminder.findById(id);
+        if (!reminder) {
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'Reminder not found' });
+        }
+
+        await reminder.remove();
+        res.status(StatusCodes.OK).json({ message: 'Reminder deleted successfully' });
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
 
