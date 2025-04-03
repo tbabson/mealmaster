@@ -71,13 +71,17 @@ const SingleMeal = () => {
 
   // New onClick function for "Create Reminder"
   const handleCreateReminder = () => {
-    if (!meal) {
-      toast.error("Meal details not found.");
-      // In handleCreateReminder function
+    if (!user || !user.user) {
+      toast.error("Log in to create a reminder.");
+      navigate("/login", { state: { from: location.pathname } }); // Redirect to login and preserve location
       return;
     }
 
-    // Pass just the meal.meal object to simplify data structure
+    if (!meal) {
+      toast.error("Meal details not found.");
+      return;
+    }
+
     navigate("/reminders", { state: { meal: meal.meal } });
   };
 
