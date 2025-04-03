@@ -34,7 +34,7 @@ const debouncedSyncCart = debounce(async ({ userId, cartItems, dispatch }) => {
         await customFetch.post("/cart/sync", { userId, cartItems });
         dispatch(setLastSyncedCart(cartItems));
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to sync cart");
+        toast.error(error.response?.data?.message || "No cart to sync");
     }
 }, 1000);
 

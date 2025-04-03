@@ -1,17 +1,22 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import customFetch from '../../utils/customFetch';
+import { toast } from 'react-toastify';
 
 // Async Thunks for API Calls
 export const createReminder = createAsyncThunk(
     'reminders/createReminder',
-    async (reminderData, { rejectWithValue }) => {
+    async (reminderData, thunkAPI) => {
         try {
             const response = await customFetch.post('/reminders', reminderData);
             return response.data;
         } catch (error) {
-            console.log(error.response.data);
+            // Properly handle and return errors
+            const message =
+                error.response?.data?.message ||
+                error.message ||
+                'Failed to create reminder';
 
-            return rejectWithValue(error.response.data);
+            return thunkAPI.rejectWithValue({ message });
         }
     }
 );

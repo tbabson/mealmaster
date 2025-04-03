@@ -70,58 +70,52 @@ export const authenticateGoogleAPI = async () => {
 const sendEmailReminder = async (reminderId) => {
   try {
     // Find the reminder and populate meal and user details.
-    // Note: If the steps are embedded (not references) you don't need to populate them,
-    // but if they're referenced, uncomment the nested populate below.
     const reminder = await Reminder.findById(reminderId)
       .populate({
         path: 'meal',
-        select: 'name image ingredients preparationSteps', // Fetch necessary fields
+        select: 'name image ingredients preparationSteps',
         populate: [
           { path: 'ingredients', select: 'name' },
-          // Uncomment the next line if 'steps' inside 'preparationSteps' are references
-          // { path: 'preparationSteps.steps', select: 'stepNumber instruction duration' }
+          // This line is crucial - it populates the preparationSteps references
+          {
+            path: 'preparationSteps',
+            select: 'description skillLevel steps',
+            populate: {
+              path: 'steps',
+              select: 'stepNumber instruction duration _id'
+            }
+          }
         ]
       })
-      .populate('user', 'email fullName'); // Populate user email and full name
+      .populate('user', 'email fullName');
 
     if (!reminder) {
       console.error(`Reminder with ID ${reminderId} not found.`);
       return false;
     }
 
-    // Extract meal and user details.
+    // Extract meal and user details
     const { meal, user, reminderTime } = reminder;
     const ingredientNames = meal.ingredients.map(({ name }) => name).join(', ');
 
-    // Check if preparationSteps object and its nested steps array exist and format them.
+    // Check if preparationSteps array exists and has elements
     const formattedPreparationSteps =
       meal.preparationSteps &&
-        meal.preparationSteps.steps &&
-        meal.preparationSteps.steps.length > 0
-        ? meal.preparationSteps.steps.map(({ _id, stepNumber, instruction, duration }) =>
-          `Step ${stepNumber} (ID: ${_id}): ${instruction} (Duration: ${duration})`
+        Array.isArray(meal.preparationSteps) &&
+        meal.preparationSteps.length > 0 &&
+        meal.preparationSteps[0].steps &&
+        meal.preparationSteps[0].steps.length > 0
+        ? meal.preparationSteps[0].steps.map(({ _id, stepNumber, instruction, duration }) =>
+          `Step ${stepNumber} (ID: ${_id}): ${instruction} (Duration: ${duration || 'N/A'})`
         ).join('\n')
         : 'No preparation steps provided.';
 
-    // Configure email content with both text and HTML versions.
+    // Configure email content with both text and HTML versions
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: user.email,
       subject: `Meal Reminder: ${meal.name}`,
-      text: `Hello ${user.fullName},
-
-Just a reminder to prepare your meal: ${meal.name}
-
-Meal Details:
-- Image: ${meal.image}
-- Ingredients: ${ingredientNames}
-
-Preparation Steps:
-${formattedPreparationSteps}
-
-Scheduled Time: ${new Date(reminderTime).toLocaleString()}
-
-Enjoy your meal!`,
+      text: `Hello ${user.fullName},\n\nJust a reminder to prepare your meal: ${meal.name}\n\nMeal Details:\n- Image: ${meal.image || 'N/A'}\n- Ingredients: ${ingredientNames}\n\nPreparation Steps:\n${formattedPreparationSteps}\n\nScheduled Time: ${new Date(reminderTime).toLocaleString()}\n\nEnjoy your meal!`,
       html: `
       <!DOCTYPE html>
       <html>
@@ -146,16 +140,18 @@ Enjoy your meal!`,
           </ul>
           
           <h3 style="color: #34495e;">Preparation Steps</h3>
-          <ol style="padding-left: 20px;">
+          <ol style="padding-left: 20px; list-style: none;">
             ${meal.preparationSteps &&
-          meal.preparationSteps.steps &&
-          meal.preparationSteps.steps.length > 0
-          ? meal.preparationSteps.steps.map(({ _id, stepNumber, instruction, duration }) => `
-              <li>
-                <strong>Step ${stepNumber} (ID: ${_id})</strong>: ${instruction}
-                <span style="color: #7f8c8d; font-style: italic; margin-left: 10px;">(Duration: ${duration})</span>
-              </li>
-            `).join('')
+          Array.isArray(meal.preparationSteps) &&
+          meal.preparationSteps.length > 0 &&
+          meal.preparationSteps[0].steps &&
+          meal.preparationSteps[0].steps.length > 0
+          ? meal.preparationSteps[0].steps.map(({ _id, stepNumber, instruction, duration }) => `
+                <li>
+                  <strong>Step ${stepNumber} </strong>: ${instruction}
+                  <span style="color: #7f8c8d; font-style: italic; margin-left: 10px;">(Duration: ${duration || 'N/A'})</span>
+                </li>
+              `).join('')
           : '<li>No preparation steps provided.</li>'}
           </ol>
         </div>
@@ -169,12 +165,12 @@ Enjoy your meal!`,
       </html>`
     };
 
-    // Send email.
-    await transporter.sendMail(mailOptions);
-    console.log(`Email sent for reminder`);
+    // Send the email (assuming you have a transporter set up)
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`Email sent: ${info.messageId}`);
     return true;
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error sending email reminder:', error);
     return false;
   }
 };
@@ -290,27 +286,27 @@ const processReminder = async (reminder) => {
 // Main scheduler function
 export const scheduleReminders = () => {
   // Run every minute
-  schedule.scheduleJob('* * * * *', async () => {
-    const now = moment().tz('Africa/Lagos').toDate();
-    //console.log('Cron job triggered at', now);
+  schedule.scheduleJob("*/1 * * * *", async () => {
+    const now = moment().utc().toDate(); // Get current time in UTC
+
     try {
       // Find all due reminders within the next minute that haven't been notified
       const dueReminders = await Reminder.find({
-        reminderTime: {
-          $lte: new Date(new Date().getTime() + 120000) // 1-minute buffer
-        },
-        notified: false
+        reminderTime: { $lte: now },
+        notified: false,
       }).populate([
-        { path: 'user', select: 'email fullName' },
-        { path: 'meal', select: 'name' }
+        { path: "user", select: "email fullName" },
+        { path: "meal", select: "name" },
       ]);
+
+      if (dueReminders.length === 0) return;
 
       // Process each due reminder
       for (const reminder of dueReminders) {
         await processReminder(reminder);
       }
     } catch (error) {
-      console.error('Error processing reminders:', error);
+      console.error("Error processing reminders:", error);
     }
   });
 };

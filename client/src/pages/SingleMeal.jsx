@@ -71,7 +71,13 @@ const SingleMeal = () => {
 
   // New onClick function for "Create Reminder"
   const handleCreateReminder = () => {
-    // Redirect to the /reminders route, passing the meal details as state
+    if (!meal) {
+      toast.error("Meal details not found.");
+      // In handleCreateReminder function
+      return;
+    }
+
+    // Pass just the meal.meal object to simplify data structure
     navigate("/reminders", { state: { meal: meal.meal } });
   };
 
@@ -202,27 +208,7 @@ const SingleMeal = () => {
                   <p>No preparation steps available.</p>
                 )}
               </div>
-
-              <div className="divider"></div>
               {/* <div className="amount">{nairaAmount}</div> */}
-
-              <div className="reviews">
-                <h3>Buyers Reviews ({numOfReviews})</h3>
-                {reviews.length > 0 ? (
-                  reviews.map(({ _id, user, title, comment, rating }) => (
-                    <div key={_id} className="review">
-                      <h4>{user.fullName}</h4>
-                      <h5>Rating: {renderStars(rating)}</h5>
-                      <p>
-                        <strong>{title}</strong>
-                      </p>
-                      <p>{comment}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p>No reviews yet.</p>
-                )}
-              </div>
             </div>
           </div>
         </div>
