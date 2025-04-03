@@ -13,8 +13,8 @@ const Reminder = () => {
   // Get meal from location state
   // The meal object is nested inside location.state.meal.meal
   const mealData = location.state?.meal?.meal || location.state?.meal || {};
-  console.log("Location state:", location.state);
-  console.log("Meal from state:", mealData);
+  // console.log("Location state:", location.state);
+  // console.log("Meal from state:", mealData);
 
   const [meal, setMeal] = useState(mealData);
   const [reminderTime, setReminderTime] = useState("");
@@ -26,7 +26,7 @@ const Reminder = () => {
   const { isLoading, error } = useSelector((state) => state.reminders);
 
   useEffect(() => {
-    console.log("Meal from state:", mealData); // Debugging
+    // console.log("Meal from state:", mealData); // Debugging
     if (!mealData || Object.keys(mealData).length === 0) {
       // toast.error("Please select a meal first");
       navigate("/meals");
