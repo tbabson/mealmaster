@@ -16,14 +16,18 @@ import readline from 'readline'
 //const CREDENTIALS_PATH = '../utils/credentials.json'; // Path to Google API credentials file
 //const TOKEN_PATH = '../utils/token.json'; // Path where OAuth tokens will be saved
 
-// Set up OAuth2 client
+
+// ----- Google API Setup -----
+
 const authClient = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
   process.env.GOOGLE_REDIRECT_URI
 );
 
-// Load tokens if they exist
+// Define TOKEN_PATH as needed
+// const TOKEN_PATH = '../utils/token.json';
+
 const loadSavedToken = () => {
   try {
     const token = fs.readFileSync(TOKEN_PATH, 'utf-8');
@@ -33,21 +37,21 @@ const loadSavedToken = () => {
   }
 };
 
-// Save new tokens to disk
 const saveToken = (token) => {
   fs.writeFileSync(TOKEN_PATH, JSON.stringify(token));
   console.log('Token stored to', TOKEN_PATH);
 };
 
-// Function to authenticate with Google Calendar API
 export const authenticateGoogleAPI = async () => {
   const authUrl = authClient.generateAuthUrl({
     access_type: 'offline',
-    scope: ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events'],
+    scope: [
+      'https://www.googleapis.com/auth/calendar',
+      'https://www.googleapis.com/auth/calendar.events'
+    ],
   });
   console.log('Authorize this app by visiting this URL:', authUrl);
 
-  // Prompt for auth code
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -55,28 +59,59 @@ export const authenticateGoogleAPI = async () => {
 
   rl.question('Enter the authorization code from that page here: ', async (authCode) => {
     rl.close();
-
-    // Exchange the authorization code for an access token
     const { tokens } = await authClient.getToken(authCode);
     authClient.setCredentials(tokens);
-    saveToken(tokens);  // Save token for later use
+    saveToken(tokens);
     console.log('Successfully authenticated and saved tokens!');
   });
 };
 
-// Function to send email reminder
-// Function to send email reminder
-// Function to send email reminder
+// ----- Helper Functions for Meal Preparation -----
+
+const hasValidPreparationSteps = (meal) => {
+  return meal.preparationSteps &&
+    Array.isArray(meal.preparationSteps) &&
+    meal.preparationSteps.length > 0 &&
+    meal.preparationSteps[0].steps &&
+    Array.isArray(meal.preparationSteps[0].steps) &&
+    meal.preparationSteps[0].steps.length > 0;
+};
+
+const formatPreparationSteps = (meal, format = 'text') => {
+  if (!hasValidPreparationSteps(meal)) {
+    return format === 'text'
+      ? 'No preparation steps provided.'
+      : '<li>No preparation steps provided.</li>';
+  }
+
+  const steps = meal.preparationSteps[0].steps;
+
+  if (format === 'text') {
+    return steps.map(({ stepNumber, instruction, duration }) =>
+      `Step ${stepNumber}: ${instruction} (Duration: ${duration || 'N/A'})`
+    ).join('\n');
+  } else {
+    return steps.map(({ stepNumber, instruction, duration }) => `
+      <li>
+        <strong>Step ${stepNumber}</strong>: ${instruction}
+        <span style="color: #7f8c8d; font-style: italic; margin-left: 10px;">
+          (Duration: ${duration || 'N/A'})
+        </span>
+      </li>
+    `).join('');
+  }
+};
+
+// ----- Notification Functions -----
+
 const sendEmailReminder = async (reminderId) => {
   try {
-    // Find the reminder and populate meal and user details.
     const reminder = await Reminder.findById(reminderId)
       .populate({
         path: 'meal',
         select: 'name image ingredients preparationSteps',
         populate: [
           { path: 'ingredients', select: 'name' },
-          // This line is crucial - it populates the preparationSteps references
           {
             path: 'preparationSteps',
             select: 'description skillLevel steps',
@@ -94,98 +129,87 @@ const sendEmailReminder = async (reminderId) => {
       return false;
     }
 
-    // Extract meal and user details
     const { meal, user, reminderTime } = reminder;
     const ingredientNames = meal.ingredients.map(({ name }) => name).join(', ');
+    const ingredientsList = meal.ingredients.map(({ name }) => `<li>${name}</li>`).join('');
+    const textSteps = formatPreparationSteps(meal, 'text');
+    const htmlSteps = formatPreparationSteps(meal, 'html');
+    const formattedTime = new Date(reminderTime).toLocaleString();
 
-    // Check if preparationSteps array exists and has elements
-    const formattedPreparationSteps =
-      meal.preparationSteps &&
-        Array.isArray(meal.preparationSteps) &&
-        meal.preparationSteps.length > 0 &&
-        meal.preparationSteps[0].steps &&
-        meal.preparationSteps[0].steps.length > 0
-        ? meal.preparationSteps[0].steps.map(({ _id, stepNumber, instruction, duration }) =>
-          `Step ${stepNumber} (ID: ${_id}): ${instruction} (Duration: ${duration || 'N/A'})`
-        ).join('\n')
-        : 'No preparation steps provided.';
-
-    // Configure email content with both text and HTML versions
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"Meal Reminder" <${process.env.EMAIL_USER}>`,
       to: user.email,
+      replyTo: process.env.EMAIL_USER,
       subject: `Meal Reminder: ${meal.name}`,
-      text: `Hello ${user.fullName},\n\nJust a reminder to prepare your meal: ${meal.name}\n\nMeal Details:\n- Image: ${meal.image || 'N/A'}\n- Ingredients: ${ingredientNames}\n\nPreparation Steps:\n${formattedPreparationSteps}\n\nScheduled Time: ${new Date(reminderTime).toLocaleString()}\n\nEnjoy your meal!`,
+      text: `Hello ${user.fullName},
+
+Just a reminder to prepare your meal: ${meal.name}
+
+Meal Details:
+- Image: ${meal.image || 'N/A'}
+- Ingredients: ${ingredientNames}
+
+Preparation Steps:
+${textSteps}
+
+Scheduled Time: ${formattedTime}
+
+Enjoy your meal!`,
       html: `
       <!DOCTYPE html>
       <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Meal Reminder</title>
+      </head>
       <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h1 style="color: #333;">Meal Reminder: ${meal.name}</h1>
-        
         <p>Hello ${user.fullName},</p>
-        
         <p>Just a reminder to prepare your delicious meal.</p>
-        
         <div style="background-color: #f4f4f4; padding: 15px; border-radius: 5px;">
           <h2 style="color: #2c3e50;">Meal Details</h2>
-          
           ${meal.image ? `
           <div style="text-align: center; margin-bottom: 15px;">
             <img src="${meal.image}" alt="${meal.name}" style="max-width: 300px; border-radius: 10px;">
           </div>` : ''}
-          
           <h3 style="color: #34495e;">Ingredients</h3>
           <ul style="list-style-type: disc; padding-left: 20px;">
-            ${meal.ingredients.map(({ name }) => `<li>${name}</li>`).join('')}
+            ${ingredientsList}
           </ul>
-          
           <h3 style="color: #34495e;">Preparation Steps</h3>
           <ol style="padding-left: 20px; list-style: none;">
-            ${meal.preparationSteps &&
-          Array.isArray(meal.preparationSteps) &&
-          meal.preparationSteps.length > 0 &&
-          meal.preparationSteps[0].steps &&
-          meal.preparationSteps[0].steps.length > 0
-          ? meal.preparationSteps[0].steps.map(({ _id, stepNumber, instruction, duration }) => `
-                <li>
-                  <strong>Step ${stepNumber} </strong>: ${instruction}
-                  <span style="color: #7f8c8d; font-style: italic; margin-left: 10px;">(Duration: ${duration || 'N/A'})</span>
-                </li>
-              `).join('')
-          : '<li>No preparation steps provided.</li>'}
+            ${htmlSteps}
           </ol>
         </div>
-        
         <p style="margin-top: 15px;">
-          <strong>Scheduled Time:</strong> ${new Date(reminderTime).toLocaleString()}
+          <strong>Scheduled Time:</strong> ${formattedTime}
         </p>
-        
         <p style="color: #7f8c8d; font-style: italic;">Enjoy your meal!</p>
+        <hr style="margin-top: 20px; border: 0; border-top: 1px solid #eee;">
+        <p style="font-size: 12px; color: #999;">
+          This is an automated reminder. Please do not reply to this email.
+        </p>
       </body>
       </html>`
     };
 
-    // Send the email (assuming you have a transporter set up)
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`Email sent: ${info.messageId}`);
+    await transporter.sendMail(mailOptions);
+    console.log(`Email reminder sent for meal "${meal.name}"`);
     return true;
   } catch (error) {
     console.error('Error sending email reminder:', error);
+    if (error.response) {
+      console.error('SMTP response failed:', error.response);
+    }
     return false;
   }
 };
 
-
-// Function to sync with calendar
 const syncWithCalendar = async (reminder) => {
   try {
-    // Your calendar sync logic here
-    // Authenticate or use saved token
     loadSavedToken();
-
     const calendar = google.calendar({ version: 'v3', auth: authClient });
-
-    // Calendar event details
     const event = {
       summary: `Meal Reminder: ${reminder.meal.name}`,
       description: `It's time to prepare your meal: ${reminder.meal.name}`,
@@ -194,32 +218,34 @@ const syncWithCalendar = async (reminder) => {
         timeZone: 'UTC',
       },
       end: {
-        dateTime: new Date(new Date(reminder.reminderTime).getTime() + 60 * 60 * 1000).toISOString(), // 1-hour duration
+        dateTime: new Date(new Date(reminder.reminderTime).getTime() + 60 * 60 * 1000).toISOString(),
         timeZone: 'UTC',
       },
     };
 
-    // Insert the event into the calendar
     const calendarEvent = await calendar.events.insert({
-      calendarId: 'primary', // Main user calendar
+      calendarId: 'primary',
       resource: event,
     });
 
     console.log(`Calendar synced for reminder ${reminder._id}: Event ID: ${calendarEvent.data.id}`);
     return true;
-
-    // console.log(`Calendar synced for reminder ${reminder._id}`);
-    // return true;
   } catch (error) {
-    //console.error('Error syncing with calendar:', error);
     return false;
   }
 };
 
-// Function to calculate next reminder time
+const sendPushNotification = async (reminder) => {
+  // Implement push notification logic if needed
+  console.log('Push notification sent for reminder', reminder._id);
+  return true;
+};
+
+// ----- Reminder Scheduling Functions -----
+
+// Calculate the next reminder time for recurring reminders
 const getNextReminderTime = (currentReminderTime, frequency) => {
   const nextTime = new Date(currentReminderTime);
-
   switch (frequency) {
     case 'daily':
       nextTime.setDate(nextTime.getDate() + 1);
@@ -233,18 +259,15 @@ const getNextReminderTime = (currentReminderTime, frequency) => {
     default:
       return null;
   }
-
   return nextTime;
 };
 
-// Function to process a single reminder
+// Process a reminder: send notification and handle recurring logic
 const processReminder = async (reminder) => {
   let notificationSent = false;
-
-  // Send notification based on method
   switch (reminder.notificationMethod) {
     case 'email':
-      notificationSent = await sendEmailReminder(reminder);
+      notificationSent = await sendEmailReminder(reminder._id);
       break;
     case 'push':
       notificationSent = await sendPushNotification(reminder);
@@ -258,66 +281,67 @@ const processReminder = async (reminder) => {
   }
 
   if (notificationSent) {
-    // Handle recurring reminders
     if (reminder.isRecurring && reminder.recurringFrequency) {
-      const nextReminderTime = getNextReminderTime(
-        reminder.reminderTime,
-        reminder.recurringFrequency
-      );
-
+      const nextReminderTime = getNextReminderTime(reminder.reminderTime, reminder.recurringFrequency);
       if (nextReminderTime) {
         reminder.reminderTime = nextReminderTime;
-        reminder.notified = false; // Reset for next occurrence
+        reminder.notified = false;
+        await reminder.save();
+        scheduleIndividualReminder(reminder);
       } else {
         reminder.isRecurring = false;
         reminder.notified = true;
+        await reminder.save();
       }
     } else {
       reminder.notified = true;
+      await reminder.save();
     }
-
-    await reminder.save();
     return true;
   }
-
   return false;
 };
 
-// Main scheduler function
-export const scheduleReminders = () => {
-  // Run every minute
-  schedule.scheduleJob("*/1 * * * *", async () => {
-    const now = moment().utc().toDate(); // Get current time in UTC
-
-    try {
-      // Find all due reminders within the next minute that haven't been notified
-      const dueReminders = await Reminder.find({
-        reminderTime: { $lte: now },
-        notified: false,
-      }).populate([
-        { path: "user", select: "email fullName" },
-        { path: "meal", select: "name" },
-      ]);
-
-      if (dueReminders.length === 0) return;
-
-      // Process each due reminder
-      for (const reminder of dueReminders) {
-        await processReminder(reminder);
-      }
-    } catch (error) {
-      console.error("Error processing reminders:", error);
-    }
+// Schedule an individual job for a given reminder
+export const scheduleIndividualReminder = (reminder) => {
+  // Convert the reminder time to a UTC Date object.
+  const utcTime = moment.utc(reminder.reminderTime).toDate();
+  const job = schedule.scheduleJob(utcTime, async () => {
+    console.log(`Processing reminder ${reminder._id} scheduled at ${reminder.reminderTime} (UTC)`);
+    await processReminder(reminder);
   });
+  // Optionally, store the job reference on the reminder if needed:
+  reminder.job = job;
 };
 
-// Start the reminder scheduler
-export const initializeReminderSystem = () => {
+// Example function to create and schedule a new reminder
+export const createReminder = async (reminderData) => {
+  const reminder = new Reminder(reminderData);
+  await reminder.save();
+  scheduleIndividualReminder(reminder);
+  return reminder;
+};
+
+// Optional: Function to reschedule an existing reminder (if updated)
+export const rescheduleReminder = async (reminder) => {
+  if (reminder.job && typeof reminder.job.cancel === 'function') {
+    reminder.job.cancel();
+  }
+  scheduleIndividualReminder(reminder);
+};
+
+// ----- Initialize Reminder System -----
+// At startup, schedule jobs for all pending reminders.
+// This is useful to re-establish jobs if the server restarts.
+export const initializeReminderSystem = async () => {
   try {
     console.log('Initializing reminder system...');
-    scheduleReminders();
+    // Find all reminders that haven't been notified yet.
+    const reminders = await Reminder.find({ notified: false });
+    reminders.forEach((reminder) => {
+      scheduleIndividualReminder(reminder);
+    });
   } catch (error) {
-    console.error("Error initializing reminder system:", error.message);
+    console.error('Error initializing reminder system:', error.message);
   }
 };
-
