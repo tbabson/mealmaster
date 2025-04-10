@@ -13,11 +13,13 @@ const Reminder = () => {
   // Get meal from location state
   // The meal object is nested inside location.state.meal.meal
   const mealData = location.state?.meal?.meal || location.state?.meal || {};
-  // console.log("Location state:", location.state);
-  // console.log("Meal from state:", mealData);
-
   const [meal, setMeal] = useState(mealData);
-  const [reminderTime, setReminderTime] = useState("");
+
+  // Instead of one datetime-local input, we use three:
+  const [reminderDate, setReminderDate] = useState(""); // e.g. "2025-04-10"
+  const [reminderTime, setReminderTime] = useState(""); // e.g. "02:16"
+  const [period, setPeriod] = useState("PM"); // AM or PM; default set to PM
+
   const [notificationMethod, setNotificationMethod] = useState("email");
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringFrequency, setRecurringFrequency] = useState("");
@@ -26,9 +28,7 @@ const Reminder = () => {
   const { isLoading, error } = useSelector((state) => state.reminders);
 
   useEffect(() => {
-    // console.log("Meal from state:", mealData); // Debugging
     if (!mealData || Object.keys(mealData).length === 0) {
-      // toast.error("Please select a meal first");
       navigate("/meals");
     }
   }, [mealData, navigate]);
@@ -42,14 +42,17 @@ const Reminder = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!reminderTime) {
-      toast.error("Please select a reminder time");
+    if (!reminderDate || !reminderTime || !period) {
+      toast.error("Please select a valid reminder date, time, and period");
       return;
     }
 
+    // Combine the three inputs into one string that looks like: "YYYY-MM-DD hh:mm AM/PM"
+    const combinedReminderTime = `${reminderDate} ${reminderTime} ${period}`;
+
     const reminderData = {
       meal: meal._id, // Change from mealId to meal
-      reminderTime,
+      reminderTime: combinedReminderTime, // Send the combined string to the backend
       notificationMethod,
       isRecurring,
       ...(isRecurring && { recurringFrequency }),
@@ -117,13 +120,33 @@ const Reminder = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
+          <label>Reminder Date</label>
+          <input
+            type="date"
+            value={reminderDate}
+            onChange={(e) => setReminderDate(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-group">
           <label>Reminder Time</label>
           <input
-            type="datetime-local"
+            type="time"
             value={reminderTime}
             onChange={(e) => setReminderTime(e.target.value)}
             required
           />
+        </div>
+        <div className="form-group">
+          <label>Period</label>
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            required
+          >
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+          </select>
         </div>
         <div className="form-group">
           <label>Notification Method</label>

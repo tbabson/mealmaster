@@ -92,6 +92,21 @@ const Wrapper = styled.div`
     }
   }
 
+  /* New styling for the date, time, and period inputs */
+  .datetime-group {
+    display: flex;
+    gap: 10px;
+
+    input[type="date"],
+    input[type="time"] {
+      flex: 1;
+    }
+
+    select {
+      width: 100px;
+    }
+  }
+
   .checkbox-group {
     flex-direction: row;
     align-items: center;

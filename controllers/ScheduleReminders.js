@@ -195,7 +195,7 @@ Enjoy your meal!`,
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(`Email reminder sent for meal "${meal.name}"`);
+    // console.log(`Email reminder sent for meal "${meal.name}"`);
     return true;
   } catch (error) {
     console.error('Error sending email reminder:', error);
@@ -307,7 +307,6 @@ export const scheduleIndividualReminder = (reminder) => {
   // Convert the reminder time to a UTC Date object.
   const utcTime = moment.utc(reminder.reminderTime).toDate();
   const job = schedule.scheduleJob(utcTime, async () => {
-    console.log(`Processing reminder ${reminder._id} scheduled at ${reminder.reminderTime} (UTC)`);
     await processReminder(reminder);
   });
   // Optionally, store the job reference on the reminder if needed:

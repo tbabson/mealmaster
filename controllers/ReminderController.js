@@ -3,6 +3,7 @@ import Subscription from '../models/SubscriptionModel.js';
 import { StatusCodes } from 'http-status-codes';
 import Meal from '../models/MealModel.js'; // Assuming a Meal model exists
 //import nodemailer from 'nodemailer';
+import { scheduleIndividualReminder } from './ScheduleReminders.js';
 import { google } from 'googleapis';
 import webPush from 'web-push';
 import dotenv from 'dotenv';
@@ -85,7 +86,7 @@ export const createReminder = async (req, res) => {
             recurringFrequency,
             subscription: savedSubscription ? savedSubscription._id : null,
         });
-
+        scheduleIndividualReminder(reminder); // Schedule the reminder
         res.status(StatusCodes.CREATED).json({ reminder });
     } catch (error) {
         res
