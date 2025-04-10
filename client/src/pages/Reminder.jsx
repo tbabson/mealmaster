@@ -4,6 +4,7 @@ import Wrapper from "../assets/wrappers/Reminder";
 import { createReminder } from "../Features/Reminder/reminderSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import moment from "moment-timezone"; // Import moment-timezone for time zone handling
 
 const Reminder = () => {
   const dispatch = useDispatch();
@@ -11,15 +12,10 @@ const Reminder = () => {
   const location = useLocation();
 
   // Get meal from location state
-  // The meal object is nested inside location.state.meal.meal
   const mealData = location.state?.meal?.meal || location.state?.meal || {};
+
   const [meal, setMeal] = useState(mealData);
-
-  // Instead of one datetime-local input, we use three:
-  const [reminderDate, setReminderDate] = useState(""); // e.g. "2025-04-10"
-  const [reminderTime, setReminderTime] = useState(""); // e.g. "02:16"
-  const [period, setPeriod] = useState("PM"); // AM or PM; default set to PM
-
+  const [reminderTime, setReminderTime] = useState("");
   const [notificationMethod, setNotificationMethod] = useState("email");
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringFrequency, setRecurringFrequency] = useState("");
@@ -42,17 +38,18 @@ const Reminder = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!reminderDate || !reminderTime || !period) {
-      toast.error("Please select a valid reminder date, time, and period");
+    if (!reminderTime) {
+      toast.error("Please select a reminder time");
       return;
     }
 
-    // Combine the three inputs into one string that looks like: "YYYY-MM-DD hh:mm AM/PM"
-    const combinedReminderTime = `${reminderDate} ${reminderTime} ${period}`;
+    // Convert the time to UTC before sending to the server
+    const reminderDate = new Date(reminderTime);
+    const utcReminderTime = reminderDate.toISOString(); // Converts to UTC string format
 
     const reminderData = {
       meal: meal._id, // Change from mealId to meal
-      reminderTime: combinedReminderTime, // Send the combined string to the backend
+      reminderTime: utcReminderTime,
       notificationMethod,
       isRecurring,
       ...(isRecurring && { recurringFrequency }),
@@ -71,6 +68,11 @@ const Reminder = () => {
 
   // Destructure meal details
   const { _id, name, image, ingredients = [], preparationSteps = [] } = meal;
+
+  // Convert the reminder time from UTC to local time for display purposes
+  const displayReminderTime = reminderTime
+    ? moment(reminderTime).local().format("YYYY-MM-DD hh:mm A") // Format in local time
+    : "";
 
   return (
     <Wrapper>
@@ -120,33 +122,16 @@ const Reminder = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Reminder Date</label>
-          <input
-            type="date"
-            value={reminderDate}
-            onChange={(e) => setReminderDate(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
           <label>Reminder Time</label>
           <input
-            type="time"
+            type="datetime-local"
             value={reminderTime}
             onChange={(e) => setReminderTime(e.target.value)}
             required
           />
-        </div>
-        <div className="form-group">
-          <label>Period</label>
-          <select
-            value={period}
-            onChange={(e) => setPeriod(e.target.value)}
-            required
-          >
-            <option value="AM">AM</option>
-            <option value="PM">PM</option>
-          </select>
+          {displayReminderTime && (
+            <p>Scheduled reminder time: {displayReminderTime}</p>
+          )}
         </div>
         <div className="form-group">
           <label>Notification Method</label>

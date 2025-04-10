@@ -5,6 +5,7 @@ import Meal from '../models/MealModel.js'; // Assuming a Meal model exists
 //import nodemailer from 'nodemailer';
 import { scheduleIndividualReminder } from './ScheduleReminders.js';
 import { google } from 'googleapis';
+import moment from 'moment-timezone';
 import webPush from 'web-push';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -48,6 +49,7 @@ export const savePushSubscription = async (req, res) => {
 // @desc    Create a new meal reminder
 // @route   POST /api/reminders
 export const createReminder = async (req, res) => {
+
     const {
         meal: mealId,
         reminderTime,
@@ -77,10 +79,12 @@ export const createReminder = async (req, res) => {
             });
         }
 
+        const utcReminderTime = moment(reminderTime).utc().toISOString();
+
         const reminder = await Reminder.create({
             user: userId,
             meal: meal._id, // Link the valid meal ID,
-            reminderTime,
+            reminderTime: utcReminderTime,
             notificationMethod,
             isRecurring,
             recurringFrequency,
