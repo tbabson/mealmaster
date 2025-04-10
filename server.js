@@ -79,7 +79,16 @@ app.post('/api/v1/payment/webhook',
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(helmet())
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "https://res.cloudinary.com"],
+      // you might need to include other sources too
+    },
+  })
+);
+
 
 
 
