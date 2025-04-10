@@ -1,4 +1,12 @@
+import { Link } from "react-router-dom";
+
 const Profile = () => {
-  return <h1>Profile</h1>;
+  return (
+    <div>
+      <Link to="/reminders">
+        <h1>Reminders</h1>
+      </Link>
+    </div>
+  );
 };
 export default Profile;

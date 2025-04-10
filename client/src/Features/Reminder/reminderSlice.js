@@ -21,6 +21,25 @@ export const createReminder = createAsyncThunk(
     }
 );
 
+// Async thunk for fetching the reminders
+export const fetchSingleUserReminders = createAsyncThunk(
+    'reminders/fetchSingleUserReminders',
+    async (userId, { rejectWithValue }) => {
+        try {
+            const response = await customFetch.get(`reminders/user`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`, // Assuming you're using token-based auth
+                },
+            });
+            console.log(response.data.reminders);
+            return response.data.reminders;
+
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || error.message);
+        }
+    }
+);
+
 export const fetchUserReminders = createAsyncThunk(
     'reminders/fetchUserReminders',
     async (_, { rejectWithValue }) => {
@@ -37,7 +56,7 @@ export const updateReminder = createAsyncThunk(
     'reminders/updateReminder',
     async ({ id, reminderData }, { rejectWithValue }) => {
         try {
-            const response = await customFetch.patch(`/api/reminders/${id}`, reminderData);
+            const response = await customFetch.patch(`reminders/${id}`, reminderData);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -49,7 +68,7 @@ export const deleteReminder = createAsyncThunk(
     'reminders/deleteReminder',
     async (id, { rejectWithValue }) => {
         try {
-            await customFetch.delete(`/api/reminders/${id}`);
+            await customFetch.delete(`/reminders/${id}`);
             return id;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -61,7 +80,7 @@ export const sendPushNotification = createAsyncThunk(
     'reminders/sendPushNotification',
     async (id, { rejectWithValue }) => {
         try {
-            const response = await customFetch.post(`/api/reminders/send-push/${id}`);
+            const response = await customFetch.post(`/send-push/${id}`);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -73,7 +92,7 @@ export const subscribeToPushNotifications = createAsyncThunk(
     'reminders/subscribeToPushNotifications',
     async (subscriptionData, { rejectWithValue }) => {
         try {
-            const response = await customFetch.post('/api/reminders/subscribe', subscriptionData);
+            const response = await customFetch.post('reminders/subscribe', subscriptionData);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -85,7 +104,7 @@ export const syncWithCalendar = createAsyncThunk(
     'reminders/syncWithCalendar',
     async (id, { rejectWithValue }) => {
         try {
-            const response = await customFetch.post(`/api/reminders/calendar-sync/${id}`);
+            const response = await customFetch.post(`reminders/calendar-sync/${id}`);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -127,6 +146,24 @@ const reminderSlice = createSlice({
             state.isLoading = false;
             state.error = action.payload;
         });
+
+        // Fetch Single User Reminders
+        builder
+            .addCase(fetchSingleUserReminders.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(fetchSingleUserReminders.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.reminders = action.payload.map((reminder) => ({
+                    ...reminder,
+                    time: reminder.reminderTime, // alias it as `time`
+                }));
+            })
+            .addCase(fetchSingleUserReminders.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            });
 
         // Fetch User Reminders
         builder.addCase(fetchUserReminders.pending, (state) => {

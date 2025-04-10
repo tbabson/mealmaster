@@ -82,7 +82,7 @@ const SingleMeal = () => {
       return;
     }
 
-    navigate("/reminders", { state: { meal: meal.meal } });
+    navigate("/create-reminders", { state: { meal: meal.meal } });
   };
 
   const renderStars = (rating) => (

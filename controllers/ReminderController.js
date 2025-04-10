@@ -99,6 +99,23 @@ export const createReminder = async (req, res) => {
     }
 };
 
+// @desc    Get a specific user's reminders
+// @route   GET /api/reminders/user
+export const getSingleUserReminders = async (req, res) => {
+    const userId = req.user.userId; // Assuming the user is authenticated and userId is available
+
+    try {
+        // Fetch the reminders for the authenticated user
+        const reminders = await Reminder.find({ user: userId }).populate('meal');
+        if (!reminders.length) {
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'No reminders found for this user' });
+        }
+        res.status(StatusCodes.OK).json({ reminders, count: reminders.length });
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
+    }
+};
+
 
 // @desc Send push notification
 // @route POST /api/reminders/send-push/:id
@@ -261,7 +278,7 @@ export const deleteReminder = async (req, res) => {
             return res.status(StatusCodes.NOT_FOUND).json({ message: 'Reminder not found' });
         }
 
-        await reminder.remove();
+        await reminder.deleteOne();
         res.status(StatusCodes.OK).json({ message: 'Reminder deleted successfully' });
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });

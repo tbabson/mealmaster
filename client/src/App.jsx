@@ -23,7 +23,8 @@ import {
   AddMeal,
   UpdateMeal,
   DeleteMeal,
-  Reminder,
+  CreateReminder,
+  Reminders,
 } from "./pages";
 import OrderSuccess from "./pages/OrderSuccess";
 
@@ -101,9 +102,13 @@ const router = createBrowserRouter([
         loader: singleOrder(queryClient),
       },
       {
-        path: "/reminders",
-        element: <Reminder />,
+        path: "/create-reminders",
+        element: <CreateReminder />,
         // action: reminderAction,
+      },
+      {
+        path: "/reminders",
+        element: <Reminders />,
       },
     ],
   },

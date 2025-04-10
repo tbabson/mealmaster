@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import moment from "moment-timezone";
 
-const Reminder = () => {
+const createReminders = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -215,4 +215,4 @@ const Reminder = () => {
   );
 };
 
-export default Reminder;
+export default createReminders;

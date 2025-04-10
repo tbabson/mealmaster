@@ -1,5 +1,5 @@
 import express from 'express';
-import { createReminder, sendPushNotification, savePushSubscription, syncWithCalendar, getUserReminders, updateReminder, deleteReminder } from '../controllers/ReminderController.js';
+import { createReminder, sendPushNotification, savePushSubscription, syncWithCalendar, getUserReminders, updateReminder, getSingleUserReminders, deleteReminder } from '../controllers/ReminderController.js';
 import {
     authenticateUser,
     authorizePermissions,
@@ -22,6 +22,9 @@ router.post('/calendar-sync/:id', authenticateUser, syncWithCalendar);
 
 // Get all user reminders
 router.get('/reminders', authenticateUser, authorizePermissions('admin'), getUserReminders);
+
+// Get reminders for single user
+router.get('/user', authenticateUser, getSingleUserReminders);
 
 // Update a reminder
 router.patch('/:id', authenticateUser, updateReminder);
