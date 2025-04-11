@@ -1,4 +1,6 @@
+// UserReminder.js
 import styled from 'styled-components';
+import { motion } from 'framer-motion';
 
 const Wrapper = styled.div`
   display: flex;
@@ -25,14 +27,6 @@ const Wrapper = styled.div`
     flex-grow: 1;
   }
 
-  .reminder-card {
-    border: 1px solid #ccc;
-    border-radius: 12px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    background-color: #f9f9f9;
-  }
-
   .btn-group {
     margin-top: 1rem;
     display: flex;
@@ -42,7 +36,8 @@ const Wrapper = styled.div`
   .edit-btn,
   .delete-btn,
   .save-btn,
-  .cancel-btn {
+  .cancel-btn,
+  .confirm-btn {
     padding: 0.4rem 0.8rem;
     border: none;
     border-radius: 8px;
@@ -71,6 +66,11 @@ const Wrapper = styled.div`
     color: white;
   }
 
+  .confirm-btn {
+    background-color: #dc3545;
+    color: white;
+  }
+
   textarea {
     width: 100%;
     resize: none;
@@ -78,8 +78,9 @@ const Wrapper = styled.div`
     font-size: 1rem;
     margin-top: 0.5rem;
   }
+`;
 
-  .modal-overlay {
+export const ModalOverlay = styled(motion.div)`
   position: fixed;
   top: 0;
   left: 0;
@@ -90,20 +91,30 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 999;
-}
+`;
 
-.modal {
+export const ModalContent = styled(motion.div)`
   background: #fff;
   padding: 2rem;
-  border-radius: 10px;
+  border-radius: 12px;
   text-align: center;
-}
+  max-width: 400px;
+`;
 
-.btn-group {
-  margin-top: 1rem;
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
+export const ReminderCard = styled(motion.li)`
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f9f9f9;
+  list-style: none;
+
+  .edit-time-input {
+  margin-top: 0.5rem;
+  padding: 0.3rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  border: 1px solid var(--grey);
 }
 
 `;

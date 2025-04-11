@@ -8,7 +8,12 @@ import {
   updateReminder,
 } from "../Features/Reminder/reminderSlice";
 import { Loading } from "../components";
-import Wrapper from "../assets/wrappers/UserReminder"; // styled-components wrapper
+import Wrapper, {
+  ModalOverlay,
+  ModalContent,
+  ReminderCard,
+} from "../assets/wrappers/UserReminder";
+import { AnimatePresence } from "framer-motion";
 import "react-calendar/dist/Calendar.css";
 
 const Reminders = () => {
@@ -22,15 +27,14 @@ const Reminders = () => {
   const [editText, setEditText] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [reminderToDelete, setReminderToDelete] = useState(null);
+  const [editTime, setEditTime] = useState("");
 
   useEffect(() => {
     dispatch(fetchSingleUserReminders());
   }, [dispatch]);
 
   useEffect(() => {
-    if (error) {
-      toast.error(error.message || "Failed to fetch reminders");
-    }
+    if (error) toast.error(error.message || "Failed to fetch reminders");
   }, [error]);
 
   const handleDelete = (id) => {
@@ -43,17 +47,33 @@ const Reminders = () => {
   const handleEdit = (reminder) => {
     setEditingReminder(reminder._id);
     setEditText(reminder.note || "");
+    setEditTime(
+      new Date(reminder.reminderTime).toISOString().substring(11, 16)
+    ); // format as "HH:MM"
   };
 
   const handleSaveEdit = () => {
+    const currentReminder = reminders.find((r) => r._id === editingReminder);
+    const updatedDateTime = new Date(currentReminder.reminderTime);
+    const [hours, minutes] = editTime.split(":");
+    updatedDateTime.setHours(Number(hours));
+    updatedDateTime.setMinutes(Number(minutes));
+
     dispatch(
-      updateReminder({ id: editingReminder, reminderData: { note: editText } })
+      updateReminder({
+        id: editingReminder,
+        reminderData: {
+          note: editText,
+          reminderTime: updatedDateTime.toISOString(),
+        },
+      })
     )
       .unwrap()
       .then(() => {
         toast.success("Reminder updated");
         setEditingReminder(null);
         setEditText("");
+        setEditTime("");
       })
       .catch((err) => toast.error(err.message || "Update failed"));
   };
@@ -84,91 +104,118 @@ const Reminders = () => {
           <p>No reminders found.</p>
         ) : (
           <ul>
-            {remindersForSelectedDate.map((reminder) => (
-              <li key={reminder._id} className="reminder-card">
-                <h4>{reminder.title || "Reminder"}</h4>
-                <p>
-                  <strong>Time:</strong>{" "}
-                  {new Date(reminder.reminderTime).toLocaleTimeString()}
-                </p>
-                {reminder.meal && (
+            <AnimatePresence>
+              {remindersForSelectedDate.map((reminder) => (
+                <ReminderCard
+                  key={reminder._id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h4>{reminder.title || "Reminder"}</h4>
                   <p>
-                    <strong>Meal:</strong> {reminder.meal.name}
+                    <strong>Time:</strong>{" "}
+                    {new Date(reminder.reminderTime).toLocaleTimeString()}
                   </p>
-                )}
-
-                {editingReminder === reminder._id ? (
-                  <>
-                    <textarea
-                      value={editText}
-                      onChange={(e) => setEditText(e.target.value)}
-                      rows="3"
-                    />
-                    <div className="btn-group">
-                      <button className="save-btn" onClick={handleSaveEdit}>
-                        Save
-                      </button>
-                      <button
-                        className="cancel-btn"
-                        onClick={() => setEditingReminder(null)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
+                  {reminder.meal && (
                     <p>
-                      <strong>Note:</strong> {reminder.note || "No notes"}
+                      <strong>Meal:</strong> {reminder.meal.name}
                     </p>
-                    <div className="btn-group">
-                      <button
-                        className="btn edit-btn"
-                        onClick={() => handleEdit(reminder)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="delete-btn"
-                        onClick={() => {
-                          setReminderToDelete(reminder);
-                          setShowDeleteModal(true);
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </>
-                )}
-              </li>
-            ))}
+                  )}
+
+                  {editingReminder === reminder._id ? (
+                    <>
+                      <textarea
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                        rows="3"
+                      />
+                      <input
+                        type="time"
+                        value={editTime}
+                        onChange={(e) => setEditTime(e.target.value)}
+                        className="edit-time-input"
+                      />
+
+                      <div className="btn-group">
+                        <button className="save-btn" onClick={handleSaveEdit}>
+                          Save
+                        </button>
+                        <button
+                          className="cancel-btn"
+                          onClick={() => setEditingReminder(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p>
+                        <strong>Note:</strong> {reminder.note || "No notes"}
+                      </p>
+                      <div className="btn-group">
+                        <button
+                          className="edit-btn"
+                          onClick={() => handleEdit(reminder)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="delete-btn"
+                          onClick={() => {
+                            setReminderToDelete(reminder);
+                            setShowDeleteModal(true);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </ReminderCard>
+              ))}
+            </AnimatePresence>
           </ul>
         )}
       </div>
-      {showDeleteModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <p>Are you sure you want to delete this reminder?</p>
-            <div className="btn-group">
-              <button
-                className="confirm-btn"
-                onClick={() => {
-                  handleDelete(reminderToDelete._id);
-                  setShowDeleteModal(false);
-                }}
-              >
-                Yes, delete
-              </button>
-              <button
-                className="cancel-btn"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
+      <AnimatePresence>
+        {showDeleteModal && (
+          <ModalOverlay
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <ModalContent
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <p>Are you sure you want to delete this reminder?</p>
+              <div className="btn-group">
+                <button
+                  className="confirm-btn"
+                  onClick={() => {
+                    handleDelete(reminderToDelete._id);
+                    setShowDeleteModal(false);
+                  }}
+                >
+                  Yes, delete
+                </button>
+                <button
+                  className="cancel-btn"
+                  onClick={() => setShowDeleteModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </ModalContent>
+          </ModalOverlay>
+        )}
+      </AnimatePresence>
     </Wrapper>
   );
 };

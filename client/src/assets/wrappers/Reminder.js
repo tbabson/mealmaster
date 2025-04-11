@@ -1,12 +1,33 @@
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  .reminderContainer{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    width: 90%;
+    margin: 2rem auto;
+
+    @media (max-width: 768px){
+        grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 768px){
+        grid-template-columns: 1.5fr 1fr;
+    }
+
+    @media (min-width: 1024px){
+        grid-template-columns: 1.5fr 1fr;
+    }
+  }
+
+  .reminderMealDetails {
+    background-color: var(--white);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
 
   h2 {
     text-align: center;

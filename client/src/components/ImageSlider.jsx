@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Wrapper from "../assets/wrappers/ImageSlider";
 import { BiSolidChevronLeft, BiSolidChevronRight } from "react-icons/bi";
+import { motion, AnimatePresence } from "framer-motion";
 
 const slides = [
   {
@@ -39,37 +40,51 @@ const ImageSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 3000);
+    const interval = setInterval(() => nextSlide(), 4000);
     return () => clearInterval(interval);
   }, [currentIndex]);
 
-  const nextSlide = () => {
+  const nextSlide = () =>
     setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
+  const prevSlide = () =>
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? slides.length - 1 : prevIndex - 1
     );
-  };
 
   return (
     <Wrapper>
       <div className="slider-container">
-        {slides.map((slide, index) => (
-          <div
-            key={index}
-            className={`slide ${index === currentIndex ? "active" : ""}`}
+        <AnimatePresence>
+          <motion.div
+            key={currentIndex}
+            className="slide active"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.02 }}
+            transition={{ duration: 0.6 }}
           >
-            <img src={slide.image} alt={`Slide ${index + 1}`} />
+            <img
+              src={slides[currentIndex].image}
+              alt={`Slide ${currentIndex + 1}`}
+            />
             <div className="text-overlay">
-              <h3>{slide.title}</h3>
-              <p>{slide.description}</p>
+              <motion.h3
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                {slides[currentIndex].title}
+              </motion.h3>
+              <motion.p
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                {slides[currentIndex].description}
+              </motion.p>
             </div>
-          </div>
-        ))}
+          </motion.div>
+        </AnimatePresence>
 
         {/* Arrows */}
         <button className="arrow-button left-arrow" onClick={prevSlide}>

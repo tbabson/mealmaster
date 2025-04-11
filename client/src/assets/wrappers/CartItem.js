@@ -78,10 +78,11 @@ const Wrapper = styled.div`
         }
        
         .removeIngredient {
-          padding: 0.25rem 0.5rem;
+          padding: 0.2rem 0.2rem;
           background-color: var(--primary);
-          color: white;
+          color: var(--light);
           border: none;
+          font-size: 1rem;
           border-radius: 0.25rem;
           cursor: pointer;
          
@@ -112,6 +113,10 @@ const Wrapper = styled.div`
         background-color: var(--primary-dark, #2980b9);
       }
     }
+  }
+  .btn-primary svg{
+     font-size: 1rem;
+     margin-bottom: -2px;
   }
 
   @media (max-width: 768px) {

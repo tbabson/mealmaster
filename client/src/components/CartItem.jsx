@@ -6,6 +6,7 @@ import {
   updateIngredientQuantity,
   removeMeal,
 } from "../Features/Cart/cartSlice";
+import { MdDeleteForever } from "react-icons/md";
 import Wrapper from "../assets/wrappers/CartItem";
 
 const CartItem = ({ meal }) => {
@@ -82,7 +83,7 @@ const CartItem = ({ meal }) => {
                       className="removeIngredient"
                       aria-label="Remove ingredient"
                     >
-                      -
+                      <MdDeleteForever />
                     </button>
                   </div>
                 </li>
@@ -93,6 +94,7 @@ const CartItem = ({ meal }) => {
               onClick={() => removeMealHandler(meal)}
               className="btn btn-primary"
             >
+              <MdDeleteForever />
               Remove meal
             </button>
           </div>

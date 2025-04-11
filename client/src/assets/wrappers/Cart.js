@@ -38,6 +38,17 @@ const Wrapper = styled.div`
     }
     
 }
+.cartTotals{
+    
+    margin: 0 0 2rem;
+
+    @media (min-width: 768px){
+        margin-top: -2rem;
+    }
+
+}
+
+
 
 
 `
