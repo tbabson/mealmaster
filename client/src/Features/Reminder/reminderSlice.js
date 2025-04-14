@@ -31,7 +31,6 @@ export const fetchSingleUserReminders = createAsyncThunk(
                     Authorization: `Bearer ${localStorage.getItem('token')}`, // Assuming you're using token-based auth
                 },
             });
-            console.log(response.data.reminders);
             return response.data.reminders;
 
         } catch (error) {
@@ -80,7 +79,7 @@ export const sendPushNotification = createAsyncThunk(
     'reminders/sendPushNotification',
     async (id, { rejectWithValue }) => {
         try {
-            const response = await customFetch.post(`/send-push/${id}`);
+            const response = await customFetch.post(`reminders/send-push/${id}`);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -92,9 +91,10 @@ export const subscribeToPushNotifications = createAsyncThunk(
     'reminders/subscribeToPushNotifications',
     async (subscriptionData, { rejectWithValue }) => {
         try {
-            const response = await customFetch.post('reminders/subscribe', subscriptionData);
+            const response = await customFetch.post('/reminders/subscribe', subscriptionData);
             return response.data;
         } catch (error) {
+            console.log(error.response.data);
             return rejectWithValue(error.response.data);
         }
     }
@@ -218,7 +218,7 @@ const reminderSlice = createSlice({
 
         // Push Notification Subscription
         builder.addCase(subscribeToPushNotifications.fulfilled, (state, action) => {
-            state.pushSubscription = action.payload;
+            state.pushSubscription = action.payload.subscription; // Store only the subscription object
         });
 
         // Send Push Notification

@@ -31,7 +31,10 @@ const ReminderSchema = new mongoose.Schema(
     },
     subscription: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Subscription', // Reference to the subscription model
+      ref: 'Subscription',
+      required: function () {
+        return this.notificationMethod === 'push';
+      }
     },
     notified: {
       type: Boolean,

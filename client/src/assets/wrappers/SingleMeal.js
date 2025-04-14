@@ -220,31 +220,34 @@ section{
             text-transform: capitalize;
         }
 
+        .singleReview{
+            margin-bottom: 1.5rem;
+
+            h4{
+            color: var(--dark);
+            font-size: 1rem;
+            /* margin-bottom: 0.5rem; */
+            text-transform: capitalize;
+        }
+        h5{
+            color: var(--secondary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        p{
+            color: var(--dark);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+        }
+
+
         .review{
             margin-bottom: 1rem;
             padding: 1rem;
             border: 1.5px solid var(--light);
-            border-radius: 10px;
-
-        h4{
-            color: var(--dark);
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            text-transform: capitalize;
-        }
-
-            h5{
-                color: var(--secondary);
-                font-size: 1rem;
-                margin-bottom: 1rem
-            }
-
-            p{
-                color: var(--dark);
-                font-size: 1rem;
-                margin-bottom: 1rem;
-                line-height: 1.5;
-            }
+            border-radius: 10px; 
 
             strong{
                 color: var(--dark);
@@ -260,7 +263,7 @@ section{
 
         p{
             color: var(--dark);
-            font-size: 1rem;
+            font-size: 1.5rem;
         }
     }
 }

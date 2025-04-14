@@ -10,7 +10,9 @@ import { transporter } from '../utils/transporter.js';
 import moment from 'moment-timezone';
 import { google } from 'googleapis';
 import fs from 'fs';
-import readline from 'readline'
+import readline from 'readline';
+import webPush from 'web-push';
+import Subscription from '../models/SubscriptionModel.js';
 
 // Load client secrets from a local file
 //const CREDENTIALS_PATH = '../utils/credentials.json'; // Path to Google API credentials file
@@ -236,9 +238,55 @@ const syncWithCalendar = async (reminder) => {
 };
 
 const sendPushNotification = async (reminder) => {
-  // Implement push notification logic if needed
-  console.log('Push notification sent for reminder', reminder._id);
-  return true;
+  try {
+    // Fetch and populate the subscription details from the database
+    const subscription = await Subscription.findById(reminder.subscription).lean();
+    if (!subscription) {
+      console.error('No subscription found for the reminder');
+      return false;
+    }
+
+    // Verify the subscription has the required fields
+    if (!subscription.keys || !subscription.keys.auth || !subscription.keys.p256dh) {
+      console.error('Subscription missing required keys');
+      return false;
+    }
+
+    // Create the notification payload with resized image
+    const payload = JSON.stringify({
+      title: `Meal Reminder: ${reminder.meal.name}`,
+      body: `Hello! It's time to prepare your meal: ${reminder.meal.name}. Check the details in your app.`,
+      icon: reminder.meal.image || '/public/favchrome.png', // Use meal image or fallback to default
+      badge: '/public/favicon.ico',
+      image: reminder.meal.image, // Image in notification
+      data: {
+        mealId: reminder.meal._id,
+        url: `/meal/${reminder.meal._id}`, // URL to open when clicking the notification
+        imageSize: {
+          width: 150,
+          height: 150
+        }
+      },
+      vibrate: [200, 100, 200], // Vibration pattern for mobile devices
+    });
+
+    // Structure the subscription object correctly for web-push
+    const pushSubscription = {
+      endpoint: subscription.endpoint,
+      keys: {
+        p256dh: subscription.keys.p256dh,
+        auth: subscription.keys.auth
+      }
+    };
+
+    // Send the push notification
+    await webPush.sendNotification(pushSubscription, payload);
+    console.log('Push notification sent successfully');
+    return true;
+  } catch (error) {
+    console.error('Error sending push notification:', error);
+    return false;
+  }
 };
 
 // ----- Reminder Scheduling Functions -----
@@ -264,6 +312,17 @@ const getNextReminderTime = (currentReminderTime, frequency) => {
 
 // Process a reminder: send notification and handle recurring logic
 const processReminder = async (reminder) => {
+  // Populate the reminder with meal and subscription data
+  reminder = await Reminder.findById(reminder._id)
+    .populate('meal')
+    .populate('subscription')
+    .lean();
+
+  if (!reminder) {
+    console.error('Reminder not found when processing');
+    return false;
+  }
+
   let notificationSent = false;
   switch (reminder.notificationMethod) {
     case 'email':
@@ -281,21 +340,22 @@ const processReminder = async (reminder) => {
   }
 
   if (notificationSent) {
-    if (reminder.isRecurring && reminder.recurringFrequency) {
-      const nextReminderTime = getNextReminderTime(reminder.reminderTime, reminder.recurringFrequency);
+    const updatedReminder = await Reminder.findById(reminder._id);
+    if (updatedReminder.isRecurring && updatedReminder.recurringFrequency) {
+      const nextReminderTime = getNextReminderTime(updatedReminder.reminderTime, updatedReminder.recurringFrequency);
       if (nextReminderTime) {
-        reminder.reminderTime = nextReminderTime;
-        reminder.notified = false;
-        await reminder.save();
-        scheduleIndividualReminder(reminder);
+        updatedReminder.reminderTime = nextReminderTime;
+        updatedReminder.notified = false;
+        await updatedReminder.save();
+        scheduleIndividualReminder(updatedReminder);
       } else {
-        reminder.isRecurring = false;
-        reminder.notified = true;
-        await reminder.save();
+        updatedReminder.isRecurring = false;
+        updatedReminder.notified = true;
+        await updatedReminder.save();
       }
     } else {
-      reminder.notified = true;
-      await reminder.save();
+      updatedReminder.notified = true;
+      await updatedReminder.save();
     }
     return true;
   }

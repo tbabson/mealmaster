@@ -213,6 +213,38 @@ const SingleMeal = () => {
                 )}
               </div>
               {/* <div className="amount">{nairaAmount}</div> */}
+
+              {/* Reviews Section */}
+
+              <div className="divider"></div>
+
+              <div className="reviews">
+                <h3>Buyers Reviews ({numOfReviews}):</h3>
+
+                {reviews.length > 0 ? (
+                  reviews.map(
+                    ({ _id: reviewId, user, title, comment, rating }) => {
+                      const { fullName } = user;
+
+                      return (
+                        <div key={reviewId} className="singleReview">
+                          <h4>{fullName}</h4>
+
+                          <h5>Rating: {renderStars(rating)}</h5>
+
+                          <p>
+                            <strong>{title}</strong>
+                          </p>
+
+                          <p>{comment}</p>
+                        </div>
+                      );
+                    }
+                  )
+                ) : (
+                  <p>No reviews yet.</p>
+                )}
+              </div>
             </div>
           </div>
         </div>

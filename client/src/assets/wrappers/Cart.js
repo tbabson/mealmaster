@@ -16,8 +16,6 @@ const Wrapper = styled.div`
     }
 }
 
-
-
 .cartContainer{
     display: grid;
     grid-template-columns: 1fr;

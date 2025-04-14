@@ -27,18 +27,32 @@ webPush.setVapidDetails(
 // Save the push subscription in the database
 
 export const savePushSubscription = async (req, res) => {
+    console.log('Received Subscription Data:', req.body);
     const { endpoint, keys } = req.body;
+    const userId = req.user.userId; // Extract user ID from authenticated request
+
+    // Validate subscription data
+    if (!endpoint || !keys || !keys.p256dh || !keys.auth) {
+        console.error('Invalid subscription data:', { endpoint, keys });
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            message: 'Invalid subscription data. Ensure endpoint, keys.p256dh, and keys.auth are provided.'
+        });
+    }
 
     try {
         // Save subscription to the database
         const subscription = await Subscription.create({
             endpoint,
-            p256dh: keys.p256dh,
-            auth: keys.auth,
+            keys: {
+                p256dh: keys.p256dh,
+                auth: keys.auth,
+            },
+            user: userId, // Add the user ID
         });
 
         res.status(StatusCodes.CREATED).json({ message: 'Push subscription saved successfully', subscription });
     } catch (error) {
+        console.error('Error saving subscription:', error); // Log the error details
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Failed to save subscription' });
     }
 };
@@ -69,13 +83,23 @@ export const createReminder = async (req, res) => {
                 .json({ message: 'Invalid meal ID provided' });
         }
 
+        // Validate subscription before saving the reminder
+        if (!subscription || !subscription.endpoint || !subscription.keys) {
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message: 'A valid push subscription is required to create a reminder with push notifications.'
+            });
+        }
+
         // Save the subscription if provided
         let savedSubscription = null;
         if (subscription) {
             savedSubscription = await Subscription.create({
                 endpoint: subscription.endpoint,
-                p256dh: subscription.keys.p256dh,
-                auth: subscription.keys.auth,
+                keys: {
+                    p256dh: subscription.keys.p256dh,
+                    auth: subscription.keys.auth
+                },
+                user: userId // Add the authenticated user's ID
             });
         }
 
@@ -145,7 +169,7 @@ export const sendPushNotification = async (req, res) => {
         // Create the notification payload
         const payload = JSON.stringify({
             title: `Meal Reminder: ${reminder.meal.name}`,
-            body: `Hello ${reminder.user.fullName}, it's time to prepare your meal: ${reminder.meal.name}.`,
+            body: `Hello ${reminder.user.fullName}, it's time to prepare your meal: ${reminder.meal.name}. Ingredients: ${reminder.meal.ingredients.map(ingredient => ingredient.name).join(', ')}.`
         });
 
         // Send the push notification
@@ -309,3 +333,4 @@ export const deleteReminder = async (req, res) => {
 //         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
 //     }
 // };
+

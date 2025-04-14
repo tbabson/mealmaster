@@ -19,3 +19,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     </Provider>
   </React.StrictMode>
 );
+
+// Register the service worker for push notifications
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker
+    .register("/service-worker.js")
+    .then((registration) => {})
+    .catch((error) => {
+      console.error("Service Worker registration failed:", error);
+    });
+}

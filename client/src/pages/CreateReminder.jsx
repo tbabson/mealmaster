@@ -5,6 +5,7 @@ import { createReminder } from "../Features/Reminder/reminderSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import moment from "moment-timezone";
+import PushNotificationButton from "../components/PushNotificationButton";
 
 const createReminders = () => {
   const dispatch = useDispatch();
@@ -23,9 +24,12 @@ const createReminders = () => {
   const [notificationMethod, setNotificationMethod] = useState("email");
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringFrequency, setRecurringFrequency] = useState("");
+  const [pushNotificationEnabled, setPushNotificationEnabled] = useState(false);
 
-  // Get loading and error states from Redux
-  const { isLoading, error } = useSelector((state) => state.reminders);
+  // Get loading, error, and pushSubscription states from Redux
+  const { isLoading, error, pushSubscription } = useSelector(
+    (state) => state.reminders
+  );
 
   useEffect(() => {
     if (!mealData || Object.keys(mealData).length === 0) {
@@ -56,12 +60,25 @@ const createReminders = () => {
     // Convert the time to UTC
     const utcReminderTime = formattedTime.utc().toISOString(); // Converts to UTC string format
 
+    // Transform the pushSubscription to include only the required fields
+    const transformedSubscription = pushSubscription
+      ? {
+          endpoint: pushSubscription.endpoint,
+          keys: {
+            p256dh: pushSubscription.keys.p256dh,
+            auth: pushSubscription.keys.auth,
+          },
+        }
+      : null;
+
+    // Include the push subscription in the reminder data if available
     const reminderData = {
       meal: meal._id, // Change from mealId to meal
       reminderTime: utcReminderTime, // Send the UTC time to the backend
       notificationMethod,
       isRecurring,
       ...(isRecurring && { recurringFrequency }),
+      ...(pushNotificationEnabled && { subscription: transformedSubscription }), // Include transformed subscription if push notifications are enabled
     };
 
     dispatch(createReminder(reminderData))
@@ -127,12 +144,20 @@ const createReminders = () => {
               <label>Notification Method</label>
               <select
                 value={notificationMethod}
-                onChange={(e) => setNotificationMethod(e.target.value)}
+                onChange={(e) => {
+                  setNotificationMethod(e.target.value);
+                  if (e.target.value === "push") {
+                    setPushNotificationEnabled(true);
+                  } else {
+                    setPushNotificationEnabled(false);
+                  }
+                }}
               >
                 <option value="email">Email</option>
                 <option value="push">Push Notification</option>
                 <option value="calendar">Google Calendar</option>
               </select>
+              {notificationMethod === "push" && <PushNotificationButton />}
             </div>
             <div className="form-group checkbox-group">
               <input
