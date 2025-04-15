@@ -1,5 +1,5 @@
 import { body, param, validationResult } from 'express-validator';
-import { BadRequestError, NotFoundError } from '../errors/customErrors.js';
+import { BadRequestError, NotFoundError } from '../errors/customError.js';
 
 const withValidationErrors = (validateValues) => {
     return [
@@ -17,17 +17,17 @@ const withValidationErrors = (validateValues) => {
     ]
 }
 
-export const validateUserUpdate = withValidationErrors([
-    body('fullName')
-        .optional()
-        .isLength({ min: 2 })
-        .withMessage('Name must be at least 2 characters long'),
-    body('email')
-        .optional()
-        .isEmail()
-        .withMessage('Please provide a valid email'),
-    body('password')
-        .optional()
-        .isLength({ min: 6 })
-        .withMessage('Password must be at least 6 characters long'),
-]);
+// export const validateUserUpdate = withValidationErrors([
+//     body('fullName')
+//         .optional()
+//         .isLength({ min: 2 })
+//         .withMessage('Name must be at least 2 characters long'),
+//     body('email')
+//         .optional()
+//         .isEmail()
+//         .withMessage('Please provide a valid email'),
+//     body('password')
+//         .optional()
+//         .isLength({ min: 6 })
+//         .withMessage('Password must be at least 6 characters long'),
+// ]);
