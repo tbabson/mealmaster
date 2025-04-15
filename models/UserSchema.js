@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-
 const UserSchema = new mongoose.Schema({
   fullName: {
     type: String,
@@ -39,6 +38,19 @@ const UserSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user',
   },
+  // Google Calendar Authentication fields
+  googleRefreshToken: {
+    type: String,
+    sparse: true,
+  },
+  googleCalendarSyncEnabled: {
+    type: Boolean,
+    default: false
+  },
+  lastGoogleCalendarSync: {
+    type: Date,
+    sparse: true
+  }
 }, { timestamps: true });
 
 UserSchema.methods.toJSON = function () {
@@ -46,18 +58,5 @@ UserSchema.methods.toJSON = function () {
   delete obj.password
   return obj
 }
-
-
-// // Password hash middleware
-// UserSchema.pre('save', async function () {
-//   if (!this.isModified('password')) return;
-//   const salt = await bcrypt.genSalt(10);
-//   this.password = await bcrypt.hash(this.password, salt);
-// });
-
-// // Method to compare passwords
-// UserSchema.methods.matchPassword = async function (enteredPassword) {
-//   return await bcrypt.compare(enteredPassword, this.password);
-// };
 
 export default mongoose.model('User', UserSchema);

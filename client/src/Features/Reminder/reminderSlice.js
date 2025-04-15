@@ -104,10 +104,34 @@ export const syncWithCalendar = createAsyncThunk(
     'reminders/syncWithCalendar',
     async (id, { rejectWithValue }) => {
         try {
-            const response = await customFetch.post(`reminders/calendar-sync/${id}`);
+            const response = await customFetch.post(`/reminders/calendar-sync/${id}`);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const checkCalendarAuthStatus = createAsyncThunk(
+    'reminders/checkCalendarAuthStatus',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await customFetch.get('/users/currentuser');
+            return response.data.user.googleCalendarSyncEnabled;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || error.message);
+        }
+    }
+);
+
+export const revokeCalendarAccess = createAsyncThunk(
+    'reminders/revokeCalendarAccess',
+    async (_, { rejectWithValue }) => {
+        try {
+            await customFetch.post('/api/auth/google/revoke');
+            return true;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || error.message);
         }
     }
 );
@@ -118,7 +142,12 @@ const initialState = {
     currentReminder: null,
     isLoading: false,
     error: null,
-    pushSubscription: null
+    pushSubscription: null,
+    calendarAuthStatus: {
+        isAuthorized: false,
+        isChecking: true,
+        error: null
+    }
 };
 
 // Create Slice
@@ -129,6 +158,9 @@ const reminderSlice = createSlice({
         // Any synchronous reducers can be added here
         clearCurrentReminder: (state) => {
             state.currentReminder = null;
+        },
+        clearCalendarError: (state) => {
+            state.calendarAuthStatus.error = null;
         }
     },
     extraReducers: (builder) => {
@@ -241,21 +273,52 @@ const reminderSlice = createSlice({
         });
         builder.addCase(syncWithCalendar.fulfilled, (state, action) => {
             state.isLoading = false;
-            // Optionally update the reminder with calendar sync details
-            const index = state.reminders.findIndex(
-                (reminder) => reminder._id === action.payload._id
-            );
+            // Update reminder with calendar event details if needed
+            if (state.currentReminder?._id === action.payload.reminder._id) {
+                state.currentReminder = action.payload.reminder;
+            }
+            const index = state.reminders.findIndex(r => r._id === action.payload.reminder._id);
             if (index !== -1) {
-                state.reminders[index] = action.payload;
+                state.reminders[index] = action.payload.reminder;
             }
         });
         builder.addCase(syncWithCalendar.rejected, (state, action) => {
             state.isLoading = false;
             state.error = action.payload;
         });
+
+        // Check Calendar Auth Status
+        builder
+            .addCase(checkCalendarAuthStatus.pending, (state) => {
+                state.calendarAuthStatus.isChecking = true;
+                state.calendarAuthStatus.error = null;
+            })
+            .addCase(checkCalendarAuthStatus.fulfilled, (state, action) => {
+                state.calendarAuthStatus.isChecking = false;
+                state.calendarAuthStatus.isAuthorized = action.payload;
+            })
+            .addCase(checkCalendarAuthStatus.rejected, (state, action) => {
+                state.calendarAuthStatus.isChecking = false;
+                state.calendarAuthStatus.error = action.payload;
+            });
+
+        // Revoke Calendar Access
+        builder
+            .addCase(revokeCalendarAccess.pending, (state) => {
+                state.calendarAuthStatus.isChecking = true;
+                state.calendarAuthStatus.error = null;
+            })
+            .addCase(revokeCalendarAccess.fulfilled, (state) => {
+                state.calendarAuthStatus.isChecking = false;
+                state.calendarAuthStatus.isAuthorized = false;
+            })
+            .addCase(revokeCalendarAccess.rejected, (state, action) => {
+                state.calendarAuthStatus.isChecking = false;
+                state.calendarAuthStatus.error = action.payload;
+            });
     }
 });
 
 // Export actions and reducer
-export const { clearCurrentReminder } = reminderSlice.actions;
+export const { clearCurrentReminder, clearCalendarError } = reminderSlice.actions;
 export default reminderSlice.reducer;

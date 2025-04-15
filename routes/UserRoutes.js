@@ -1,25 +1,17 @@
-import { Router } from "express";
-const router = Router()
+import express from 'express';
+import { getAllUsers, getUser, updateUser, deleteUser, showCurrentUser, changeUserPassword } from '../controllers/UserController.js';
+import { validateUserUpdate } from '../middleware/validationMiddleware.js';
+import { authenticateUser } from '../middleware/authMiddleware.js';
+import upload from '../middleware/multer.js';
 
-import { getAllUsers, getUser, showCurrentUser, updateUser, changeUserPassword, deleteUser } from "../controllers/UserController.js";
+const router = express.Router();
 
-import { authenticateUser, authorizePermissions } from "../middleware/authMiddleware.js";
-//import { validateUpdateUserInput } from "../middleware/validationMiddleware.js";
-//import { validateUserPasswordChange } from "../middleware/validationMiddleware.js";
+router.route('/').get(authenticateUser, getAllUsers);
+router.route('/showMe').get(authenticateUser, showCurrentUser);
+router.route('/changeUserPassword').patch(authenticateUser, changeUserPassword);
+router.route('/:id')
+    .get(authenticateUser, getUser)
+    .patch(authenticateUser, validateUserUpdate, upload.single('profileImage'), updateUser)
+    .delete(authenticateUser, deleteUser);
 
-
-router.patch('/changeUserPassword', authenticateUser, changeUserPassword);
-router.get('/', authenticateUser, authorizePermissions('admin'), getAllUsers);
-router.get('/currentUser', authenticateUser, showCurrentUser);
-router.get('/:id', authenticateUser, authorizePermissions("admin"), getUser);
-router.delete('/:id', authenticateUser, authorizePermissions("admin"), deleteUser);
-router.patch('/:id', authenticateUser, updateUser)
-
-
-//validateUpdateUserInput,
-// router.route('/changeUserPassword').patch(authenticateUser, validateUserPasswordChange, changeUserPassword);
-// router.route('/').get(authenticateUser, authorizePermissions('admin'), getAllUsers)
-//router.route('/currentUser').get(showCurrentUser)
-// router.route('/:id').get(authenticateUser, authorizePermissions("admin"), getUser).patch(authenticateUser, validateUpdateUserInput, updateUser).delete(authenticateUser, authorizePermissions("admin"), deleteUser)
-
-export default router
+export default router;

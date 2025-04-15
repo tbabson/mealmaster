@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Wrapper from "../assets/wrappers/Reminder";
-import { createReminder } from "../Features/Reminder/reminderSlice";
+import {
+  createReminder,
+  syncWithCalendar,
+} from "../Features/Reminder/reminderSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import moment from "moment-timezone";
 import PushNotificationButton from "../components/PushNotificationButton";
+import customFetch from "../utils/customFetch";
 
 const createReminders = () => {
   const dispatch = useDispatch();
@@ -25,6 +29,9 @@ const createReminders = () => {
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringFrequency, setRecurringFrequency] = useState("");
   const [pushNotificationEnabled, setPushNotificationEnabled] = useState(false);
+  const [isGoogleAuthRequired, setIsGoogleAuthRequired] = useState(false);
+  const [isCalendarAuthorized, setIsCalendarAuthorized] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   // Get loading, error, and pushSubscription states from Redux
   const { isLoading, error, pushSubscription } = useSelector(
@@ -32,16 +39,95 @@ const createReminders = () => {
   );
 
   useEffect(() => {
+    // Handle initial meal data
     if (!mealData || Object.keys(mealData).length === 0) {
-      navigate("/meals");
+      // Try to recover meal data from localStorage if coming back from auth
+      const searchParams = new URLSearchParams(location.search);
+      const authStatus = searchParams.get("calendar_auth");
+      const storedMeal = localStorage.getItem("pendingReminderMeal");
+
+      if (authStatus && storedMeal) {
+        setMeal(JSON.parse(storedMeal));
+        // Clean up stored meal after retrieving
+        localStorage.removeItem("pendingReminderMeal");
+      } else {
+        navigate("/meals");
+      }
     }
-  }, [mealData, navigate]);
+  }, [mealData, navigate, location.search]);
 
   useEffect(() => {
     if (error) {
       toast.error(error.message || "Failed to create reminder");
     }
   }, [error]);
+
+  useEffect(() => {
+    // Check calendar auth status when component mounts
+    const checkCalendarAuth = async () => {
+      try {
+        const response = await customFetch.get("/users/currentuser");
+        setIsCalendarAuthorized(response.data.user.googleCalendarSyncEnabled);
+      } catch (error) {
+        console.error("Failed to check calendar auth status:", error);
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkCalendarAuth();
+
+    // Handle callback from Google OAuth with improved error handling
+    const searchParams = new URLSearchParams(location.search);
+    const authStatus = searchParams.get("calendar_auth");
+    const error = searchParams.get("error");
+
+    if (authStatus === "success") {
+      setIsCalendarAuthorized(true);
+      toast.success("Successfully connected to Google Calendar");
+    } else if (authStatus === "failed") {
+      toast.error(error || "Failed to connect to Google Calendar");
+    }
+  }, [location]);
+
+  // Handle Google Calendar authorization
+  const handleGoogleAuth = async () => {
+    try {
+      // Store current meal data in localStorage before redirecting
+      localStorage.setItem("pendingReminderMeal", JSON.stringify(meal));
+      window.location.href = `${
+        import.meta.env.VITE_API_URL || "http://localhost:5000"
+      }/api/v1/auth/google`;
+    } catch (error) {
+      toast.error("Failed to authenticate with Google Calendar");
+    }
+  };
+
+  // Handle Google Calendar revocation
+  const handleRevokeAccess = async () => {
+    try {
+      await customFetch.post("/api/auth/google/revoke");
+      setIsCalendarAuthorized(false);
+      toast.success("Google Calendar access revoked");
+    } catch (error) {
+      toast.error("Failed to revoke Google Calendar access");
+    }
+  };
+
+  const handleNotificationMethodChange = (e) => {
+    const method = e.target.value;
+    setNotificationMethod(method);
+    if (method === "push") {
+      setPushNotificationEnabled(true);
+      setIsGoogleAuthRequired(false);
+    } else if (method === "calendar") {
+      setPushNotificationEnabled(false);
+      setIsGoogleAuthRequired(!isCalendarAuthorized);
+    } else {
+      setPushNotificationEnabled(false);
+      setIsGoogleAuthRequired(false);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -58,37 +144,65 @@ const createReminders = () => {
     const formattedTime = moment(combinedReminderTime, "YYYY-MM-DD hh:mm A");
 
     // Convert the time to UTC
-    const utcReminderTime = formattedTime.utc().toISOString(); // Converts to UTC string format
+    const utcReminderTime = formattedTime.utc().toISOString();
 
-    // Transform the pushSubscription to include only the required fields
-    const transformedSubscription = pushSubscription
-      ? {
-          endpoint: pushSubscription.endpoint,
-          keys: {
-            p256dh: pushSubscription.keys.p256dh,
-            auth: pushSubscription.keys.auth,
-          },
-        }
-      : null;
+    // Only include subscription data if push notification is selected
+    const subscriptionData =
+      notificationMethod === "push" && pushSubscription
+        ? {
+            endpoint: pushSubscription.endpoint,
+            keys: {
+              p256dh: pushSubscription.keys.p256dh,
+              auth: pushSubscription.keys.auth,
+            },
+          }
+        : null;
 
-    // Include the push subscription in the reminder data if available
+    // Basic reminder data
     const reminderData = {
-      meal: meal._id, // Change from mealId to meal
-      reminderTime: utcReminderTime, // Send the UTC time to the backend
+      meal: meal._id,
+      reminderTime: utcReminderTime,
       notificationMethod,
       isRecurring,
       ...(isRecurring && { recurringFrequency }),
-      ...(pushNotificationEnabled && { subscription: transformedSubscription }), // Include transformed subscription if push notifications are enabled
     };
+
+    // Add subscription data only for push notifications
+    if (notificationMethod === "push" && subscriptionData) {
+      reminderData.subscription = subscriptionData;
+    }
+
+    // Validate based on notification method
+    if (notificationMethod === "push" && !subscriptionData) {
+      toast.error("Please enable push notifications first");
+      return;
+    }
+
+    if (notificationMethod === "calendar" && !isCalendarAuthorized) {
+      toast.error("Please connect your Google Calendar first");
+      return;
+    }
 
     dispatch(createReminder(reminderData))
       .unwrap()
-      .then(() => {
+      .then((response) => {
         toast.success("Reminder created successfully");
+        // If calendar notification is selected, sync with Google Calendar
+        if (notificationMethod === "calendar") {
+          dispatch(syncWithCalendar(response.reminder._id))
+            .unwrap()
+            .then(() => {
+              toast.success("Reminder synced with Google Calendar");
+            })
+            .catch((error) => {
+              toast.error("Failed to sync with Google Calendar");
+            });
+        }
         navigate("/reminders");
       })
       .catch((error) => {
         console.error("Reminder creation failed", error);
+        toast.error(error.message || "Failed to create reminder");
       });
   };
 
@@ -144,20 +258,39 @@ const createReminders = () => {
               <label>Notification Method</label>
               <select
                 value={notificationMethod}
-                onChange={(e) => {
-                  setNotificationMethod(e.target.value);
-                  if (e.target.value === "push") {
-                    setPushNotificationEnabled(true);
-                  } else {
-                    setPushNotificationEnabled(false);
-                  }
-                }}
+                onChange={handleNotificationMethodChange}
               >
                 <option value="email">Email</option>
                 <option value="push">Push Notification</option>
                 <option value="calendar">Google Calendar</option>
               </select>
               {notificationMethod === "push" && <PushNotificationButton />}
+              {notificationMethod === "calendar" && !isCheckingAuth && (
+                <>
+                  {isCalendarAuthorized ? (
+                    <div className="calendar-status">
+                      <span className="success-text">
+                        ✓ Connected to Google Calendar
+                      </span>
+                      <button
+                        type="button"
+                        className="revoke-btn"
+                        onClick={handleRevokeAccess}
+                      >
+                        Disconnect
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="google-auth-btn"
+                      onClick={handleGoogleAuth}
+                    >
+                      Connect Google Calendar
+                    </button>
+                  )}
+                </>
+              )}
             </div>
             <div className="form-group checkbox-group">
               <input

@@ -9,11 +9,9 @@ import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import cloudinary from 'cloudinary';
 import helmet from 'helmet';
-import { initializeReminderSystem } from './controllers/ScheduleReminders.js'
-import cors from 'cors'
-
-
-//import { authenticateGoogleAPI } from './controllers/ScheduleReminders.js';
+import { initializeReminderSystem } from './controllers/ScheduleReminders.js';
+import cors from 'cors';
+import { validateGoogleConfig } from './utils/configValidation.js';
 
 //CUSTOM IMPORTS
 //routers
@@ -39,6 +37,13 @@ import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
 
 import { handleStripeWebhook } from './controllers/paymentControllers.js';
 
+// Validate required configurations
+try {
+  validateGoogleConfig();
+} catch (error) {
+  console.error('Configuration Error:', error.message);
+  process.exit(1);
+}
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -46,28 +51,24 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-// const __dirname = dirname(fileURLToPath(import.meta.url));
-// if (process.env.NODE_ENV === 'production') {
-//   app.use(express.static(path.join(__dirname, 'client/dist')));
-// }
 const __dirname = dirname(fileURLToPath(import.meta.url));
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
 initializeReminderSystem(); // Start the reminder scheduler
-//authenticateGoogleAPI()
 
 app.use(express.static(path.resolve(__dirname, 'client/dist')));
-// Fix the syntax error
-app.use(cors({
-  origin: 'http://localhost:5173', // Your frontend URL
-  credentials: true,
-  // Add these headers to help with CORS
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
 
+// Updated CORS configuration
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production'
+    ? process.env.CLIENT_URL
+    : ['http://localhost:5173', 'http://localhost:5000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // IMPORTANT: Add the Stripe webhook route BEFORE the JSON body parser
 // This ensures the raw body is available for Stripe signature verification

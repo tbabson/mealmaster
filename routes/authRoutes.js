@@ -1,30 +1,43 @@
 import { Router } from "express";
-const router = Router()
-import { register, login, logout } from '../controllers/authController.js';
-
+import express from 'express';
+import { register, login, logout, handleGoogleAuth, revokeGoogleAccess } from '../controllers/authController.js';
+import { authenticateUser } from '../middleware/authMiddleware.js';
+import { google } from 'googleapis';
 import rateLimiter from "express-rate-limit";
 
+const router = Router();
 
 const apiLimiter = rateLimiter({
     windowMs: 15 * 60 * 1000,
     max: 15,
     message: { msg: 'IP rate limit exceeded, retry in 15 minutes' },
-})
+});
 
+router.post('/register', apiLimiter, register);
+router.post('/login', apiLimiter, login);
+router.get('/logout', logout);
 
-router.post('/register', apiLimiter, register)
+// Google Calendar Authentication routes
+router.get('/google', authenticateUser, (req, res) => {
+    const oauth2Client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        process.env.GOOGLE_REDIRECT_URI
+    );
 
-router.post('/login', apiLimiter, login)
+    const authUrl = oauth2Client.generateAuthUrl({
+        access_type: 'offline',
+        scope: [
+            'https://www.googleapis.com/auth/calendar',
+            'https://www.googleapis.com/auth/calendar.events'
+        ],
+        prompt: 'consent'
+    });
 
-router.get('/logout', logout)
+    res.redirect(authUrl);
+});
 
-// // Register a new user
-// router.post('/auth/register', register);
-
-// // Login an existing user
-// router.post('/auth/login', login);
-
-// // Logout user
-// router.post('/auth/logout', logout);
+router.get('/google/callback', authenticateUser, handleGoogleAuth);
+router.post('/google/revoke', authenticateUser, revokeGoogleAccess);
 
 export default router;

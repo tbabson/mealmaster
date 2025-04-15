@@ -4,21 +4,21 @@ import {
     authenticateUser,
     authorizePermissions,
 } from '../middleware/authMiddleware.js';
+import { authenticateGoogle } from '../middleware/googleAuthMiddleware.js';
 
 const router = express.Router();
 
 // Create a new reminder
 router.post('/', authenticateUser, createReminder);
 
-
 // Send push notification
 router.post('/send-push/:id', authenticateUser, sendPushNotification);
 
-// Send push notification
+// Save push subscription
 router.post('/subscribe', authenticateUser, savePushSubscription);
 
-// Sync reminder with calendar
-router.post('/calendar-sync/:id', authenticateUser, syncWithCalendar);
+// Sync reminder with calendar (with Google authentication)
+router.post('/calendar-sync/:id', authenticateUser, authenticateGoogle, syncWithCalendar);
 
 // Get all user reminders
 router.get('/reminders', authenticateUser, authorizePermissions('admin'), getUserReminders);
@@ -29,7 +29,7 @@ router.get('/user', authenticateUser, getSingleUserReminders);
 // Update a reminder
 router.patch('/:id', authenticateUser, updateReminder);
 
-// delete a reminder
+// Delete a reminder
 router.delete('/:id', authenticateUser, deleteReminder);
 
 export default router;

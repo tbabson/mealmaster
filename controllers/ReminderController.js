@@ -10,7 +10,6 @@ import webPush from 'web-push';
 import dotenv from 'dotenv';
 dotenv.config();
 
-
 // VAPID key configuration
 const vapidKeys = {
     publicKey: process.env.VAPID_PUBLIC_KEY,
@@ -23,11 +22,10 @@ webPush.setVapidDetails(
     vapidKeys.privateKey
 );
 
-
 // Save the push subscription in the database
 
 export const savePushSubscription = async (req, res) => {
-    console.log('Received Subscription Data:', req.body);
+    // console.log('Received Subscription Data:', req.body);
     const { endpoint, keys } = req.body;
     const userId = req.user.userId; // Extract user ID from authenticated request
 
@@ -57,13 +55,9 @@ export const savePushSubscription = async (req, res) => {
     }
 };
 
-
-
-
 // @desc    Create a new meal reminder
 // @route   POST /api/reminders
 export const createReminder = async (req, res) => {
-
     const {
         meal: mealId,
         reminderTime,
@@ -72,10 +66,10 @@ export const createReminder = async (req, res) => {
         recurringFrequency,
         subscription,
     } = req.body;
-    const userId = req.user.userId; // Assuming user authentication
+    const userId = req.user.userId;
 
     try {
-        //Validate or fetch the provided meal
+        // Validate or fetch the provided meal
         const meal = await Meal.findById(mealId);
         if (!meal) {
             return res
@@ -83,23 +77,23 @@ export const createReminder = async (req, res) => {
                 .json({ message: 'Invalid meal ID provided' });
         }
 
-        // Validate subscription before saving the reminder
-        if (!subscription || !subscription.endpoint || !subscription.keys) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                message: 'A valid push subscription is required to create a reminder with push notifications.'
-            });
-        }
-
-        // Save the subscription if provided
+        // Only validate subscription for push notifications
         let savedSubscription = null;
-        if (subscription) {
+        if (notificationMethod === 'push') {
+            if (!subscription || !subscription.endpoint || !subscription.keys) {
+                return res.status(StatusCodes.BAD_REQUEST).json({
+                    message: 'A valid push subscription is required to create a reminder with push notifications.'
+                });
+            }
+
+            // Save the subscription for push notifications
             savedSubscription = await Subscription.create({
                 endpoint: subscription.endpoint,
                 keys: {
                     p256dh: subscription.keys.p256dh,
                     auth: subscription.keys.auth
                 },
-                user: userId // Add the authenticated user's ID
+                user: userId
             });
         }
 
@@ -107,14 +101,15 @@ export const createReminder = async (req, res) => {
 
         const reminder = await Reminder.create({
             user: userId,
-            meal: meal._id, // Link the valid meal ID,
+            meal: meal._id,
             reminderTime: utcReminderTime,
             notificationMethod,
             isRecurring,
             recurringFrequency,
             subscription: savedSubscription ? savedSubscription._id : null,
         });
-        scheduleIndividualReminder(reminder); // Schedule the reminder
+
+        scheduleIndividualReminder(reminder);
         res.status(StatusCodes.CREATED).json({ reminder });
     } catch (error) {
         res
@@ -139,7 +134,6 @@ export const getSingleUserReminders = async (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
-
 
 // @desc Send push notification
 // @route POST /api/reminders/send-push/:id
@@ -180,64 +174,85 @@ export const sendPushNotification = async (req, res) => {
     }
 };
 
-
-const oAuth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
-);
-
 // @desc    Sync reminder with Google Calendar
 // @route   POST /api/reminders/calendar-sync/:id
 export const syncWithCalendar = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Retrieve reminder and populate related data
-        const reminder = await Reminder.findById(id).populate('user meal');
+        const reminder = await Reminder.findById(id)
+            .populate('user', 'email fullName')
+            .populate('meal', 'name ingredients preparationSteps');
+
         if (!reminder) {
-            return res.status(StatusCodes.NOT_FOUND).json({ message: 'Reminder not found' });
+            return res.status(StatusCodes.NOT_FOUND)
+                .json({ message: 'Reminder not found' });
         }
 
-        // Check for the user's refresh token
-        if (!req.user.googleRefreshToken) {
-            return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Missing Google refresh token' });
-        }
+        // Get the authenticated Google Calendar client from middleware
+        const calendar = google.calendar({ version: 'v3', auth: req.googleAuth });
 
-        // Set credentials using the user's refresh token
-        oAuth2Client.setCredentials({ refresh_token: req.user.googleRefreshToken });
-        const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
+        // Format ingredients and steps for the description
+        const ingredientsList = reminder.meal.ingredients
+            .map(i => `- ${i.name}`)
+            .join('\n');
 
-        // Define the Google Calendar event details
+        const stepsList = reminder.meal.preparationSteps
+            .map((step, i) => `${i + 1}. ${step.instruction}`)
+            .join('\n');
+
+        // Prepare event details with all meal information
         const event = {
             summary: `Meal Reminder: ${reminder.meal.name}`,
-            description: `Reminder to have your meal: ${reminder.meal.name}`,
+            description: `Time to prepare: ${reminder.meal.name}\n\n` +
+                `Ingredients:\n${ingredientsList}\n\n` +
+                `Steps:\n${stepsList}`,
             start: {
-                dateTime: new Date(reminder.reminderTime).toISOString(),
-                timeZone: 'Africa/Lagos', // Corrected time zone for Nigeria
+                dateTime: reminder.reminderTime,
+                timeZone: 'UTC'
             },
             end: {
-                dateTime: new Date(new Date(reminder.reminderTime).getTime() + 60 * 60 * 1000).toISOString(),
-                timeZone: 'Africa/Lagos',
+                dateTime: moment(reminder.reminderTime)
+                    .add(1, 'hour')
+                    .toISOString(),
+                timeZone: 'UTC'
             },
-            attendees: [{ email: reminder.user.email }],
+            reminders: {
+                useDefault: false,
+                overrides: [
+                    { method: 'email', minutes: 30 },
+                    { method: 'popup', minutes: 15 }
+                ]
+            },
+            attendees: [{ email: reminder.user.email }]
         };
 
-        // Insert the event into the user's Google Calendar
+        // Insert the event
         const response = await calendar.events.insert({
             calendarId: 'primary',
             resource: event,
+            sendUpdates: 'all'
         });
+
+        // Update reminder with calendar event ID
+        reminder.calendarEventId = response.data.id;
+        await reminder.save();
 
         res.status(StatusCodes.OK).json({
-            message: 'Reminder synced with calendar',
+            message: 'Successfully synced with Google Calendar',
             eventLink: response.data.htmlLink,
+            reminder
         });
+
     } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
+        console.error('Calendar sync error:', error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .json({
+                message: 'Failed to sync with Google Calendar',
+                error: error.message || 'Unknown error occurred'
+            });
     }
 };
-
 
 // @desc    Get user reminders
 // @route   GET /api/reminders
@@ -308,29 +323,4 @@ export const deleteReminder = async (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
-
-
-// @desc    Save push subscription for reminders
-// @route   POST /api/reminders/subscribe
-// export const savePushSubscription = async (req, res) => {
-//     const { subscription, mealId } = req.body;
-//     const userId = req.user._id; // Assuming user authentication
-
-//     try {
-//         // Find or create the reminder for this meal and user
-//         let reminder = await Reminder.findOne({ user: userId, meal: mealId });
-
-//         if (!reminder) {
-//             return res.status(StatusCodes.NOT_FOUND).json({ message: 'Reminder not found' });
-//         }
-
-//         // Save the push subscription in the reminder
-//         reminder.pushSubscription = subscription;
-//         await reminder.save();
-
-//         res.status(StatusCodes.OK).json({ message: 'Push subscription saved successfully' });
-//     } catch (error) {
-//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
-//     }
-// };
 

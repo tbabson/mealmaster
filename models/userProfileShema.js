@@ -20,6 +20,14 @@ const UserSchema = new mongoose.Schema(
             enum: ['user', 'admin'],
             default: 'user',
         },
+        profileImage: {
+            type: String,
+            default: '',
+        },
+        cloudinaryId: {
+            type: String,
+            default: '',
+        },
         orders: [
             {
                 type: mongoose.Schema.Types.ObjectId,

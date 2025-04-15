@@ -40,8 +40,32 @@ const ReminderSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // New Google Calendar specific fields
+    calendarEventId: {
+      type: String,
+      sparse: true, // Allow null/undefined values
+      description: 'Google Calendar event ID for synced reminders'
+    },
+    calendarSyncStatus: {
+      type: String,
+      enum: ['pending', 'synced', 'failed', 'not_applicable'],
+      default: 'not_applicable'
+    },
+    calendarEventLink: {
+      type: String,
+      sparse: true,
+      description: 'Direct link to the Google Calendar event'
+    },
+    lastSyncedAt: {
+      type: Date,
+      description: 'Timestamp of last successful Google Calendar sync'
+    }
   },
   { timestamps: true }
 );
+
+// Index for efficient queries on calendar-related fields
+ReminderSchema.index({ calendarEventId: 1 });
+ReminderSchema.index({ calendarSyncStatus: 1 });
 
 export default mongoose.model('Reminder', ReminderSchema);

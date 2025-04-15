@@ -5,16 +5,12 @@ import { BadRequestError, UnauthenticatedError } from '../errors/customErrors.js
 import Order from '../models/OrderModel.js'; // Ensure models are imported
 import Reminder from '../models/ReminderModel.js'
 import Cart from '../models/CartModel.js';
+import cloudinary from 'cloudinary';
+import fs from 'fs/promises';
+import path from 'path';
 
 
 
-
-
-// GET ALL USERS CONTROLLER
-// export const getAllUsers = async (req, res) => {
-//     const users = await User.find({})
-//     res.status(StatusCodes.OK).json({ users, count: users.length })
-// }
 export const getAllUsers = async (req, res) => {
     try {
         // Fetch all users and populate orders and reminders
@@ -48,14 +44,6 @@ export const getAllUsers = async (req, res) => {
     }
 }
 
-// SHOW CURRENT USER CONTROLLER
-// export const showCurrentUser = async (req, res) => {
-//     const user = await User.findOne({ _id: req.user.userId })
-//     const userWithoutPassword = user.toJSON()
-//     res.status(StatusCodes.OK).json({ user: userWithoutPassword })
-//     //res.status(StatusCodes.OK).json({ user: req.user });;
-// };
-
 export const showCurrentUser = async (req, res) => {
     try {
         const user = await User.findById(req.user.userId).select("-password");
@@ -86,8 +74,10 @@ export const getUser = async (req, res) => {
         // Fetch cart items separately
         const cartItems = await Cart.find({ userId: user._id });
 
-        // Fetch other documents
-        const orders = await Order.find({ user: user._id });
+        // Fetch orders with userId field instead of user
+        const orders = await Order.find({ userId: user._id }).sort({ createdAt: -1 });
+
+        // Fetch reminders
         const reminders = await Reminder.find({ user: user._id });
 
         // Send the response with user and related documents
@@ -104,14 +94,46 @@ export const getUser = async (req, res) => {
 
 // EDIT USER CONTROLLER
 export const updateUser = async (req, res) => {
-    //const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
-    //    new: true
-    // })
-    const obj = { ...req.body }
-    delete obj.password
-    const updatedUser = await User.findByIdAndUpdate(req.user.userId, obj)
+    try {
+        const obj = { ...req.body };
+        delete obj.password;
 
-    res.status(StatusCodes.OK).json({ msg: 'user updated' })
+        // Handle image upload if there's a file
+        if (req.file) {
+            // If user already has an image, delete it from Cloudinary
+            const currentUser = await User.findById(req.user.userId);
+            if (currentUser.profileImage && currentUser.cloudinaryId) {
+                await cloudinary.v2.uploader.destroy(currentUser.cloudinaryId);
+            }
+
+            // Upload new image to Cloudinary
+            const result = await cloudinary.v2.uploader.upload(req.file.path, {
+                folder: 'mealmaster/users',
+                use_filename: true,
+            });
+
+            // Remove local file after upload
+            const absolutePath = path.resolve(req.file.path);
+            await fs.unlink(absolutePath);
+
+            // Add Cloudinary data to the update object
+            obj.profileImage = result.secure_url;
+            obj.cloudinaryId = result.public_id;
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.userId,
+            obj,
+            { new: true }
+        ).select('-password');
+
+        res.status(StatusCodes.OK).json({ user: updatedUser });
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Error updating user profile",
+            error: error.message
+        });
+    }
 }
 
 // DELETE USER CONTROLLER
