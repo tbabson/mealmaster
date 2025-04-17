@@ -199,29 +199,37 @@ export const deleteBlog = async (req, res) => {
 // Add Comment
 export const addComment = async (req, res) => {
     try {
-        const blog = await Blog.findById(req.params.id);
+        const { id } = req.params;
+        const { content } = req.body;
 
-        if (!blog) {
-            return res.status(StatusCodes.NOT_FOUND)
-                .json({ message: 'Blog not found' });
+        // Validate content
+        if (!content || !content.trim()) {
+            return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Comment content is required' });
         }
 
-        const comment = {
-            content: req.body.content,
-            user: req.user.userId,
-        };
-
-        blog.comments.push(comment);
-        await blog.save();
-
-        const updatedBlog = await Blog.findById(req.params.id)
+        // Add comment and return updated blog with populated fields
+        const blog = await Blog.findByIdAndUpdate(
+            id,
+            {
+                $push: {
+                    comments: {
+                        content,
+                        user: req.user.userId,
+                    },
+                },
+            },
+            { new: true }
+        )
             .populate('author', 'fullName')
             .populate('comments.user', 'fullName');
 
-        res.status(StatusCodes.OK).json({ blog: updatedBlog });
+        if (!blog) {
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'Blog not found' });
+        }
+
+        res.status(StatusCodes.OK).json({ blog });
     } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR)
-            .json({ message: error.message });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
 

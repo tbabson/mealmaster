@@ -23,7 +23,7 @@ export const getAllBlogs = createAsyncThunk(
     'blog/getAllBlogs',
     async (_, thunkAPI) => {
         const { search, searchStatus, searchCategory, sort, page } = thunkAPI.getState().blog;
-        let url = `/api/v1/blogs?page=${page}&status=${searchStatus}&category=${searchCategory}&sort=${sort}`;
+        let url = `/blogs?page=${page}&status=${searchStatus}&category=${searchCategory}&sort=${sort}`;
         if (search) {
             url = url + `&search=${search}`;
         }
@@ -40,10 +40,13 @@ export const getSingleBlog = createAsyncThunk(
     'blog/getSingleBlog',
     async (id, thunkAPI) => {
         try {
-            const resp = await customFetch.get(`/api/v1/blogs/${id}`);
+            const resp = await customFetch.get(`/blogs/${id}`);
             return resp.data;
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.msg);
+            return thunkAPI.rejectWithValue(
+                error?.response?.data?.message || 'Failed to fetch blog'
+            );
+
         }
     }
 );
@@ -52,7 +55,7 @@ export const createBlog = createAsyncThunk(
     'blog/createBlog',
     async (blog, thunkAPI) => {
         try {
-            const resp = await customFetch.post('/api/v1/blogs', blog);
+            const resp = await customFetch.post('/blogs', blog);
             toast.success('Blog Created Successfully');
             return resp.data;
         } catch (error) {
@@ -65,7 +68,7 @@ export const updateBlog = createAsyncThunk(
     'blog/updateBlog',
     async ({ blogId, blog }, thunkAPI) => {
         try {
-            const resp = await customFetch.patch(`/api/v1/blogs/${blogId}`, blog);
+            const resp = await customFetch.patch(`/blogs/${blogId}`, blog);
             toast.success('Blog Updated Successfully');
             return resp.data;
         } catch (error) {
@@ -78,7 +81,7 @@ export const deleteBlog = createAsyncThunk(
     'blog/deleteBlog',
     async (blogId, thunkAPI) => {
         try {
-            const resp = await customFetch.delete(`/api/v1/blogs/${blogId}`);
+            const resp = await customFetch.delete(`/blogs/${blogId}`);
             thunkAPI.dispatch(getAllBlogs());
             return resp.data;
         } catch (error) {
@@ -91,7 +94,7 @@ export const addComment = createAsyncThunk(
     'blog/addComment',
     async ({ blogId, comment }, thunkAPI) => {
         try {
-            const resp = await customFetch.post(`/api/v1/blogs/${blogId}/comments`, comment);
+            const resp = await customFetch.post(`/blogs/${blogId}/comments`, comment);
             return resp.data;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data.msg);
@@ -103,7 +106,7 @@ export const deleteComment = createAsyncThunk(
     'blog/deleteComment',
     async ({ blogId, commentId }, thunkAPI) => {
         try {
-            const resp = await customFetch.delete(`/api/v1/blogs/${blogId}/comments/${commentId}`);
+            const resp = await customFetch.delete(`/blogs/${blogId}/comments/${commentId}`);
             return resp.data;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data.msg);
@@ -177,7 +180,7 @@ const blogSlice = createSlice({
                 toast.error(payload);
             })
             .addCase(addComment.fulfilled, (state, { payload }) => {
-                state.blog.comments = payload.comments;
+                state.blog = payload.blog;
             })
             .addCase(addComment.rejected, (state, { payload }) => {
                 toast.error(payload);

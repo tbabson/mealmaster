@@ -1,6 +1,5 @@
 import express from 'express';
 import { getAllUsers, getUser, updateUser, deleteUser, showCurrentUser, changeUserPassword } from '../controllers/UserController.js';
-// import { validateUserUpdate } from '../middleware/validationMiddleware.js';
 import { authenticateUser } from '../middleware/authMiddleware.js';
 import upload from '../middleware/multer.js';
 

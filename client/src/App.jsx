@@ -8,6 +8,7 @@ import store, { persistor } from "./store";
 import {
   HomeLayout,
   Blog,
+  SingleBlog,
   Profile,
   Cart,
   Error,
@@ -74,6 +75,10 @@ const router = createBrowserRouter([
       {
         path: "blog",
         element: <Blog />,
+      },
+      {
+        path: "blogs/:id",
+        element: <SingleBlog />,
       },
       {
         path: "profile",

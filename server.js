@@ -17,6 +17,7 @@ import { validateGoogleConfig } from './utils/configValidation.js';
 //routers
 import authRouter from './routes/authRoutes.js';
 import mealRouter from './routes/MealRoutes.js';
+import blogRouter from './routes/BlogRoutes.js';
 import ingredientRouter from './routes/ingredientRoutes.js';
 import preparationRouter from './routes/prepStepRoutes.js';
 import shoppingListsRouter from './routes/shoppingListRoutes.js';
@@ -99,6 +100,7 @@ app.use(
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/meals', mealRouter);
+app.use('/api/v1/blogs', blogRouter);
 app.use('/api/v1/ingredients', ingredientRouter);
 app.use('/api/v1/preparationSteps', preparationRouter);
 app.use('/api/v1/shoppingLists', shoppingListsRouter);

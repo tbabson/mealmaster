@@ -19,3 +19,4 @@ export { default as SingleOrder } from './SingleOrder'
 export { default as OrderSuccess } from './OrderSuccess'
 export { default as CreateReminder } from "./CreateReminder"
 export { default as Reminders } from "./Reminders"
+export { default as SingleBlog } from "./SingleBlog"

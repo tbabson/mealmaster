@@ -8,7 +8,7 @@ import {
     addComment,
     deleteComment
 } from '../controllers/BlogController.js';
-import { authenticateUser } from '../middleware/authMiddleware.js';
+import { authenticateUser, authorizePermissions } from '../middleware/authMiddleware.js';
 import multer from 'multer';
 import path from 'path';
 
@@ -40,7 +40,7 @@ const upload = multer({
 
 // Blog Routes
 router.route('/')
-    .post(authenticateUser, upload.single('featuredImage'), createBlog)
+    .post(authenticateUser, authorizePermissions("admin"), upload.single('featuredImage'), createBlog)
     .get(getAllBlogs);
 
 router.route('/:id')
