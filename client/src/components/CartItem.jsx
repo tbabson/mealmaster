@@ -60,7 +60,7 @@ const CartItem = ({ meal }) => {
                 <li key={ingredient._id || ingredient.name}>
                   <span>
                     {ingredient.name} - {ingredient.quantity}{" "}
-                    {ingredient.unit || "pcs"}
+                    {ingredient.unit || "pcs"} {formatPrice(ingredient.price)}
                   </span>
                   <div>
                     <select

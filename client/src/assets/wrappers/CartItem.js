@@ -60,21 +60,34 @@ const Wrapper = styled.div`
         display: flex;
         align-items: center;
         justify-content: space-between;
-        flex-wrap: wrap;
-       
+        gap: 1rem;
+        
         span {
           color: var(--dark); 
           font-weight: 500;
           text-transform: capitalize;
           line-height: 1.5;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          flex: 1;
+          min-width: 0;
+        }
+       
+        div {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          flex-shrink: 0;
         }
        
         select {
           padding: 0.25rem;
-          margin: 0 0.5rem;
           border: 1px solid var(--primary-light, #ddd);
           border-radius: 0.25rem;
           background-color: var(--white, #fff);
+          width: 60px;
+          flex-shrink: 0;
         }
        
         .removeIngredient {
@@ -85,6 +98,10 @@ const Wrapper = styled.div`
           font-size: 1rem;
           border-radius: 0.25rem;
           cursor: pointer;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
          
           &:hover {
             background-color: var(--darkest);

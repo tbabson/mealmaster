@@ -83,6 +83,8 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <Profile />,
+        loader: ordersLoader(queryClient, store),
+        errorElement: <Error />,
       },
       {
         path: "cart",

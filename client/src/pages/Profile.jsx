@@ -1,103 +1,179 @@
 import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { FaChevronDown, FaChevronUp, FaEdit, FaCamera } from "react-icons/fa";
+import {
+  FaChevronDown,
+  FaChevronUp,
+  FaEdit,
+  FaCamera,
+  FaTimes,
+} from "react-icons/fa";
 import moment from "moment";
 import { toast } from "react-toastify";
 import Wrapper from "../assets/wrappers/Profile";
+import { ModalOverlay, ModalContent } from "../assets/wrappers/UserReminder";
 import Loading from "../components/Loading";
-import customFetch from "../utils/customFetch";
 import { FormRow } from "../components";
-import { setUser } from "../Features/user/userSlice";
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
+import { fetchCurrentUser, setUser } from "../Features/user/userSlice";
+import {
+  fetchSingleUserReminders,
+  updateReminder,
+  deleteReminder,
+} from "../Features/Reminder/reminderSlice";
+import customFetch from "../utils/customFetch";
 
 const Profile = () => {
   const dispatch = useDispatch();
-  const { user: currentUser } = useSelector((state) => state.user);
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [activeAccordion, setActiveAccordion] = useState("orders"); // Set orders as default open section
-  const fileInputRef = useRef(null);
+  const { user: currentUser, loading: userLoading } = useSelector(
+    (state) => state.user
+  );
+  const { reminders, isLoading: reminderLoading } = useSelector(
+    (state) => state.reminders
+  );
 
-  // Edit Profile Modal States
+  // You'll need to add these selectors for orders and cart items from your Redux store
+  const { orders } = useLoaderData(); // Orders are preloaded via the loader
+  const cartItems = useSelector((state) => state.cart.cartItems) || [];
+
+  // Local state
+  const [activeAccordion, setActiveAccordion] = useState("orders");
+  const fileInputRef = useRef(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [selectedReminder, setSelectedReminder] = useState(null);
+  const [editingReminder, setEditingReminder] = useState(null);
+  const [editText, setEditText] = useState("");
+  const [editTime, setEditTime] = useState("");
   const [editFormData, setEditFormData] = useState({
     fullName: "",
     email: "",
   });
-
-  // Change Password Modal States
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordFormData, setPasswordFormData] = useState({
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
 
+  // Initial data fetch
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (!currentUser?._id) {
-        setLoading(false);
-        return;
-      }
+    if (currentUser?._id) {
+      dispatch(fetchCurrentUser());
+      dispatch(fetchSingleUserReminders());
+    }
+  }, [dispatch, currentUser?._id]);
 
-      try {
-        const response = await customFetch.get(`/users/${currentUser._id}`);
-        setUserData(response.data);
-        setEditFormData({
-          fullName: response.data.user.fullName,
-          email: response.data.user.email,
-        });
-      } catch (error) {
-        toast.error(
-          error?.response?.data?.message || "Error fetching user data"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, [currentUser?._id]);
+  // Update form data when user data changes
+  useEffect(() => {
+    if (currentUser) {
+      setEditFormData({
+        fullName: currentUser.fullName || "",
+        email: currentUser.email || "",
+      });
+    }
+  }, [currentUser]);
 
   const toggleAccordion = (section) => {
-    if (activeAccordion === section) {
-      setActiveAccordion(null);
-    } else {
-      setActiveAccordion(section);
+    setActiveAccordion(activeAccordion === section ? null : section);
+  };
+
+  const handleReminderClick = (reminder) => {
+    setSelectedReminder(reminder);
+    setEditText(reminder.note || "");
+    setEditTime(
+      new Date(reminder.reminderTime).toISOString().substring(11, 16)
+    );
+    setShowReminderModal(true);
+  };
+
+  const handleSaveReminderEdit = () => {
+    const updatedDateTime = new Date(selectedReminder.reminderTime);
+    const [hours, minutes] = editTime.split(":");
+    updatedDateTime.setHours(Number(hours));
+    updatedDateTime.setMinutes(Number(minutes));
+
+    dispatch(
+      updateReminder({
+        id: editingReminder,
+        reminderData: {
+          note: editText,
+          reminderTime: updatedDateTime.toISOString(),
+        },
+      })
+    )
+      .unwrap()
+      .then(() => {
+        setEditingReminder(null);
+        toast.success("Reminder updated successfully");
+      })
+      .catch((err) => toast.error(err?.message || "Failed to update reminder"));
+  };
+
+  const handleDeleteReminder = (id) => {
+    dispatch(deleteReminder(id))
+      .unwrap()
+      .then(() => {
+        setShowReminderModal(false);
+        toast.success("Reminder deleted successfully");
+      })
+      .catch((err) => toast.error(err?.message || "Failed to delete reminder"));
+  };
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
+      return;
     }
+
+    const formData = new FormData();
+    formData.append("profileImage", file);
+
+    try {
+      const response = await customFetch.patch(
+        "/users/update-profile-image",
+        formData
+      );
+      dispatch(setUser(response.data.user));
+      toast.success("Profile image updated successfully");
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Failed to update profile image"
+      );
+    }
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleEditProfile = async (e) => {
     e.preventDefault();
     try {
       const response = await customFetch.patch(
-        `/users/${currentUser._id}`,
+        "/users/update-profile",
         editFormData
       );
-      dispatch(setUser({ ...currentUser, ...editFormData }));
+      dispatch(setUser(response.data.user));
       setShowEditModal(false);
       toast.success("Profile updated successfully");
-      // Refresh user data
-      const updatedUserData = await customFetch.get(
-        `/users/${currentUser._id}`
-      );
-      setUserData(updatedUserData.data);
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Error updating profile");
+      toast.error(error?.response?.data?.message || "Failed to update profile");
     }
   };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
     if (passwordFormData.newPassword !== passwordFormData.confirmPassword) {
-      toast.error("New passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
+
     try {
-      await customFetch.patch("/users/changeUserPassword", {
-        oldPassword: passwordFormData.oldPassword,
-        newPassword: passwordFormData.newPassword,
-      });
+      await customFetch.patch("/users/change-password", passwordFormData);
       setShowPasswordModal(false);
       setPasswordFormData({
         oldPassword: "",
@@ -106,65 +182,14 @@ const Profile = () => {
       });
       toast.success("Password changed successfully");
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Error changing password");
-    }
-  };
-
-  const handleImageClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleImageChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Validate file type and size
-    const validTypes = ["image/jpeg", "image/png", "image/jpg"];
-    if (!validTypes.includes(file.type)) {
-      toast.error("Please upload a valid image file (JPEG, PNG)");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      // 5MB limit
-      toast.error("Image size should be less than 5MB");
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      formData.append("profileImage", file);
-
-      const response = await customFetch.patch(
-        `/users/${currentUser._id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      // Update both the Redux store and local state with the complete user data
-      const updatedUser = response.data.user;
-      dispatch(setUser(updatedUser));
-      setUserData((prev) => ({
-        ...prev,
-        user: updatedUser,
-      }));
-      toast.success("Profile image updated successfully");
-    } catch (error) {
       toast.error(
-        error?.response?.data?.message || "Error updating profile image"
+        error?.response?.data?.message || "Failed to change password"
       );
     }
   };
 
-  if (loading) return <Loading />;
+  if (userLoading || reminderLoading) return <Loading />;
   if (!currentUser) return <h2>Please log in to view your profile</h2>;
-  if (!userData) return <h2>No user data found...</h2>;
-
-  const { user, orders, reminders, cartItems } = userData;
 
   return (
     <Wrapper>
@@ -173,14 +198,14 @@ const Profile = () => {
           <div className="profile-header">
             <div className="profile-image-container">
               <div className="profile-image" onClick={handleImageClick}>
-                {userData?.user?.profileImage ? (
+                {currentUser?.profileImage ? (
                   <img
-                    src={userData.user.profileImage}
-                    alt={userData.user.fullName}
+                    src={currentUser.profileImage}
+                    alt={currentUser.fullName}
                   />
                 ) : (
                   <div className="profile-image-placeholder">
-                    {userData?.user?.fullName?.charAt(0)}
+                    {currentUser?.fullName?.charAt(0)}
                   </div>
                 )}
                 <div className="image-overlay">
@@ -195,10 +220,10 @@ const Profile = () => {
                 />
               </div>
             </div>
-            <h2>{user.fullName}'s Profile</h2>
+            <h2>{currentUser.fullName}'s Profile</h2>
             <div className="user-info">
-              <p>Email: {user.email}</p>
-              {user.role === "admin" && <p>Role: {user.role}</p>}
+              <p>Email: {currentUser.email}</p>
+              {currentUser.role === "admin" && <p>Role: {currentUser.role}</p>}
             </div>
             <div className="profile-actions">
               <button
@@ -257,7 +282,7 @@ const Profile = () => {
                 ) : (
                   orders.map((order) => (
                     <Link
-                      to={`/order/${order._id}`}
+                      to={`/orders/${order._id}`}
                       key={order._id}
                       className="order-card"
                     >
@@ -296,13 +321,15 @@ const Profile = () => {
                   <p>No reminders found</p>
                 ) : (
                   reminders.map((reminder) => (
-                    <Link
-                      to={`/reminders`}
+                    <div
                       key={reminder._id}
                       className="reminder-card"
+                      onClick={(e) => handleReminderClick(reminder, e)}
+                      style={{ cursor: "pointer" }}
                     >
                       <h4>
-                        {reminder.meal ? reminder.meal.name : "Unnamed Meal"}
+                        {reminder.meal ? reminder.meal.name : "Unnamed Meal"}{" "}
+                        <span>Reminder</span>
                       </h4>
                       <p>
                         Time:{" "}
@@ -315,7 +342,7 @@ const Profile = () => {
                       {reminder.isRecurring && (
                         <p>Frequency: {reminder.recurringFrequency}</p>
                       )}
-                    </Link>
+                    </div>
                   ))
                 )}
               </div>
@@ -339,23 +366,145 @@ const Profile = () => {
                   activeAccordion === "cart" ? "active" : ""
                 }`}
               >
-                {cartItems.length === 0 ? (
+                {Array.isArray(cartItems) && cartItems.length === 0 ? (
                   <p>No items in cart</p>
                 ) : (
                   <>
-                    {cartItems.map((item) => (
-                      <Link to="/cart" key={item._id} className="order-card">
-                        <h4>{item.meal ? item.meal.name : "Unnamed Item"}</h4>
-                        <p>Quantity: {item.quantity}</p>
-                        <p>Price: ${item.price}</p>
-                      </Link>
-                    ))}
+                    {Array.isArray(cartItems) &&
+                      cartItems.map((item) => (
+                        <Link to="/cart" key={item._id} className="order-card">
+                          <h4>{item.meal ? item.meal.name : "Unnamed Item"}</h4>
+                          <p>Quantity: {item.quantity}</p>
+                          <p>Price: ${item.price}</p>
+                        </Link>
+                      ))}
                   </>
                 )}
               </div>
             </div>
           </div>
         </div>
+
+        {/* Reminder Modal */}
+        <AnimatePresence>
+          {showReminderModal && selectedReminder && (
+            <ModalOverlay
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <ModalContent
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                <button
+                  className="close-modal-btn"
+                  onClick={() => setShowReminderModal(false)}
+                >
+                  <FaTimes />
+                </button>
+
+                <div className="modal-content">
+                  <h3>
+                    {selectedReminder.meal?.name || "Unnamed Meal"}{" "}
+                    <span>Reminder</span>
+                  </h3>
+
+                  {editingReminder === selectedReminder._id ? (
+                    <div className="edit-form">
+                      <div className="form-group">
+                        <label>Time:</label>
+                        <input
+                          type="time"
+                          value={editTime}
+                          onChange={(e) => setEditTime(e.target.value)}
+                          className="edit-time-input"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Note:</label>
+                        <textarea
+                          value={editText}
+                          onChange={(e) => setEditText(e.target.value)}
+                          placeholder="Add a note..."
+                          rows="3"
+                          maxLength="500"
+                          className="edit-note-input"
+                        />
+                        <small>
+                          {500 - editText.length} characters remaining
+                        </small>
+                      </div>
+                      <div className="btn-group">
+                        <button
+                          className="save-btn"
+                          onClick={handleSaveReminderEdit}
+                        >
+                          Save Changes
+                        </button>
+                        <button
+                          className="cancel-btn"
+                          onClick={() => setEditingReminder(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="reminder-details">
+                      <p>
+                        <strong>Time:</strong>{" "}
+                        {moment(selectedReminder.reminderTime).format(
+                          "MMMM Do YYYY, h:mm a"
+                        )}
+                      </p>
+                      <p>
+                        <strong>Method:</strong>{" "}
+                        {selectedReminder.notificationMethod}
+                      </p>
+                      <p>
+                        <strong>Recurring:</strong>{" "}
+                        {selectedReminder.isRecurring ? "Yes" : "No"}
+                      </p>
+                      {selectedReminder.isRecurring && (
+                        <p>
+                          <strong>Frequency:</strong>{" "}
+                          {selectedReminder.recurringFrequency}
+                        </p>
+                      )}
+                      {selectedReminder.note && (
+                        <div className="note-section">
+                          <strong>Note:</strong>
+                          <p>{selectedReminder.note}</p>
+                        </div>
+                      )}
+                      <div className="btn-group">
+                        <button
+                          className="edit-btn"
+                          onClick={() =>
+                            setEditingReminder(selectedReminder._id)
+                          }
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="delete-btn"
+                          onClick={() =>
+                            handleDeleteReminder(selectedReminder._id)
+                          }
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </ModalContent>
+            </ModalOverlay>
+          )}
+        </AnimatePresence>
 
         {/* Edit Profile Modal */}
         {showEditModal && (

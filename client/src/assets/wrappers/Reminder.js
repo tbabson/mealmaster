@@ -188,6 +188,49 @@ const Wrapper = styled.div`
     font-size: 14px;
     margin-top: 5px;
   }
+
+  .note-input, .edit-note-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--grey-200);
+    border-radius: var(--border-radius);
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+    
+    &:focus {
+      outline: none;
+      border-color: var(--primary-500);
+      box-shadow: 0 0 0 2px var(--primary-100);
+    }
+  }
+
+  .reminder-note {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--grey-50);
+    border-radius: var(--border-radius);
+    border-left: 3px solid var(--primary-500);
+
+    .note-label {
+      font-weight: 600;
+      color: var(--grey-600);
+      margin-bottom: 0.5rem;
+    }
+
+    .note-content {
+      color: var(--text-color);
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+  }
+
+  small {
+    color: var(--grey-500);
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    display: block;
+  }
 `;
 
 export default Wrapper;

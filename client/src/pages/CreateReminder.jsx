@@ -32,6 +32,7 @@ const createReminders = () => {
   const [isGoogleAuthRequired, setIsGoogleAuthRequired] = useState(false);
   const [isCalendarAuthorized, setIsCalendarAuthorized] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [note, setNote] = useState("");
 
   // Get loading, error, and pushSubscription states from Redux
   const { isLoading, error, pushSubscription } = useSelector(
@@ -164,6 +165,7 @@ const createReminders = () => {
       reminderTime: utcReminderTime,
       notificationMethod,
       isRecurring,
+      note, // Add note to reminder data
       ...(isRecurring && { recurringFrequency }),
     };
 
@@ -253,6 +255,18 @@ const createReminders = () => {
                 <option value="AM">AM</option>
                 <option value="PM">PM</option>
               </select>
+            </div>
+            <div className="form-group">
+              <label>Add Note</label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Add a note about this reminder..."
+                rows="3"
+                maxLength="500"
+                className="note-input"
+              />
+              <small>{500 - note.length} characters remaining</small>
             </div>
             <div className="form-group">
               <label>Notification Method</label>

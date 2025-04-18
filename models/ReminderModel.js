@@ -36,6 +36,11 @@ const ReminderSchema = new mongoose.Schema(
         return this.notificationMethod === 'push';
       }
     },
+    note: {
+      type: String,
+      maxlength: [500, 'Note cannot be more than 500 characters'],
+      default: '',
+    },
     notified: {
       type: Boolean,
       default: false,

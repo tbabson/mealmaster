@@ -65,6 +65,7 @@ export const createReminder = async (req, res) => {
         isRecurring,
         recurringFrequency,
         subscription,
+        note,
     } = req.body;
     const userId = req.user.userId;
 
@@ -107,6 +108,7 @@ export const createReminder = async (req, res) => {
             isRecurring,
             recurringFrequency,
             subscription: savedSubscription ? savedSubscription._id : null,
+            note,
         });
 
         scheduleIndividualReminder(reminder);
@@ -278,6 +280,7 @@ export const updateReminder = async (req, res) => {
         notificationMethod,
         isRecurring,
         recurringFrequency,
+        note,
     } = req.body;
 
     try {
@@ -295,6 +298,7 @@ export const updateReminder = async (req, res) => {
             isRecurring !== undefined ? isRecurring : reminder.isRecurring;
         reminder.recurringFrequency =
             recurringFrequency || reminder.recurringFrequency;
+        reminder.note = note !== undefined ? note : reminder.note;
         //reminder.healthGoals = healthGoals || reminder.healthGoals;
 
         await reminder.save();

@@ -55,7 +55,7 @@ export const updateReminder = createAsyncThunk(
     'reminders/updateReminder',
     async ({ id, reminderData }, { rejectWithValue }) => {
         try {
-            const response = await customFetch.patch(`reminders/${id}`, reminderData);
+            const response = await customFetch.patch(`/reminders/${id}`, reminderData);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
