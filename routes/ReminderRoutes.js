@@ -21,7 +21,7 @@ router.post('/subscribe', authenticateUser, savePushSubscription);
 router.post('/calendar-sync/:id', authenticateUser, authenticateGoogle, syncWithCalendar);
 
 // Get all user reminders
-router.get('/reminders', authenticateUser, authorizePermissions('admin'), getUserReminders);
+router.get('/', authenticateUser, authorizePermissions('admin'), getUserReminders);
 
 // Get reminders for single user
 router.get('/user', authenticateUser, getSingleUserReminders);

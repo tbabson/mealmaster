@@ -66,7 +66,7 @@ const createReminders = () => {
     // Check calendar auth status when component mounts
     const checkCalendarAuth = async () => {
       try {
-        const response = await customFetch.get("/users/currentuser");
+        const response = await customFetch.get("/users/current-user");
         setIsCalendarAuthorized(response.data.user.googleCalendarSyncEnabled);
       } catch (error) {
         console.error("Failed to check calendar auth status:", error);

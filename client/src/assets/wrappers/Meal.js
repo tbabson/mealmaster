@@ -66,15 +66,27 @@ const Wrapper = styled.div`
     flex-direction: column;
   }
 
-  .mealInfo h3 {
+  .mealName {
     font-size: 1.2rem;
     color: var(--darkest);
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
     line-height: 1.3;
+    position: relative;
 
     @media (min-width: 768px) {
       font-size: 1.3rem;
+      margin-bottom: 1rem;      
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background: var(--primary);
     }
   }
 
@@ -83,7 +95,7 @@ const Wrapper = styled.div`
     font-weight: 400;
     text-transform: capitalize;
     color: var(--dark);
-    margin: 0.5rem 0;
+    margin: 0.8rem 0;
     flex-wrap: wrap;
     align-items: center;
   }
@@ -103,6 +115,9 @@ const Wrapper = styled.div`
   .mealOption {
     display: flex;
     justify-content: space-between;
+    margin-top: 1.25rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--secondary);
     align-items: center;
     margin-top: auto; /* Push this section to the bottom */
   }
@@ -110,7 +125,7 @@ const Wrapper = styled.div`
   .mealOption p {
     font-size: 0.8rem;
     font-weight: 500;
-    color: var(--medium);
+    color: var(--dark);
   }
 
 

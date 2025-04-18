@@ -8,6 +8,7 @@ import Loading from "../components/Loading";
 import customFetch from "../utils/customFetch";
 import { FormRow } from "../components";
 import { setUser } from "../Features/user/userSlice";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -255,7 +256,11 @@ const Profile = () => {
                   <p>No orders found</p>
                 ) : (
                   orders.map((order) => (
-                    <div key={order._id} className="order-card">
+                    <Link
+                      to={`/order/${order._id}`}
+                      key={order._id}
+                      className="order-card"
+                    >
                       <h4>Order ID: {order._id}</h4>
                       <p>Status: {order.status}</p>
                       <p>Total: ${order.total}</p>
@@ -263,7 +268,7 @@ const Profile = () => {
                         Date:{" "}
                         {moment(order.createdAt).format("MMMM Do YYYY, h:mm a")}
                       </p>
-                    </div>
+                    </Link>
                   ))
                 )}
               </div>
@@ -291,7 +296,11 @@ const Profile = () => {
                   <p>No reminders found</p>
                 ) : (
                   reminders.map((reminder) => (
-                    <div key={reminder._id} className="reminder-card">
+                    <Link
+                      to={`/reminders`}
+                      key={reminder._id}
+                      className="reminder-card"
+                    >
                       <h4>
                         {reminder.meal ? reminder.meal.name : "Unnamed Meal"}
                       </h4>
@@ -306,7 +315,7 @@ const Profile = () => {
                       {reminder.isRecurring && (
                         <p>Frequency: {reminder.recurringFrequency}</p>
                       )}
-                    </div>
+                    </Link>
                   ))
                 )}
               </div>
@@ -333,13 +342,15 @@ const Profile = () => {
                 {cartItems.length === 0 ? (
                   <p>No items in cart</p>
                 ) : (
-                  cartItems.map((item) => (
-                    <div key={item._id} className="order-card">
-                      <h4>{item.meal ? item.meal.name : "Unnamed Item"}</h4>
-                      <p>Quantity: {item.quantity}</p>
-                      <p>Price: ${item.price}</p>
-                    </div>
-                  ))
+                  <>
+                    {cartItems.map((item) => (
+                      <Link to="/cart" key={item._id} className="order-card">
+                        <h4>{item.meal ? item.meal.name : "Unnamed Item"}</h4>
+                        <p>Quantity: {item.quantity}</p>
+                        <p>Price: ${item.price}</p>
+                      </Link>
+                    ))}
+                  </>
                 )}
               </div>
             </div>

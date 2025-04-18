@@ -245,21 +245,31 @@ const Wrapper = styled.div`
   }
 
   .order-card, .reminder-card {
-    background: var(--grey-50);
-    padding: 1rem;
-    border-radius: 0.5rem;
-    margin-bottom: 1rem;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: var(--lightest);
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
 
-    h4 {
-      color: var(--primary-500);
-      margin-bottom: 0.5rem;
-    }
-
-    p {
-      margin: 0.25rem 0;
-      color: var(--grey-600);
-    }
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2);
+    background: var(--light);
   }
+
+  h4 {
+    color: var(--primary-500);
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    margin: 0.25rem 0;
+    color: var(--text-color);
+  }
+}
 
   @media (max-width: 992px) {
     .profile-container {

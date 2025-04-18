@@ -15,6 +15,7 @@ import Wrapper, {
 } from "../assets/wrappers/UserReminder";
 import { AnimatePresence } from "framer-motion";
 import "react-calendar/dist/Calendar.css";
+import moment from "moment";
 
 const Reminders = () => {
   const dispatch = useDispatch();
@@ -113,15 +114,17 @@ const Reminders = () => {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <h4>{reminder.title || "Reminder"}</h4>
+                  <h4>{reminder.meal ? reminder.meal.name : "Unnamed Meal"}</h4>
                   <p>
-                    <strong>Time:</strong>{" "}
-                    {new Date(reminder.reminderTime).toLocaleTimeString()}
+                    Time:{" "}
+                    {moment(reminder.reminderTime).format(
+                      "MMMM Do YYYY, h:mm a"
+                    )}
                   </p>
-                  {reminder.meal && (
-                    <p>
-                      <strong>Meal:</strong> {reminder.meal.name}
-                    </p>
+                  <p>Method: {reminder.notificationMethod}</p>
+                  <p>Recurring: {reminder.isRecurring ? "Yes" : "No"}</p>
+                  {reminder.isRecurring && (
+                    <p>Frequency: {reminder.recurringFrequency}</p>
                   )}
 
                   {editingReminder === reminder._id ? (
@@ -137,7 +140,6 @@ const Reminders = () => {
                         onChange={(e) => setEditTime(e.target.value)}
                         className="edit-time-input"
                       />
-
                       <div className="btn-group">
                         <button className="save-btn" onClick={handleSaveEdit}>
                           Save
@@ -152,9 +154,6 @@ const Reminders = () => {
                     </>
                   ) : (
                     <>
-                      <p>
-                        <strong>Note:</strong> {reminder.note || "No notes"}
-                      </p>
                       <div className="btn-group">
                         <button
                           className="edit-btn"

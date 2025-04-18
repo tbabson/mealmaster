@@ -116,7 +116,7 @@ export const checkCalendarAuthStatus = createAsyncThunk(
     'reminders/checkCalendarAuthStatus',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await customFetch.get('/users/currentuser');
+            const response = await customFetch.get('/users/current-user');
             return response.data.user.googleCalendarSyncEnabled;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
