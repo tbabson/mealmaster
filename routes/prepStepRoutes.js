@@ -6,6 +6,7 @@ import {
     getPreparationStepById,
     updatePreparationStep,
     deletePreparationStep,
+    deletePreparationStepsByMeal,
 } from '../controllers/PrepStepController.js';
 import {
     authenticateUser,
@@ -24,5 +25,7 @@ router.patch('/:id', authenticateUser,
     authorizePermissions('admin'), updatePreparationStep); // Update a preparation step
 router.delete('/:id', authenticateUser,
     authorizePermissions('admin'), deletePreparationStep); // Delete a preparation step
+
+router.delete('/meal/:mealId', authenticateUser, deletePreparationStepsByMeal);
 
 export default router;

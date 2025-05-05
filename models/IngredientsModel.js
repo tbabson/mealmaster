@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 const SubstitutionSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Substitution name is required'],
+    required: [false, 'Substitution name is required'],
   },
   quantity: {
     type: Number,

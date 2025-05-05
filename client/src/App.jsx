@@ -19,13 +19,18 @@ import {
   SingleOrder,
   Admin,
   ChangePassword,
+  AdminLogin,
   Login,
   Register,
-  AddMeal,
-  UpdateMeal,
-  DeleteMeal,
   CreateReminder,
   Reminders,
+  AdminMeals,
+  AdminBlog,
+  AdminCart,
+  AdminOrders,
+  AdminReminders,
+  AdminReviews,
+  AdminUsers,
 } from "./pages";
 import OrderSuccess from "./pages/OrderSuccess";
 
@@ -111,7 +116,6 @@ const router = createBrowserRouter([
       {
         path: "/create-reminders",
         element: <CreateReminder />,
-        // action: reminderAction,
       },
       {
         path: "/reminders",
@@ -132,26 +136,43 @@ const router = createBrowserRouter([
     errorElement: <Error />,
   },
   {
-    path: "changePassword",
-    element: <ChangePassword />,
-    errorElement: <Error />,
-  },
-  {
     path: "admin",
     element: <Admin />,
     errorElement: <Error />,
     children: [
       {
-        path: "addMeal",
-        element: <AddMeal />,
+        index: true,
+        element: <AdminLogin />,
+        action: loginAction(queryClient),
       },
       {
-        path: "updateMeal/:id",
-        element: <UpdateMeal />,
+        path: "meals",
+        loader: mealsLoader(queryClient),
+        element: <AdminMeals />,
       },
       {
-        path: "deleteMeal/:id",
-        element: <DeleteMeal />,
+        path: "blog",
+        element: <AdminBlog />,
+      },
+      {
+        path: "cart",
+        element: <AdminCart />,
+      },
+      {
+        path: "orders",
+        element: <AdminOrders />,
+      },
+      {
+        path: "reminders",
+        element: <AdminReminders />,
+      },
+      {
+        path: "users",
+        element: <AdminUsers />,
+      },
+      {
+        path: "reviews",
+        element: <AdminReviews />,
       },
     ],
   },

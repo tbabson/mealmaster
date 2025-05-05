@@ -43,16 +43,28 @@ export const getAllIngredients = async (req, res) => {
 
 // @desc    Get an ingredient by ID
 // @route   GET /api/ingredients/:id
+// @desc    Get an ingredient by ID
+// @route   GET /api/ingredients/:id
 export const getIngredientById = async (req, res) => {
   const { id } = req.params;
 
   try {
+    // Check if ID format is valid
+    // if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    //   throw new BadRequestError('Invalid ingredient ID format');
+    // }
+
     const ingredient = await Ingredient.findById(id);
     if (!ingredient) {
-      throw new NotFoundError('Ingredient not found');
+      throw new NotFoundError(`No ingredient found with id: ${id}`);
     }
+
     res.status(StatusCodes.OK).json({ ingredient });
   } catch (error) {
+    if (error.name === 'NotFoundError') {
+      throw error; // Maintain the NotFoundError status code
+    }
+    // For other errors (like CastError for invalid ObjectId)
     throw new BadRequestError(error.message);
   }
 };
@@ -120,23 +132,77 @@ export const updateIngredient = async (req, res) => {
 };
 
 
+
+// @desc    Delete an ingredient (with debug)
+// @route   DELETE /api/ingredients/:id
 // @desc    Delete an ingredient
 // @route   DELETE /api/ingredients/:id
 export const deleteIngredient = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const ingredient = await Ingredient.findById(_id);
-    if (!ingredient) {
-      throw new NotFoundError('ingredient not found');
+    // Check ID format validity
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      throw new BadRequestError('Invalid ingredient ID format');
     }
 
-    await ingredient.remove();
+    // Try direct deletion and check result
+    const deleteResult = await Ingredient.deleteOne({ _id: id });
+
+    if (deleteResult.deletedCount === 0) {
+      throw new NotFoundError(`No ingredient found with id: ${id}`);
+    }
+
+    // Update any meals that reference this ingredient
+    try {
+      await Meal.updateMany(
+        { ingredients: id },
+        { $pull: { ingredients: id } }
+      );
+    } catch (mealError) {
+      // Don't throw here - we've already deleted the ingredient successfully
+    }
+
     res
       .status(StatusCodes.OK)
-      .json({ message: 'Ingredient deleted successfully' });
+      .json({
+        message: 'Ingredient deleted successfully'
+      });
   } catch (error) {
-    throw new BadRequestError(error.message);
+    if (error.name === 'NotFoundError') {
+      throw error;
+    } else if (error.name === 'CastError') {
+      throw new BadRequestError(`Invalid ID format: ${error.message}`);
+    } else {
+      throw new BadRequestError(error.message);
+    }
   }
 };
 
+export const deleteIngredientsByMeal = async (req, res) => {
+  try {
+    const { mealId } = req.params;
+
+    // Check if the meal exists
+    const isValidMeal = await Meal.findById(mealId);
+    if (!isValidMeal) {
+      throw new NotFoundError(`No meal with id: ${mealId}`);
+    }
+
+    // Delete all ingredients for this meal
+    const result = await Ingredient.deleteMany({ meal: mealId });
+
+    // Clear the ingredients array in the meal document
+    await Meal.findByIdAndUpdate(
+      mealId,
+      { ingredients: [] },
+      { new: true }
+    );
+
+    res.status(StatusCodes.OK).json({
+      message: `Deleted ${result.deletedCount} ingredients for meal ${mealId}`
+    });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
+  }
+};

@@ -12,6 +12,7 @@ import { query } from 'express';
 export const createMeal = async (req, res) => {
     try {
         const { name, mealType, ingredients, country, dietary, preparationSteps, isRecommended } = req.body;
+
         // Check if the image file is present
         if (!req.file) {
             return res
@@ -21,40 +22,50 @@ export const createMeal = async (req, res) => {
 
         // Upload image to Cloudinary
         const result = await cloudinary.v2.uploader.upload(req.file.path, {
-            folder: 'mealmaster', // Cloudinary folder
+            folder: 'mealmaster',
             use_filename: true,
         });
 
+        // Get the absolute path of the uploaded file
+        const filePath = path.resolve(req.file.path);
 
-        // Remove local file after upload
-        //await fs.unlink(req.file.path);
-        const absolutePath = path.resolve(req.file.path);
-        await fs.unlink(absolutePath);
-
-
-        // Create the new meal in the database without the ingredients first
+        // Create the new meal in the database
         const meal = await Meal.create({
             name,
             mealType,
-            country, dietary,
-            preparationSteps, isRecommended,
-            image: result.secure_url, // Use Cloudinary URL for the image
-            cloudinaryId: result.public_id, // Save Cloudinary public ID
-            createdBy: req.user.userId, // Ensure you're properly using user info
+            country,
+            dietary,
+            preparationSteps,
+            isRecommended,
+            image: result.secure_url,
+            cloudinaryId: result.public_id,
+            createdBy: req.user.userId,
         });
 
-        // Update the meal's ingredients field with the provided ingredient IDs
+        // Update the meal's ingredients field
         await Meal.findByIdAndUpdate(
             meal._id,
-            { ingredients: ingredients }, // Update with the provided ingredient IDs
-            { new: true } // Return the updated meal
+            { ingredients: ingredients },
+            { new: true }
         );
 
+        // Remove local file after everything else is done
+        try {
+            await fs.unlink(filePath);
+        } catch (unlinkError) {
+            console.error(`Error deleting local file: ${filePath}`, unlinkError);
+            // Continue with the request even if file deletion fails
+        }
+
         // Respond with the created meal
-        const updatedMeal = await Meal.findById(meal._id).populate('ingredients').populate('preparationSteps'); // Optionally populate ingredients
+        const updatedMeal = await Meal.findById(meal._id)
+            .populate('ingredients')
+            .populate('preparationSteps');
+
         res.status(StatusCodes.CREATED).json({ meal: updatedMeal });
+
     } catch (error) {
-        // Generic error handler
+        console.error('Error creating meal:', error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };

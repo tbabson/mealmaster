@@ -137,3 +137,31 @@ export const deletePreparationStep = async (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
+
+export const deletePreparationStepsByMeal = async (req, res) => {
+    try {
+        const { mealId } = req.params;
+
+        // Check if the meal exists
+        const isValidMeal = await Meal.findById(mealId);
+        if (!isValidMeal) {
+            throw new NotFoundError(`No meal with id: ${mealId}`);
+        }
+
+        // Delete all preparation steps for this meal
+        const result = await PreparationSteps.deleteMany({ meal: mealId });
+
+        // Clear the preparationSteps array in the meal document
+        await Meal.findByIdAndUpdate(
+            mealId,
+            { preparationSteps: [] },
+            { new: true }
+        );
+
+        res.status(StatusCodes.OK).json({
+            message: `Deleted ${result.deletedCount} preparation steps for meal ${mealId}`
+        });
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
+    }
+};
