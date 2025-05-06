@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import CartItem from "./CartItem";
+import Wrapper from "../assets/wrappers/CartItemList";
 
 const CartItemList = () => {
   const cartItems = useSelector((state) => state.cart.cartItems) || [];
@@ -24,13 +25,15 @@ const CartItemList = () => {
   }
 
   return (
-    <div className="cart-list">
-      {cartItems.map((meal) => (
-        <div key={meal.mealID} className="cart-item-container">
-          <CartItem meal={meal} />
-        </div>
-      ))}
-    </div>
+    <Wrapper>
+      <div className="cart-list">
+        {cartItems.map((meal) => (
+          <div key={meal.mealID} className="cart-item-container">
+            <CartItem meal={meal} />
+          </div>
+        ))}
+      </div>
+    </Wrapper>
   );
 };
 
