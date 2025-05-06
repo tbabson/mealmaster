@@ -11,11 +11,15 @@ const Wrapper = styled.div`
   }
 
   .cartItemContainer {
-    width: 90%;
+    width: 100%;
     display: grid;
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: 1fr;
     gap: 1.5rem;
     align-items: start;
+
+    @media (min-width: 480px) {
+      grid-template-columns: 1fr 3fr;
+    }
   }
 
   .mealImage {
@@ -25,7 +29,7 @@ const Wrapper = styled.div`
    
     img {
       width: 100%;
-      max-width: 150px;
+      max-width: 120px;
       height: auto;
       border-radius: 0.5rem;
       object-fit: cover;
@@ -38,8 +42,11 @@ const Wrapper = styled.div`
   }
 
   .ingredients {
+    width: 100%;
+    overflow-x: hidden;
+
     h3 {
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       color: var(--darkest, #333);
       margin-bottom: 1rem;
       font-weight: 600;
@@ -51,6 +58,7 @@ const Wrapper = styled.div`
       list-style: none;
       padding: 0;
       margin: 0 0 1.5rem 0;
+      width: 100%;
      
       li {
         margin-bottom: 0.8rem;
@@ -60,25 +68,24 @@ const Wrapper = styled.div`
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 1rem;
+        gap: 0.5rem;
+        flex-wrap: wrap;
         
         span {
           color: var(--dark); 
           font-weight: 500;
           text-transform: capitalize;
           line-height: 1.5;
-          white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
           flex: 1;
-          min-width: 0;
+          min-width: 150px;
         }
        
         div {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          flex-shrink: 0;
         }
        
         select {
@@ -87,7 +94,6 @@ const Wrapper = styled.div`
           border-radius: 0.25rem;
           background-color: var(--white, #fff);
           width: 60px;
-          flex-shrink: 0;
         }
        
         .removeIngredient {
@@ -98,7 +104,6 @@ const Wrapper = styled.div`
           font-size: 1rem;
           border-radius: 0.25rem;
           cursor: pointer;
-          flex-shrink: 0;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -131,24 +136,10 @@ const Wrapper = styled.div`
       }
     }
   }
-  .btn-primary svg{
-     font-size: 1rem;
-     margin-bottom: -2px;
-  }
-
-  @media (max-width: 768px) {
-    .cartItemContainer {
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-   
-    .mealImage {
-      margin-bottom: 1rem;
-     
-      img {
-        max-width: 120px;
-      }
-    }
+  
+  .btn-primary svg {
+    font-size: 1rem;
+    margin-bottom: -2px;
   }
 `;
 
