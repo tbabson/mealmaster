@@ -12,6 +12,7 @@ import helmet from 'helmet';
 import { initializeReminderSystem } from './controllers/ScheduleReminders.js';
 import cors from 'cors';
 import { validateGoogleConfig } from './utils/configValidation.js';
+import { generateSitemap } from './utils/sitemapGenerator.js';
 
 //CUSTOM IMPORTS
 //routers
@@ -91,7 +92,18 @@ app.use(
   })
 );
 
-
+// Sitemap endpoint
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const baseURL = `${req.protocol}://${req.get('host')}`;
+    const sitemap = await generateSitemap(baseURL);
+    res.header('Content-Type', 'application/xml');
+    res.send(sitemap);
+  } catch (error) {
+    console.error('Sitemap generation error:', error);
+    res.status(500).send('Error generating sitemap');
+  }
+});
 
 
 // app.get('/', (req, res) => {

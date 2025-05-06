@@ -31,6 +31,9 @@ const Wrapper = styled.article`
       font-size: 1.5rem;
       font-weight: 600;
       margin-bottom: 0.5rem;
+      text-transform: capitalize;
+      line-height: 1.4;
+
     }
   }
 

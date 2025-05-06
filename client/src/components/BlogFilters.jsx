@@ -2,15 +2,30 @@ import { useDispatch, useSelector } from "react-redux";
 import { FormRow, FormRowSelect } from ".";
 import { handleChange, clearFilters } from "../Features/Blog/blogSlice";
 import Wrapper from "../assets/wrappers/BlogFilter";
+import { useCallback } from "react";
+import debounce from "lodash/debounce";
 
 const BlogFilters = () => {
   const dispatch = useDispatch();
   const { search, searchCategory, sort } = useSelector((store) => store.blog);
 
+  // Debounce the search dispatch
+  const debouncedSearch = useCallback(
+    debounce((name, value) => {
+      dispatch(handleChange({ name, value }));
+    }, 500),
+    [dispatch]
+  );
+
   const handleSearch = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    dispatch(handleChange({ name, value }));
+
+    if (name === "search") {
+      debouncedSearch(name, value);
+    } else {
+      dispatch(handleChange({ name, value }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -34,12 +49,12 @@ const BlogFilters = () => {
           handleChange={handleSearch}
           list={[
             "all",
-            "recipes",
-            "nutrition",
-            "cooking-tips",
-            "health",
-            "lifestyle",
-            "other",
+            "General",
+            "Recipes",
+            "Nutrition",
+            "Cooking Tips",
+            "Health",
+            "Other",
           ]}
           labelText="category"
         />

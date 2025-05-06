@@ -102,7 +102,7 @@ const Wrapper = styled.div`
   .mobile-link.active {
     background: var(--primary-light);
     border-left-color: var(--primary);
-    color: var(--primary);
+    color: var(--darkest);
   }
   
   .mobile-logout {
@@ -173,7 +173,7 @@ const Wrapper = styled.div`
     
     .nav-link.active {
       background: var(--primary-light);
-      color: var(--primary);
+      color: var(--darkest);
     }
     
     .desktop-logout {

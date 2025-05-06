@@ -1,5 +1,8 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import OrganizationSchema from "./components/OrganizationSchema";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { useEffect } from "react";
@@ -48,7 +51,7 @@ import { loader as singleOrder } from "./actionsAndLoaders/SingleOrderLoader";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 10,
+      staleTime: 1000 * 60 * 5,
     },
   },
 });
@@ -195,14 +198,18 @@ const CartInitializer = () => {
 
 const App = () => {
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <QueryClientProvider client={queryClient}>
-          <CartInitializer />
-          <RouterProvider router={router} />
-        </QueryClientProvider>
-      </PersistGate>
-    </Provider>
+    <HelmetProvider>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <QueryClientProvider client={queryClient}>
+            <CartInitializer />
+            <OrganizationSchema />
+            <RouterProvider router={router} />
+            <ReactQueryDevtools initialIsOpen={false} />
+          </QueryClientProvider>
+        </PersistGate>
+      </Provider>
+    </HelmetProvider>
   );
 };
 

@@ -47,7 +47,7 @@ export const getAllBlogs = async (req, res) => {
 
     // Filtering
     if (category && category !== 'all') {
-        queryObject.category = category;
+        queryObject.category = { $regex: new RegExp(`^${category}$`, 'i') };
     }
 
     if (status && status !== 'all') {
@@ -115,6 +115,24 @@ export const getBlog = async (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR)
             .json({ message: error.message });
     }
+};
+
+// Get Single Blog with Related Articles
+export const getSingleBlog = async (req, res) => {
+    const { id } = req.params;
+    const blog = await Blog.findById(id).populate('author', 'fullName');
+
+    if (!blog) {
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: 'Blog not found' });
+    }
+
+    // Get related articles
+    const relatedArticles = await Blog.findRelated(id, 3);
+
+    res.status(StatusCodes.OK).json({
+        blog,
+        relatedArticles
+    });
 };
 
 // Update Blog

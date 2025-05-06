@@ -23,6 +23,21 @@ const BlogSchema = new mongoose.Schema({
         trim: true,
         maxlength: [100, 'Title cannot be more than 100 characters'],
     },
+    metaTitle: {
+        type: String,
+        maxlength: [60, 'Meta title should not exceed 60 characters'],
+    },
+    metaDescription: {
+        type: String,
+        maxlength: [160, 'Meta description should not exceed 160 characters'],
+    },
+    slug: {
+        type: String,
+        unique: true,
+    },
+    keywords: [{
+        type: String,
+    }],
     content: {
         type: String,
         required: [true, 'Blog content is required'],
@@ -30,6 +45,10 @@ const BlogSchema = new mongoose.Schema({
     featuredImage: {
         type: String,
         required: [true, 'Featured image is required'],
+    },
+    featuredImageAlt: {
+        type: String,
+        required: [true, 'Image alt text is required for accessibility and SEO'],
     },
     cloudinaryId: {
         type: String,
@@ -42,7 +61,7 @@ const BlogSchema = new mongoose.Schema({
     category: {
         type: String,
         required: [true, 'Blog category is required'],
-        enum: ['Recipes', 'Nutrition', 'Cooking Tips', 'Health', 'Other'],
+        enum: ['General', 'Recipes', 'Nutrition', 'Cooking Tips', 'Health', 'Other'],
     },
     tags: [{
         type: String,
@@ -52,19 +71,38 @@ const BlogSchema = new mongoose.Schema({
         type: String,
         enum: ['draft', 'published'],
         default: 'published',
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now,
     }
 }, {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
+});
+
+// Method to find related articles based on category and keywords
+BlogSchema.statics.findRelated = async function (blogId, limit = 3) {
+    const blog = await this.findById(blogId);
+    if (!blog) return [];
+
+    return this.find({
+        _id: { $ne: blogId },
+        status: 'published',
+        $or: [
+            { category: blog.category },
+            { keywords: { $in: blog.keywords } }
+        ]
+    })
+        .sort('-createdAt')
+        .limit(limit)
+        .populate('author', 'fullName');
+};
+
+// Drop any existing slug index if it exists
+BlogSchema.pre('save', async function () {
+    try {
+        await this.collection.dropIndex('slug_1');
+    } catch (error) {
+        // Index might not exist, ignore error
+    }
 });
 
 export default mongoose.model('Blog', BlogSchema);

@@ -13,6 +13,7 @@ const initialState = {
     isLoading: false,
     blogs: [],
     blog: null,
+    relatedArticles: [],
     totalBlogs: 0,
     numOfPages: 1,
     page: 1,
@@ -46,7 +47,6 @@ export const getSingleBlog = createAsyncThunk(
             return thunkAPI.rejectWithValue(
                 error?.response?.data?.message || 'Failed to fetch blog'
             );
-
         }
     }
 );
@@ -56,10 +56,9 @@ export const createBlog = createAsyncThunk(
     async (blog, thunkAPI) => {
         try {
             const resp = await customFetch.post('/blogs', blog);
-            toast.success('Blog Created Successfully');
             return resp.data;
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.msg);
+            return thunkAPI.rejectWithValue(error?.response?.data?.message || 'Failed to create blog');
         }
     }
 );
@@ -69,10 +68,9 @@ export const updateBlog = createAsyncThunk(
     async ({ blogId, blog }, thunkAPI) => {
         try {
             const resp = await customFetch.patch(`/blogs/${blogId}`, blog);
-            toast.success('Blog Updated Successfully');
             return resp.data;
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.msg);
+            return thunkAPI.rejectWithValue(error?.response?.data?.message || 'Failed to update blog');
         }
     }
 );
@@ -85,7 +83,7 @@ export const deleteBlog = createAsyncThunk(
             thunkAPI.dispatch(getAllBlogs());
             return resp.data;
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.msg);
+            return thunkAPI.rejectWithValue(error?.response?.data?.message || 'Failed to delete blog');
         }
     }
 );
@@ -97,7 +95,7 @@ export const addComment = createAsyncThunk(
             const resp = await customFetch.post(`/blogs/${blogId}/comments`, comment);
             return resp.data;
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.msg);
+            return thunkAPI.rejectWithValue(error?.response?.data?.message || 'Failed to add comment');
         }
     }
 );
@@ -109,7 +107,7 @@ export const deleteComment = createAsyncThunk(
             const resp = await customFetch.delete(`/blogs/${blogId}/comments/${commentId}`);
             return resp.data;
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.msg);
+            return thunkAPI.rejectWithValue(error?.response?.data?.message || 'Failed to delete comment');
         }
     }
 );
@@ -150,6 +148,7 @@ const blogSlice = createSlice({
             .addCase(getSingleBlog.fulfilled, (state, { payload }) => {
                 state.isLoading = false;
                 state.blog = payload.blog;
+                state.relatedArticles = payload.relatedArticles;
             })
             .addCase(getSingleBlog.rejected, (state, { payload }) => {
                 state.isLoading = false;

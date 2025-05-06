@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: /sitemap.xml
+
+# Disallow crawling of admin pages
+Disallow: /admin/
+Disallow: /admin/*
+
+# Prevent crawling of API endpoints
+Disallow: /api/
+Disallow: /api/*
+
+# Allow crawling of static assets
+Allow: /static/
+Allow: /images/
+Allow: /favchrome.png
+Allow: /favicon.ico

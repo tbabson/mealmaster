@@ -5,8 +5,10 @@ import { getAllBlogs, changePage } from "../Features/Blog/blogSlice";
 import BlogCard from "../components/BlogCard";
 import BlogFilters from "../components/BlogFilters";
 import Loading from "../components/Loading";
+import { useNavigation } from "react-router-dom";
 
 const Blog = () => {
+  const navigation = useNavigation;
   const dispatch = useDispatch();
   const {
     isLoading,
@@ -18,6 +20,11 @@ const Blog = () => {
     numOfPages,
   } = useSelector((state) => state.blog);
 
+  // Add this effect to reset scroll position when route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [navigation.location]);
+
   useEffect(() => {
     dispatch(getAllBlogs());
   }, [dispatch, search, searchCategory, sort, page]);
@@ -28,9 +35,9 @@ const Blog = () => {
 
   return (
     <Wrapper>
-      <div className="blog-header">
+      {/* <div className="blog-header">
         <h1>Blog Posts</h1>
-      </div>
+      </div> */}
 
       <BlogFilters />
 

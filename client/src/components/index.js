@@ -21,3 +21,8 @@ export { default as CartItem } from './CartItem'
 export { default as CartItemList } from './CartItemList'
 export { default as CheckoutForm } from './CheckoutForm'
 export { default as FormInput } from './FormInput'
+export { default as SocialShare } from './SocialShare';
+export { default as RelatedArticles } from './RelatedArticles';
+export { default as BlogSchema } from './BlogSchema';
+export { default as OrganizationSchema } from './OrganizationSchema';
+export { default as BreadcrumbSchema } from './BreadcrumbSchema';
