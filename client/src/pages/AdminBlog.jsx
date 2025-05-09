@@ -33,7 +33,7 @@ const AdminBlog = () => {
     sort,
   } = useSelector((store) => store.blog);
 
-  const [activeTab, setActiveTab] = useState("list");
+  const [showForm, setShowForm] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [blogForm, setBlogForm] = useState({
@@ -171,7 +171,7 @@ const AdminBlog = () => {
       }
 
       resetForm();
-      setActiveTab("list");
+      setShowForm(false);
       dispatch(getAllBlogs());
     } catch (error) {
       toast.error(error || "Something went wrong");
@@ -193,7 +193,7 @@ const AdminBlog = () => {
       slug: blog.slug || "",
     });
     setIsEditing(true);
-    setActiveTab("create");
+    setShowForm(true);
   };
 
   const handleDelete = async (id) => {
@@ -211,7 +211,7 @@ const AdminBlog = () => {
     setBlogForm({
       title: "",
       content: "",
-      category: "Other",
+      category: "General",
       status: "draft",
       featuredImage: null,
       metaTitle: "",
@@ -226,158 +226,29 @@ const AdminBlog = () => {
 
   return (
     <Wrapper>
-      <div className="sidebar">
-        <button
-          className={`sidebar-btn ${activeTab === "list" ? "active" : ""}`}
-          onClick={() => setActiveTab("list")}
-        >
-          <FaList /> View Blogs
-        </button>
-        <button
-          className={`sidebar-btn ${activeTab === "create" ? "active" : ""}`}
-          onClick={() => {
-            setActiveTab("create");
-            resetForm();
-          }}
-        >
-          <FaPlus /> Create Blog
-        </button>
-      </div>
+      <div className="admin-content">
+        <div className="header">
+          <h2>
+            {showForm
+              ? isEditing
+                ? "Edit Blog"
+                : "Create New Blog"
+              : "All Blogs"}
+          </h2>
+          <button
+            className="btn toggle-btn"
+            onClick={() => {
+              setShowForm(!showForm);
+              if (!showForm) resetForm();
+            }}
+          >
+            {showForm ? <FaList /> : <FaPlus />}
+            {showForm ? "View Blogs" : "Create Blog"}
+          </button>
+        </div>
 
-      <div className="content">
-        {activeTab === "list" ? (
-          <div className="blogs-list">
-            <h2>All Blogs</h2>
-            <div className="filters-container">
-              <FormRow
-                type="text"
-                name="search"
-                labelText="Search Blogs"
-                value={search}
-                handleChange={(e) =>
-                  handleFilterChange("search", e.target.value)
-                }
-              />
-              <FormRowSelect
-                labelText="Status"
-                name="searchStatus"
-                value={searchStatus}
-                list={["all", "draft", "published"]}
-                handleChange={(e) =>
-                  handleFilterChange("searchStatus", e.target.value)
-                }
-              />
-              <FormRowSelect
-                labelText="Category"
-                name="searchCategory"
-                value={searchCategory}
-                list={[
-                  "all",
-                  "General",
-                  "Recipes",
-                  "Nutrition",
-                  "Cooking Tips",
-                  "Health",
-                  "Other",
-                ]}
-                handleChange={(e) =>
-                  handleFilterChange("searchCategory", e.target.value)
-                }
-              />
-              <FormRowSelect
-                labelText="Sort"
-                name="sort"
-                value={sort}
-                list={["newest", "oldest", "a-z", "z-a"]}
-                handleChange={(e) => handleFilterChange("sort", e.target.value)}
-              />
-              <button
-                className="btn clear-btn"
-                onClick={() => dispatch(clearFilters())}
-              >
-                Clear Filters
-              </button>
-            </div>
-
-            {isLoading ? (
-              <div className="loading-container">Loading blogs...</div>
-            ) : (
-              <div className="blogs-grid">
-                {blogs.map((blog) => (
-                  <div key={blog._id} className="blog-card">
-                    {blog.featuredImage && (
-                      <img src={blog.featuredImage} alt={blog.title} />
-                    )}
-                    <div className="blog-info">
-                      <h3>{blog.title}</h3>
-                      <p>Category: {blog.category}</p>
-                      <p>Status: {blog.status}</p>
-                      <p>
-                        Created: {new Date(blog.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="blog-actions">
-                      <button
-                        className="edit-btn"
-                        onClick={() => handleEdit(blog)}
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        className="delete-btn"
-                        onClick={() => handleDelete(blog._id)}
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {numOfPages > 1 && (
-              <div className="pagination">
-                <button
-                  onClick={() => handleFilterChange("page", 1)}
-                  disabled={page === 1}
-                  className="btn btn-first"
-                >
-                  First
-                </button>
-                <button
-                  onClick={() =>
-                    handleFilterChange("page", Math.max(1, page - 1))
-                  }
-                  disabled={page === 1}
-                  className="btn btn-prev"
-                >
-                  Prev
-                </button>
-                <span className="page-info">
-                  Page {page} of {numOfPages}
-                </span>
-                <button
-                  onClick={() =>
-                    handleFilterChange("page", Math.min(numOfPages, page + 1))
-                  }
-                  disabled={page === numOfPages}
-                  className="btn btn-next"
-                >
-                  Next
-                </button>
-                <button
-                  onClick={() => handleFilterChange("page", numOfPages)}
-                  disabled={page === numOfPages}
-                  className="btn btn-last"
-                >
-                  Last
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
+        {showForm ? (
           <div className="blog-form">
-            <h2>{isEditing ? "Edit Blog" : "Create New Blog"}</h2>
             <form onSubmit={handleSubmit}>
               <FormRow
                 type="text"
@@ -542,6 +413,135 @@ const AdminBlog = () => {
                 {isEditing ? "Update Blog" : "Create Blog"}
               </button>
             </form>
+          </div>
+        ) : (
+          <div className="blogs-list">
+            <div className="filters-container">
+              <FormRow
+                type="text"
+                name="search"
+                labelText="Search Blogs"
+                value={search}
+                handleChange={(e) =>
+                  handleFilterChange("search", e.target.value)
+                }
+              />
+              <FormRowSelect
+                labelText="Status"
+                name="searchStatus"
+                value={searchStatus}
+                list={["all", "draft", "published"]}
+                handleChange={(e) =>
+                  handleFilterChange("searchStatus", e.target.value)
+                }
+              />
+              <FormRowSelect
+                labelText="Category"
+                name="searchCategory"
+                value={searchCategory}
+                list={[
+                  "all",
+                  "General",
+                  "Recipes",
+                  "Nutrition",
+                  "Cooking Tips",
+                  "Health",
+                  "Other",
+                ]}
+                handleChange={(e) =>
+                  handleFilterChange("searchCategory", e.target.value)
+                }
+              />
+              <FormRowSelect
+                labelText="Sort"
+                name="sort"
+                value={sort}
+                list={["newest", "oldest", "a-z", "z-a"]}
+                handleChange={(e) => handleFilterChange("sort", e.target.value)}
+              />
+              <button
+                className="btn clear-btn"
+                onClick={() => dispatch(clearFilters())}
+              >
+                Clear Filters
+              </button>
+            </div>
+
+            {isLoading ? (
+              <div className="loading-container">Loading blogs...</div>
+            ) : (
+              <div className="blogs-grid">
+                {blogs.map((blog) => (
+                  <div key={blog._id} className="blog-card">
+                    {blog.featuredImage && (
+                      <img src={blog.featuredImage} alt={blog.title} />
+                    )}
+                    <div className="blog-info">
+                      <h3>{blog.title}</h3>
+                      <p>Category: {blog.category}</p>
+                      <p>Status: {blog.status}</p>
+                      <p>
+                        Created: {new Date(blog.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="blog-actions">
+                      <button
+                        className="edit-btn"
+                        onClick={() => handleEdit(blog)}
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDelete(blog._id)}
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {numOfPages > 1 && (
+              <div className="pagination">
+                <button
+                  onClick={() => handleFilterChange("page", 1)}
+                  disabled={page === 1}
+                  className="btn btn-first"
+                >
+                  First
+                </button>
+                <button
+                  onClick={() =>
+                    handleFilterChange("page", Math.max(1, page - 1))
+                  }
+                  disabled={page === 1}
+                  className="btn btn-prev"
+                >
+                  Prev
+                </button>
+                <span className="page-info">
+                  Page {page} of {numOfPages}
+                </span>
+                <button
+                  onClick={() =>
+                    handleFilterChange("page", Math.min(numOfPages, page + 1))
+                  }
+                  disabled={page === numOfPages}
+                  className="btn btn-next"
+                >
+                  Next
+                </button>
+                <button
+                  onClick={() => handleFilterChange("page", numOfPages)}
+                  disabled={page === numOfPages}
+                  className="btn btn-last"
+                >
+                  Last
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

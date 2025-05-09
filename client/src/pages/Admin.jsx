@@ -1,6 +1,6 @@
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { logoutUser } from "../Features/user/userSlice"; // Update this path as needed
+import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../Features/user/userSlice";
 import {
   FaSignOutAlt,
   FaUtensils,
@@ -10,16 +10,19 @@ import {
   FaBell,
   FaStar,
   FaUsers,
-  FaBars,
-  FaTimes,
 } from "react-icons/fa";
-import { useState } from "react";
+import { BiSolidDashboard as FaDashboard } from "react-icons/bi";
+import { useEffect } from "react";
 import Wrapper from "../assets/wrappers/Admin";
 
 const Admin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const { user } = useSelector((state) => state.user);
+
+  // Check if current path is admin login page
+  const isLoginPage = location.pathname === "/admin";
 
   const handleLogout = () => {
     dispatch(logoutUser())
@@ -32,154 +35,96 @@ const Admin = () => {
       });
   };
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  // If not on login page and not logged in as admin, redirect to login
+  useEffect(() => {
+    if (!isLoginPage && (!user || user.role !== "admin")) {
+      navigate("/admin", { state: { from: location.pathname } });
+    }
+  }, [user, navigate, location.pathname, isLoginPage]);
 
+  // For login page, just render the Outlet (which will be AdminLogin)
+  if (isLoginPage) {
+    return <Outlet />;
+  }
+
+  // For other admin pages, render the full dashboard with sidebar nav
   return (
     <Wrapper>
       <main className="admin-main">
-        <nav className="nav-container">
-          <div className="nav-center">
-            <div className="nav-header">
-              <div className="logo-container">
-                <h1 className="admin-title">Admin Dashboard</h1>
-              </div>
-              <button className="menu-toggle" onClick={toggleMenu}>
-                {isMenuOpen ? <FaTimes /> : <FaBars />}
-              </button>
-              <div className="nav-links">
-                <NavLink
-                  to="/admin/meals"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  <FaUtensils className="icon-spacing" /> Meals
-                </NavLink>
-                <NavLink
-                  to="/admin/blog"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  <FaBlog className="icon-spacing" /> Blog
-                </NavLink>
-                <NavLink
-                  to="/admin/cart"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  <FaShoppingCart className="icon-spacing" /> Cart
-                </NavLink>
-                <NavLink
-                  to="/admin/orders"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  <FaClipboardList className="icon-spacing" /> Orders
-                </NavLink>
-                <NavLink
-                  to="/admin/reminders"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  <FaBell className="icon-spacing" /> Reminders
-                </NavLink>
-                <NavLink
-                  to="/admin/users"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  <FaUsers className="icon-spacing" /> Users
-                </NavLink>
-                <NavLink
-                  to="/admin/reviews"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  <FaStar className="icon-spacing" /> Reviews
-                </NavLink>
-                <button
-                  onClick={handleLogout}
-                  className="logout-btn desktop-logout"
-                >
-                  <FaSignOutAlt className="icon-spacing" /> Logout
-                </button>
-              </div>
-            </div>
+        <aside className="sidebar">
+          <div className="logo-container">
+            <h1 className="admin-title">Admin Dashboard</h1>
           </div>
-
-          {/* Mobile menu */}
-          {isMenuOpen && (
-            <div className="mobile-menu">
-              <NavLink
-                to="/admin/meals"
-                className={({ isActive }) =>
-                  isActive ? "mobile-link active" : "mobile-link"
-                }
-              >
-                <FaUtensils className="icon-spacing" /> Meals
-              </NavLink>
-              <NavLink
-                to="/admin/blog"
-                className={({ isActive }) =>
-                  isActive ? "mobile-link active" : "mobile-link"
-                }
-              >
-                <FaBlog className="icon-spacing" /> Blog
-              </NavLink>
-              <NavLink
-                to="/admin/cart"
-                className={({ isActive }) =>
-                  isActive ? "mobile-link active" : "mobile-link"
-                }
-              >
-                <FaShoppingCart className="icon-spacing" /> Cart
-              </NavLink>
-              <NavLink
-                to="/admin/orders"
-                className={({ isActive }) =>
-                  isActive ? "mobile-link active" : "mobile-link"
-                }
-              >
-                <FaClipboardList className="icon-spacing" /> Orders
-              </NavLink>
-              <NavLink
-                to="/admin/reminders"
-                className={({ isActive }) =>
-                  isActive ? "mobile-link active" : "mobile-link"
-                }
-              >
-                <FaBell className="icon-spacing" /> Reminders
-              </NavLink>
-              <NavLink
-                to="/admin/users"
-                className={({ isActive }) =>
-                  isActive ? "mobile-link active" : "mobile-link"
-                }
-              >
-                <FaUsers className="icon-spacing" /> Users
-              </NavLink>
-              <NavLink
-                to="/admin/reviews"
-                className={({ isActive }) =>
-                  isActive ? "mobile-link active" : "mobile-link"
-                }
-              >
-                <FaStar className="icon-spacing" /> Reviews
-              </NavLink>
-              <button onClick={handleLogout} className="mobile-logout">
-                <FaSignOutAlt className="icon-spacing" /> Logout
-              </button>
-            </div>
-          )}
-        </nav>
+          <nav className="nav-links">
+            <NavLink
+              to="/admin/dashboard"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              <FaDashboard className="icon-spacing" /> Dashboard
+            </NavLink>
+            <NavLink
+              to="/admin/meals"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              <FaUtensils className="icon-spacing" /> Meals
+            </NavLink>
+            <NavLink
+              to="/admin/blog"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              <FaBlog className="icon-spacing" /> Blog
+            </NavLink>
+            <NavLink
+              to="/admin/cart"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              <FaShoppingCart className="icon-spacing" /> Cart
+            </NavLink>
+            <NavLink
+              to="/admin/orders"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              <FaClipboardList className="icon-spacing" /> Orders
+            </NavLink>
+            <NavLink
+              to="/admin/reminders"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              <FaBell className="icon-spacing" /> Reminders
+            </NavLink>
+            <NavLink
+              to="/admin/users"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              <FaUsers className="icon-spacing" /> Users
+            </NavLink>
+            <NavLink
+              to="/admin/reviews"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              <FaStar className="icon-spacing" /> Reviews
+            </NavLink>
+            <button onClick={handleLogout} className="logout-btn">
+              <FaSignOutAlt className="icon-spacing" /> Logout
+            </button>
+          </nav>
+        </aside>
 
         <div className="content-container">
           <div className="content-wrapper">

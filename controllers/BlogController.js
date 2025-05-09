@@ -110,30 +110,33 @@ export const getBlog = async (req, res) => {
                 .json({ message: 'Blog not found' });
         }
 
-        res.status(StatusCodes.OK).json({ blog });
+        // Get related articles
+        const relatedArticles = await Blog.findRelated(id, 3);
+
+        res.status(StatusCodes.OK).json({ blog, relatedArticles });
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR)
             .json({ message: error.message });
     }
 };
 
-// Get Single Blog with Related Articles
-export const getSingleBlog = async (req, res) => {
-    const { id } = req.params;
-    const blog = await Blog.findById(id).populate('author', 'fullName');
+// // Get Single Blog with Related Articles
+// export const getSingleBlog = async (req, res) => {
+//     const { id } = req.params;
+//     const blog = await Blog.findById(id).populate('author', 'fullName');
 
-    if (!blog) {
-        return res.status(StatusCodes.NOT_FOUND).json({ msg: 'Blog not found' });
-    }
+//     if (!blog) {
+//         return res.status(StatusCodes.NOT_FOUND).json({ msg: 'Blog not found' });
+//     }
 
-    // Get related articles
-    const relatedArticles = await Blog.findRelated(id, 3);
+//     // Get related articles
+//     const relatedArticles = await Blog.findRelated(id, 3);
 
-    res.status(StatusCodes.OK).json({
-        blog,
-        relatedArticles
-    });
-};
+//     res.status(StatusCodes.OK).json({
+//         blog,
+//         relatedArticles
+//     });
+// };
 
 // Update Blog
 export const updateBlog = async (req, res) => {

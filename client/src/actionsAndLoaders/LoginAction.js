@@ -22,55 +22,48 @@ export const action = (queryClient) => async ({ request }) => {
     }
 
     try {
+        // First attempt to login
         const response = await customFetch.post("/auth/login", data);
-        console.log("Login response:", response.data);
 
         // Invalidate queries to refresh data
         queryClient.invalidateQueries();
 
         // Check if we need to verify admin role
         if (role === "admin") {
-            // Since the login response doesn't include user role info,
-            // we need to make another request to check the role
             try {
+                // Verify if the user has admin privileges
                 const userResponse = await customFetch.get("/users/current-user");
-                console.log("User data response:", userResponse.data);
-
                 const userData = userResponse.data.user;
 
                 if (!userData || userData.role !== "admin") {
+                    // If not admin, logout and return error
+                    await customFetch.get("/auth/logout");
                     errors.msg = "This account doesn't have admin privileges";
-                    // Logout since they don't have admin access
-                    return redirect("/");
+                    return errors;
                 }
 
+                // Admin login successful
                 toast.success("Admin login successful");
-                return redirect("/admin/meals");
+                return redirect("/admin/dashboard");
             } catch (error) {
-                console.log("Role verification error:", error);
                 errors.msg = "Could not verify admin privileges";
                 return errors;
             }
         } else {
-            // For regular users, we don't need to check role
+            // Regular user login successful
             toast.success("Login successful");
-            return redirect("/");
+            return redirect(returnPath);
         }
     } catch (error) {
-        console.log("Login error:", error);
-
         // More robust error handling
         let errorMessage = "Login failed";
-
         if (error.response) {
             errorMessage = error.response.data?.msg || "Server error: " + error.response.status;
-            console.log("Response error data:", error.response.data);
         } else if (error.request) {
             errorMessage = "No response from server. Please check your connection.";
         } else {
             errorMessage = error.message || "An unexpected error occurred";
         }
-
         toast.error(errorMessage);
         errors.msg = errorMessage;
         return errors;

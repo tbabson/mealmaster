@@ -27,8 +27,7 @@ const AdminMeals = () => {
   const { data, isLoading } = useQuery(allMealsQuery(filters));
   const meals = data?.meals || [];
 
-  // Rest of the state variables
-  const [activeTab, setActiveTab] = useState("list");
+  const [showForm, setShowForm] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [imageFile, setImageFile] = useState(null);
@@ -408,7 +407,7 @@ const AdminMeals = () => {
 
       // Refetch data through React Query's invalidation
       navigate("?");
-      setActiveTab("list");
+      setShowForm(false);
     } catch (error) {
       console.error("Submission error:", error);
       toast.error(error.response?.data?.message || "Something went wrong");
@@ -505,7 +504,7 @@ const AdminMeals = () => {
       }
 
       setIsEditing(true);
-      setActiveTab("create");
+      setShowForm(true);
     } catch (error) {
       toast.error("Error fetching meal details");
     }
@@ -597,167 +596,29 @@ const AdminMeals = () => {
 
   return (
     <Wrapper>
-      <div className="sidebar">
-        <button
-          className={`sidebar-btn ${activeTab === "list" ? "active" : ""}`}
-          onClick={() => setActiveTab("list")}
-        >
-          <FaList /> View Meals
-        </button>
-        <button
-          className={`sidebar-btn ${activeTab === "create" ? "active" : ""}`}
-          onClick={() => {
-            setActiveTab("create");
-            resetForm();
-          }}
-        >
-          <FaPlus /> Create Meal
-        </button>
-      </div>
+      <div className="admin-content">
+        <div className="header">
+          <h2>
+            {showForm
+              ? isEditing
+                ? "Edit Meal"
+                : "Create New Meal"
+              : "All Meals"}
+          </h2>
+          <button
+            className="btn toggle-btn"
+            onClick={() => {
+              setShowForm(!showForm);
+              if (!showForm) resetForm();
+            }}
+          >
+            {showForm ? <FaList /> : <FaPlus />}
+            {showForm ? "View Meals" : "Create Meal"}
+          </button>
+        </div>
 
-      <div className="content">
-        {activeTab === "list" ? (
-          <div className="meals-list">
-            <h2>All Meals</h2>
-            <div className="filters-container">
-              <FormRow
-                type="text"
-                name="name"
-                labelText="Search Meal"
-                value={filters.name}
-                handleChange={(e) => handleFilterChange("name", e.target.value)}
-                required={true}
-              />
-              <FormRow
-                type="text"
-                name="country"
-                labelText="Country"
-                required={true}
-                value={filters.country}
-                handleChange={(e) =>
-                  handleFilterChange("country", e.target.value)
-                }
-              />
-              <FormRowSelect
-                labelText="Meal Type"
-                required={true}
-                name="mealType"
-                list={["all", ...Object.values(MEAL)]}
-                value={filters.mealType}
-                handleChange={(e) =>
-                  handleFilterChange("mealType", e.target.value)
-                }
-              />
-              <FormRowSelect
-                labelText="Dietary"
-                name="dietary"
-                list={["all", ...Object.values(DIETARY)]}
-                value={filters.dietary}
-                handleChange={(e) =>
-                  handleFilterChange("dietary", e.target.value)
-                }
-              />
-              <FormRowSelect
-                labelText="Sort"
-                name="sort"
-                list={Object.values(SORT)}
-                value={filters.sort}
-                handleChange={(e) => handleFilterChange("sort", e.target.value)}
-              />
-              <button
-                className="btn clear-btn"
-                onClick={() => {
-                  setFilters({
-                    name: "",
-                    country: "",
-                    mealType: "all",
-                    dietary: "all",
-                    sort: "newest",
-                    page: 1,
-                  });
-                }}
-              >
-                Clear Filters
-              </button>
-            </div>
-
-            {isLoading ? (
-              <div className="loading-container">Loading meals...</div>
-            ) : (
-              <div className="meals-grid">
-                {getFilteredMeals().map((meal) => (
-                  <div key={meal._id} className="meal-card">
-                    <img src={meal.image} alt={meal.name} />
-                    <div className="meal-info">
-                      <h3>{meal.name}</h3>
-                      <p>{meal.mealType}</p>
-                      <p>{meal.country}</p>
-                    </div>
-                    <div className="meal-actions">
-                      <button
-                        className="edit-btn"
-                        onClick={() => handleEdit(meal)}
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        className="delete-btn"
-                        onClick={() => handleDelete(meal._id)}
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {data && data.numOfPages > 1 && (
-              <div className="pagination">
-                <button
-                  onClick={() => handleFilterChange("page", 1)}
-                  disabled={filters.page === 1}
-                  className="btn btn-first"
-                >
-                  First
-                </button>
-                <button
-                  onClick={() =>
-                    handleFilterChange("page", Math.max(1, filters.page - 1))
-                  }
-                  disabled={filters.page === 1}
-                  className="btn btn-prev"
-                >
-                  Prev
-                </button>
-                <span className="page-info">
-                  Page {filters.page} of {data.numOfPages}
-                </span>
-                <button
-                  onClick={() =>
-                    handleFilterChange(
-                      "page",
-                      Math.min(data.numOfPages, filters.page + 1)
-                    )
-                  }
-                  disabled={filters.page === data.numOfPages}
-                  className="btn btn-next"
-                >
-                  Next
-                </button>
-                <button
-                  onClick={() => handleFilterChange("page", data.numOfPages)}
-                  disabled={filters.page === data.numOfPages}
-                  className="btn btn-last"
-                >
-                  Last
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
+        {showForm ? (
           <div className="meal-form">
-            <h2>{isEditing ? "Edit Meal" : "Create New Meal"}</h2>
             <form onSubmit={handleSubmit}>
               {/* Meal Information Section */}
               <section>
@@ -1073,13 +934,151 @@ const AdminMeals = () => {
                   className="btn clear-btn"
                   onClick={() => {
                     resetForm();
-                    setActiveTab("list");
+                    setShowForm(false);
                   }}
                 >
                   Clear Form
                 </button>
               </div>
             </form>
+          </div>
+        ) : (
+          <div className="meals-list">
+            <div className="filters-container">
+              <FormRow
+                type="text"
+                name="name"
+                labelText="Search Meal"
+                value={filters.name}
+                handleChange={(e) => handleFilterChange("name", e.target.value)}
+                required={true}
+              />
+              <FormRow
+                type="text"
+                name="country"
+                labelText="Country"
+                required={true}
+                value={filters.country}
+                handleChange={(e) =>
+                  handleFilterChange("country", e.target.value)
+                }
+              />
+              <FormRowSelect
+                labelText="Meal Type"
+                required={true}
+                name="mealType"
+                list={["all", ...Object.values(MEAL)]}
+                value={filters.mealType}
+                handleChange={(e) =>
+                  handleFilterChange("mealType", e.target.value)
+                }
+              />
+              <FormRowSelect
+                labelText="Dietary"
+                name="dietary"
+                list={["all", ...Object.values(DIETARY)]}
+                value={filters.dietary}
+                handleChange={(e) =>
+                  handleFilterChange("dietary", e.target.value)
+                }
+              />
+              <FormRowSelect
+                labelText="Sort"
+                name="sort"
+                list={Object.values(SORT)}
+                value={filters.sort}
+                handleChange={(e) => handleFilterChange("sort", e.target.value)}
+              />
+              <button
+                className="btn clear-btn"
+                onClick={() => {
+                  setFilters({
+                    name: "",
+                    country: "",
+                    mealType: "all",
+                    dietary: "all",
+                    sort: "newest",
+                    page: 1,
+                  });
+                }}
+              >
+                Clear Filters
+              </button>
+            </div>
+
+            {isLoading ? (
+              <div className="loading-container">Loading meals...</div>
+            ) : (
+              <div className="meals-grid">
+                {getFilteredMeals().map((meal) => (
+                  <div key={meal._id} className="meal-card">
+                    <img src={meal.image} alt={meal.name} />
+                    <div className="meal-info">
+                      <h3>{meal.name}</h3>
+                      <p>{meal.mealType}</p>
+                      <p>{meal.country}</p>
+                    </div>
+                    <div className="meal-actions">
+                      <button
+                        className="edit-btn"
+                        onClick={() => handleEdit(meal)}
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDelete(meal._id)}
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {data && data.numOfPages > 1 && (
+              <div className="pagination">
+                <button
+                  onClick={() => handleFilterChange("page", 1)}
+                  disabled={filters.page === 1}
+                  className="btn btn-first"
+                >
+                  First
+                </button>
+                <button
+                  onClick={() =>
+                    handleFilterChange("page", Math.max(1, filters.page - 1))
+                  }
+                  disabled={filters.page === 1}
+                  className="btn btn-prev"
+                >
+                  Prev
+                </button>
+                <span className="page-info">
+                  Page {filters.page} of {data.numOfPages}
+                </span>
+                <button
+                  onClick={() =>
+                    handleFilterChange(
+                      "page",
+                      Math.min(data.numOfPages, filters.page + 1)
+                    )
+                  }
+                  disabled={filters.page === data.numOfPages}
+                  className="btn btn-next"
+                >
+                  Next
+                </button>
+                <button
+                  onClick={() => handleFilterChange("page", data.numOfPages)}
+                  disabled={filters.page === data.numOfPages}
+                  className="btn btn-last"
+                >
+                  Last
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -26,3 +26,4 @@ export { default as RelatedArticles } from './RelatedArticles';
 export { default as BlogSchema } from './BlogSchema';
 export { default as OrganizationSchema } from './OrganizationSchema';
 export { default as BreadcrumbSchema } from './BreadcrumbSchema';
+export { default as ProtectedAdminRoute } from './ProtectedAdminRoute';

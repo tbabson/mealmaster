@@ -8,6 +8,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { useEffect } from "react";
 import { fetchCart } from "./Features/Cart/cartSlice";
 import store, { persistor } from "./store";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import {
   HomeLayout,
   Blog,
@@ -19,6 +20,7 @@ import {
   SingleMeal,
   Checkout,
   Orders,
+  OrderSuccess,
   SingleOrder,
   Admin,
   ChangePassword,
@@ -34,8 +36,8 @@ import {
   AdminReminders,
   AdminReviews,
   AdminUsers,
+  AdminDashboard,
 } from "./pages";
-import OrderSuccess from "./pages/OrderSuccess";
 
 //Actions
 import { action as registerAction } from "./actionsAndLoaders/RegisterAction";
@@ -149,33 +151,69 @@ const router = createBrowserRouter([
         action: loginAction(queryClient),
       },
       {
+        path: "dashboard",
+        element: (
+          <ProtectedAdminRoute>
+            <AdminDashboard />
+          </ProtectedAdminRoute>
+        ),
+      },
+      {
         path: "meals",
         loader: mealsLoader(queryClient),
-        element: <AdminMeals />,
+        element: (
+          <ProtectedAdminRoute>
+            <AdminMeals />
+          </ProtectedAdminRoute>
+        ),
       },
       {
         path: "blog",
-        element: <AdminBlog />,
+        element: (
+          <ProtectedAdminRoute>
+            <AdminBlog />
+          </ProtectedAdminRoute>
+        ),
       },
       {
         path: "cart",
-        element: <AdminCart />,
+        element: (
+          <ProtectedAdminRoute>
+            <AdminCart />
+          </ProtectedAdminRoute>
+        ),
       },
       {
         path: "orders",
-        element: <AdminOrders />,
+        element: (
+          <ProtectedAdminRoute>
+            <AdminOrders />
+          </ProtectedAdminRoute>
+        ),
       },
       {
         path: "reminders",
-        element: <AdminReminders />,
+        element: (
+          <ProtectedAdminRoute>
+            <AdminReminders />
+          </ProtectedAdminRoute>
+        ),
       },
       {
         path: "users",
-        element: <AdminUsers />,
+        element: (
+          <ProtectedAdminRoute>
+            <AdminUsers />
+          </ProtectedAdminRoute>
+        ),
       },
       {
         path: "reviews",
-        element: <AdminReviews />,
+        element: (
+          <ProtectedAdminRoute>
+            <AdminReviews />
+          </ProtectedAdminRoute>
+        ),
       },
     ],
   },
