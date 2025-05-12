@@ -23,6 +23,7 @@ export { default as CheckoutForm } from './CheckoutForm'
 export { default as FormInput } from './FormInput'
 export { default as SocialShare } from './SocialShare';
 export { default as RelatedArticles } from './RelatedArticles';
+export { default as BlogComments } from './BlogComments';
 export { default as BlogSchema } from './BlogSchema';
 export { default as OrganizationSchema } from './OrganizationSchema';
 export { default as BreadcrumbSchema } from './BreadcrumbSchema';

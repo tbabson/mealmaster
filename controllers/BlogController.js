@@ -98,10 +98,17 @@ export const getAllBlogs = async (req, res) => {
     }
 };
 
-// Get Single Blog
+// Get Single Blog with Related Articles
 export const getBlog = async (req, res) => {
     try {
-        const blog = await Blog.findById(req.params.id)
+        const { id } = req.params;
+        const blog = await Blog.findOne({
+            $or: [
+                { _id: id },
+                { slug: id }
+            ],
+            status: 'published'
+        })
             .populate('author', 'fullName')
             .populate('comments.user', 'fullName');
 
@@ -110,10 +117,13 @@ export const getBlog = async (req, res) => {
                 .json({ message: 'Blog not found' });
         }
 
-        // Get related articles
-        const relatedArticles = await Blog.findRelated(id, 3);
+        // Get related articles 
+        const relatedArticles = await Blog.findRelated(blog._id, 3);
 
-        res.status(StatusCodes.OK).json({ blog, relatedArticles });
+        res.status(StatusCodes.OK).json({
+            blog,
+            relatedArticles
+        });
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR)
             .json({ message: error.message });

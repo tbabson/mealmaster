@@ -1,13 +1,16 @@
+// Frontend: SingleBlog.jsx
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams, useNavigation, Link } from "react-router-dom";
+import { useParams, useLocation, Link } from "react-router-dom";
 import { getSingleBlog } from "../Features/Blog/blogSlice";
-import Loading from "../components/Loading";
-import BlogComments from "../components/BlogComments";
-import SocialShare from "../components/SocialShare";
-import RelatedArticles from "../components/RelatedArticles";
-import BlogSchema from "../components/BlogSchema";
-import BreadcrumbSchema from "../components/BreadcrumbSchema";
+import {
+  Loading,
+  BlogComments,
+  SocialShare,
+  RelatedArticles,
+  BlogSchema,
+  BreadcrumbSchema,
+} from "../components";
 import {
   FaCalendarAlt,
   FaUser,
@@ -20,7 +23,7 @@ import DOMPurify from "dompurify";
 import { Helmet } from "react-helmet-async";
 
 const SingleBlog = () => {
-  const navigation = useNavigation();
+  const location = useLocation();
   const { id } = useParams();
   const dispatch = useDispatch();
   const { isLoading, blog, relatedArticles } = useSelector(
@@ -44,7 +47,7 @@ const SingleBlog = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [navigation.location]);
+  }, [location]);
 
   if (isLoading) {
     return <Loading />;
@@ -78,6 +81,7 @@ const SingleBlog = () => {
 
   const {
     title,
+    slug,
     content,
     featuredImage,
     author,
@@ -87,6 +91,7 @@ const SingleBlog = () => {
     metaDescription,
     keywords,
     featuredImageAlt,
+    tags,
   } = blog;
   const sanitizedContent = DOMPurify.sanitize(content);
   const currentUrl = window.location.href;

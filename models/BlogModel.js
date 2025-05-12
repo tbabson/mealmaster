@@ -1,3 +1,4 @@
+// Blog Model (mongoose model example)
 import mongoose from 'mongoose';
 
 const CommentSchema = new mongoose.Schema({
@@ -105,4 +106,6 @@ BlogSchema.pre('save', async function () {
     }
 });
 
-export default mongoose.model('Blog', BlogSchema);
+const Blog = mongoose.model('Blog', BlogSchema);
+
+export default Blog;
