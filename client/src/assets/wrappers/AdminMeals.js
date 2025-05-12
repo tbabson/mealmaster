@@ -4,7 +4,7 @@ const Wrapper = styled.div`
   display: flex;
   min-height: 100vh;
 
-  .sidebar {
+  /* .sidebar {
     width: 200px;
     background: var(--primary-500);
     padding: 2rem 1rem;
@@ -28,7 +28,13 @@ const Wrapper = styled.div`
     &:hover, &.active {
       background: var(--primary-700);
     }
-  }
+  } */
+
+    .admin-content{
+      padding: 2rem;
+      margin-top: 3.5rem;
+      width: 100%;
+    }
 
   .filters-container {
     background: var(--background-secondary-color);
@@ -446,11 +452,11 @@ const Wrapper = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
     
-    .sidebar {
+    /* .sidebar {
       width: 100%;
       flex-direction: row;
       padding: 1rem;
-    }
+    } */
     
     .meal-form {
       padding: 1rem;
@@ -473,16 +479,22 @@ const Wrapper = styled.div`
     }
   }
 
-  .admin-content {
-    padding: 2rem;
-    width: 100%;
-  }
-
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    width: 95%;
+  }
+
+  .header-actions {
+    margin-left: auto; /* This ensures the button is pushed to the right side */
+  }
+
+  .create-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .toggle-btn {
@@ -496,6 +508,7 @@ const Wrapper = styled.div`
     border-radius: var(--border-radius);
     padding: 2rem;
     box-shadow: var(--shadow-2);
+    margin-bottom: 4rem;
   }
 
   .filters-container {

@@ -17,13 +17,13 @@ const Wrapper = styled.div`
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 50%;
-    display: flex;
+    display: none; // Hidden by default, will be shown on mobile
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
     z-index: 1000;
-
+    
     &:hover {
       background: var(--primary-700);
       transform: scale(1.05);
@@ -40,12 +40,15 @@ const Wrapper = styled.div`
     transition: all 0.3s ease-in-out;
     z-index: 999;
 
-    &.closed {
-      transform: translateX(-250px);
-    }
-
-    &.open {
-      transform: translateX(0);
+    @media (max-width: 768px) {
+      width: 250px;
+      left: -250px; // Off-screen by default on mobile
+      top: 0;
+      bottom: 0;
+      
+      &.open {
+        left: 0; // Slide in when open
+      }
     }
   }
 
@@ -91,10 +94,6 @@ const Wrapper = styled.div`
     min-width: 1.2rem;
   }
 
-  .nav-text {
-    transition: opacity 0.3s ease;
-  }
-
   .logout-btn {
     display: flex;
     align-items: center;
@@ -121,8 +120,9 @@ const Wrapper = styled.div`
     padding: 1rem;
     margin-left: 250px;
 
-    &.sidebar-closed {
-      margin-left: 0;
+    @media (max-width: 768px) {
+      margin-left: 0; // Full width on mobile
+      padding: 0.5rem;
     }
   }
 
@@ -130,24 +130,16 @@ const Wrapper = styled.div`
     max-width: 1200px;
     margin: 0 auto;
     padding-top: 3rem;
+
+    @media (max-width: 768px) {
+      padding-top: 1rem;
+    }
   }
 
+  // Mobile-specific adjustments
   @media (max-width: 768px) {
-    .sidebar {
-      width: 200px;
-      
-      &.closed {
-        transform: translateX(-200px);
-      }
-    }
-
-    .content-container {
-      margin-left: 200px;
-      padding: 0.5rem;
-
-      &.sidebar-closed {
-        margin-left: 0;
-      }
+    .toggle-btn {
+      display: flex; // Show toggle button on mobile
     }
   }
 `;

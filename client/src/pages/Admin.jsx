@@ -10,9 +10,11 @@ import {
   FaBell,
   FaStar,
   FaUsers,
+  FaBars, // Add hamburger menu icon
+  FaTimes, // Add close icon
 } from "react-icons/fa";
 import { BiSolidDashboard as FaDashboard } from "react-icons/bi";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Wrapper from "../assets/wrappers/Admin";
 
 const Admin = () => {
@@ -20,6 +22,9 @@ const Admin = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSelector((state) => state.user);
+
+  // State for mobile sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Check if current path is admin login page
   const isLoginPage = location.pathname === "/admin";
@@ -29,10 +34,23 @@ const Admin = () => {
       .unwrap()
       .then(() => {
         navigate("/admin"); // Redirect to login page after logout
+        setIsSidebarOpen(false); // Close sidebar on logout
       })
       .catch((error) => {
         console.error("Logout failed:", error);
       });
+  };
+
+  // Toggle sidebar for mobile
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  // Close sidebar when navigating (especially on mobile)
+  const handleNavLinkClick = () => {
+    if (window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
   };
 
   // If not on login page and not logged in as admin, redirect to login
@@ -50,8 +68,16 @@ const Admin = () => {
   // For other admin pages, render the full dashboard with sidebar nav
   return (
     <Wrapper>
+      <button
+        className="toggle-btn"
+        onClick={toggleSidebar}
+        aria-label={isSidebarOpen ? "Close Sidebar" : "Open Sidebar"}
+      >
+        {isSidebarOpen ? <FaTimes /> : <FaBars />}
+      </button>
+
       <main className="admin-main">
-        <aside className="sidebar">
+        <aside className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
           <div className="logo-container">
             <h1 className="admin-title">Admin Dashboard</h1>
           </div>
@@ -61,6 +87,7 @@ const Admin = () => {
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
+              onClick={handleNavLinkClick}
             >
               <FaDashboard className="icon-spacing" /> Dashboard
             </NavLink>
@@ -69,6 +96,7 @@ const Admin = () => {
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
+              onClick={handleNavLinkClick}
             >
               <FaUtensils className="icon-spacing" /> Meals
             </NavLink>
@@ -77,6 +105,7 @@ const Admin = () => {
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
+              onClick={handleNavLinkClick}
             >
               <FaBlog className="icon-spacing" /> Blog
             </NavLink>
@@ -85,6 +114,7 @@ const Admin = () => {
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
+              onClick={handleNavLinkClick}
             >
               <FaShoppingCart className="icon-spacing" /> Cart
             </NavLink>
@@ -93,6 +123,7 @@ const Admin = () => {
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
+              onClick={handleNavLinkClick}
             >
               <FaClipboardList className="icon-spacing" /> Orders
             </NavLink>
@@ -101,6 +132,7 @@ const Admin = () => {
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
+              onClick={handleNavLinkClick}
             >
               <FaBell className="icon-spacing" /> Reminders
             </NavLink>
@@ -109,6 +141,7 @@ const Admin = () => {
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
+              onClick={handleNavLinkClick}
             >
               <FaUsers className="icon-spacing" /> Users
             </NavLink>
@@ -117,6 +150,7 @@ const Admin = () => {
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
+              onClick={handleNavLinkClick}
             >
               <FaStar className="icon-spacing" /> Reviews
             </NavLink>

@@ -16,7 +16,7 @@ const Wrapper = styled.div`
     margin-bottom: 2rem;
   }
 
-  .toggle-btn {
+  .create-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;

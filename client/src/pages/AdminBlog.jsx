@@ -236,7 +236,7 @@ const AdminBlog = () => {
               : "All Blogs"}
           </h2>
           <button
-            className="btn toggle-btn"
+            className="btn create-btn"
             onClick={() => {
               setShowForm(!showForm);
               if (!showForm) resetForm();

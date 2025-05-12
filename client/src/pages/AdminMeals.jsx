@@ -605,16 +605,18 @@ const AdminMeals = () => {
                 : "Create New Meal"
               : "All Meals"}
           </h2>
-          <button
-            className="btn toggle-btn"
-            onClick={() => {
-              setShowForm(!showForm);
-              if (!showForm) resetForm();
-            }}
-          >
-            {showForm ? <FaList /> : <FaPlus />}
-            {showForm ? "View Meals" : "Create Meal"}
-          </button>
+          <div className="header-actions">
+            <button
+              className="btn create-btn"
+              onClick={() => {
+                setShowForm(!showForm);
+                if (!showForm) resetForm();
+              }}
+            >
+              {showForm ? <FaList /> : <FaPlus />}
+              {showForm ? "View Meals" : "Create Meal"}
+            </button>
+          </div>
         </div>
 
         {showForm ? (
