@@ -7,12 +7,16 @@ import {
     updateOrderStatus,
     updateDeliveryStatus,
     updatePaymentStatus,
-    deleteOrder
+    deleteOrder,
+    getAllOrders
 } from '../controllers/OrderController.js';
 import { authenticateUser, authorizePermissions } from '../middleware/authMiddleware.js';
 
 // Order Routes
 router.post('/place', authenticateUser, placeOrder); // Place an order
+
+// Admin routes
+router.get('/', authenticateUser, authorizePermissions('admin'), getAllOrders); // Get all orders (admin only)
 
 // Use distinct path patterns to avoid conflicts
 router.get('/user/:userId', authenticateUser, getUserOrders); // Get all orders for a user

@@ -7,6 +7,7 @@ const FormRow = ({
   required,
   value,
   handleChange,
+  placeholder,
 }) => {
   // Determine if this is a controlled or uncontrolled input
   const isControlled = value !== undefined;
@@ -27,6 +28,7 @@ const FormRow = ({
           value={value}
           onChange={handleChange || onChange}
           required={!!required}
+          placeholder={placeholder}
         />
       ) : (
         // Uncontrolled input (using defaultValue)
@@ -39,6 +41,7 @@ const FormRow = ({
           defaultValue={defaultValue || ""}
           onChange={onChange}
           required={!!required}
+          placeholder={placeholder}
         />
       )}
     </div>

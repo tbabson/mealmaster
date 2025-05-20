@@ -303,7 +303,7 @@ button:disabled {
 
 ::placeholder {
   font-family: inherit;
-  color: var(--secondary-500);
+  color: var(--medium);
 }
 .form-alert {
   color: var(--red-dark);

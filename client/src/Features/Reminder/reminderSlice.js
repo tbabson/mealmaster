@@ -44,9 +44,52 @@ export const fetchUserReminders = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const response = await customFetch.get('/reminders');
-            return response.data;
+
+            // Fetch user details for each reminder
+            const remindersWithUsers = await Promise.all(
+                response.data.reminders.map(async (reminder) => {
+                    try {
+                        if (!reminder.user) {
+                            console.warn('No user ID found for reminder:', reminder._id);
+                            return {
+                                ...reminder,
+                                userDetails: {
+                                    email: 'No email',
+                                    fullName: 'Unknown User'
+                                }
+                            };
+                        }
+
+                        // Use the getUser endpoint to fetch user details
+                        const userResponse = await customFetch.get(`/users/${reminder.user}`);
+                        if (!userResponse.data || !userResponse.data.user) {
+                            throw new Error('Invalid user data received');
+                        }
+
+                        return {
+                            ...reminder,
+                            userDetails: {
+                                email: userResponse.data.user.email,
+                                fullName: userResponse.data.user.name || userResponse.data.user.fullName
+                            }
+                        };
+                    } catch (error) {
+                        console.error(`Error fetching user details for reminder ${reminder._id}:`, error);
+                        return {
+                            ...reminder,
+                            userDetails: {
+                                email: 'No email',
+                                fullName: 'Unknown User'
+                            }
+                        };
+                    }
+                })
+            );
+
+            return { reminders: remindersWithUsers };
         } catch (error) {
-            return rejectWithValue(error.response.data);
+            console.error('Error fetching reminders:', error);
+            return rejectWithValue(error.response?.data || { message: 'Failed to fetch reminders' });
         }
     }
 );
@@ -195,20 +238,27 @@ const reminderSlice = createSlice({
             .addCase(fetchSingleUserReminders.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-            });
-
-        // Fetch User Reminders
+            });        // Fetch User Reminders
         builder.addCase(fetchUserReminders.pending, (state) => {
             state.isLoading = true;
             state.error = null;
         });
         builder.addCase(fetchUserReminders.fulfilled, (state, action) => {
             state.isLoading = false;
-            state.reminders = action.payload;
+            state.error = null;
+            // Ensure we're getting an array and properly format the data
+            if (action.payload?.reminders && Array.isArray(action.payload.reminders)) {
+                state.reminders = action.payload.reminders;
+            } else {
+                console.error('Invalid reminders data structure:', action.payload);
+                state.reminders = [];
+            }
         });
         builder.addCase(fetchUserReminders.rejected, (state, action) => {
             state.isLoading = false;
-            state.error = action.payload;
+            state.error = action.payload?.message || 'Failed to fetch reminders';
+            state.reminders = []; // Reset to empty array on error
+            console.error('Failed to fetch reminders:', action.payload);
         });
 
         // Update Reminder

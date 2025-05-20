@@ -49,6 +49,7 @@ import { loader as mealsLoader } from "./actionsAndLoaders/MealsLoader";
 import { loader as singleMealLoader } from "./actionsAndLoaders/SingleMealLoader";
 import { loader as ordersLoader } from "./actionsAndLoaders/OrderLoader";
 import { loader as singleOrder } from "./actionsAndLoaders/SingleOrderLoader";
+import { loader as adminOrdersLoader } from "./actionsAndLoaders/AdminOrdersLoader";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -190,6 +191,7 @@ const router = createBrowserRouter([
             <AdminOrders />
           </ProtectedAdminRoute>
         ),
+        loader: adminOrdersLoader(queryClient, store),
       },
       {
         path: "reminders",

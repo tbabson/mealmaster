@@ -209,3 +209,115 @@ export const clearCart = async (req, res) => {
         });
     }
 };
+
+// 👑 Admin: Get All Carts
+export const getAllCarts = async (req, res) => {
+    try {
+        const { search, searchStatus, sort, page = 1, limit = 10 } = req.query;
+        const queryObject = {};
+
+        // Add search conditions
+        if (search) {
+            queryObject.$or = [
+                { "cartItems.name": { $regex: search, $options: "i" } },
+                { userId: { $regex: search, $options: "i" } }
+            ];
+        }
+
+        if (searchStatus && searchStatus !== "all") {
+            queryObject.status = searchStatus;
+        } let result = Cart.find(queryObject)
+            .populate({
+                path: 'userId',
+                select: '_id name email', // Include _id explicitly
+                model: 'User' // Make sure this matches your User model name
+            });
+
+        // Apply sorting
+        if (sort === "latest") {
+            result = result.sort("-createdAt");
+        }
+        if (sort === "oldest") {
+            result = result.sort("createdAt");
+        }
+        if (sort === "total-highest") {
+            // Calculate total based on ingredients
+            result = result.sort({
+                cartTotal: -1
+            });
+        }
+        if (sort === "total-lowest") {
+            // Calculate total based on ingredients
+            result = result.sort({
+                cartTotal: 1
+            });
+        }
+
+        // Setup pagination
+        const skip = (page - 1) * limit;
+        result = result.skip(skip).limit(limit);
+
+        const carts = await result;
+        const totalCarts = await Cart.countDocuments(queryObject);
+        const numOfPages = Math.ceil(totalCarts / limit);
+
+        res.status(StatusCodes.OK).json({
+            carts,
+            totalCarts,
+            numOfPages,
+            currentPage: page
+        });
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Error fetching carts",
+            error: error.message
+        });
+    }
+};
+
+// 👑 Admin: Update Cart Status
+export const updateCartStatus = async (req, res) => {
+    try {
+        const { cartId } = req.params;
+        const { status } = req.body;
+
+        const cart = await Cart.findById(cartId);
+        if (!cart) {
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message: "Cart not found"
+            });
+        }
+
+        cart.status = status;
+        await cart.save();
+
+        res.status(StatusCodes.OK).json(cart);
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Error updating cart status",
+            error: error.message
+        });
+    }
+};
+
+// 👑 Admin: Delete Cart
+export const deleteCart = async (req, res) => {
+    try {
+        const { cartId } = req.params;
+        const cart = await Cart.findById(cartId);
+
+        if (!cart) {
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message: "Cart not found"
+            });
+        }
+
+        await Cart.findByIdAndDelete(cartId);
+        res.status(StatusCodes.OK).json({ message: "Cart deleted successfully" });
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Error deleting cart",
+            error: error.message
+        });
+    }
+};

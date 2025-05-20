@@ -14,6 +14,14 @@ const initialState = {
     loading: false,
     error: null,
     lastSyncedCart: [],
+    // Admin state
+    carts: [],
+    totalCarts: 0,
+    numOfPages: 1,
+    page: 1,
+    search: "",
+    searchStatus: "all",
+    sort: "latest",
 };
 
 // Fetch cart from backend
@@ -41,6 +49,52 @@ const debouncedSyncCart = debounce(async ({ userId, cartItems, dispatch }) => {
 export const syncCart = createAsyncThunk("cart/syncCart", async ({ userId, cartItems }, { dispatch }) => {
     debouncedSyncCart({ userId, cartItems, dispatch });
 });
+
+// Admin: Fetch all carts
+export const fetchAllCarts = createAsyncThunk(
+    "cart/fetchAllCarts",
+    async ({ search, searchStatus, sort, page }, { rejectWithValue }) => {
+        try {
+            const params = new URLSearchParams({
+                search: search || "",
+                status: searchStatus || "all",
+                sort: sort || "latest",
+                page: page || 1
+            });
+
+            const response = await customFetch.get(`/cart/admin/all?${params}`);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue("Failed to fetch carts");
+        }
+    }
+);
+
+// Admin: Update cart status
+export const updateCartStatus = createAsyncThunk(
+    "cart/updateCartStatus",
+    async ({ cartId, status }, { rejectWithValue }) => {
+        try {
+            const response = await customFetch.patch(`/cart/admin/${cartId}/status`, { status });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Failed to update cart status");
+        }
+    }
+);
+
+// Admin: Delete cart
+export const deleteCart = createAsyncThunk(
+    "cart/deleteCart",
+    async (cartId, { rejectWithValue }) => {
+        try {
+            await customFetch.delete(`/cart/admin/${cartId}`);
+            return cartId;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Failed to delete cart");
+        }
+    }
+);
 
 const cartSlice = createSlice({
     name: "cart",
@@ -126,6 +180,15 @@ const cartSlice = createSlice({
         setLastSyncedCart: (state, action) => {
             state.lastSyncedCart = action.payload;
         },
+        // Admin reducers
+        updateFilters: (state, action) => {
+            const { name, value } = action.payload;
+            state[name] = value;
+            // Reset page to 1 when filters change
+            if (name !== 'page') {
+                state.page = 1;
+            }
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -145,6 +208,40 @@ const cartSlice = createSlice({
             })
             .addCase(logoutUser.fulfilled, (state) => {
                 return initialState; // Reset the cart state when user logs out
+            })
+            // Admin: Fetch all carts
+            .addCase(fetchAllCarts.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchAllCarts.fulfilled, (state, { payload }) => {
+                state.loading = false;
+                state.carts = payload.carts;
+                state.totalCarts = payload.totalCarts;
+                state.numOfPages = payload.numOfPages;
+            })
+            .addCase(fetchAllCarts.rejected, (state, action) => {
+                state.loading = false;
+                toast.error(action.payload);
+            })
+            // Admin: Update cart status
+            .addCase(updateCartStatus.fulfilled, (state, action) => {
+                const updatedCart = action.payload;
+                state.carts = state.carts.map(cart =>
+                    cart._id === updatedCart._id ? updatedCart : cart
+                );
+                toast.success("Cart status updated");
+            })
+            .addCase(updateCartStatus.rejected, (state, action) => {
+                toast.error(action.payload);
+            })
+            // Admin: Delete cart
+            .addCase(deleteCart.fulfilled, (state, action) => {
+                state.carts = state.carts.filter(cart => cart._id !== action.payload);
+                state.totalCarts--;
+                toast.success("Cart deleted successfully");
+            })
+            .addCase(deleteCart.rejected, (state, action) => {
+                toast.error(action.payload);
             });
     },
 
@@ -158,5 +255,6 @@ export const {
     updateIngredientQuantity,
     calculateTotals,
     setLastSyncedCart,
+    updateFilters,
 } = cartSlice.actions;
 export default cartSlice.reducer;
