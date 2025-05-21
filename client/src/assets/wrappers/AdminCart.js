@@ -9,12 +9,13 @@ const Wrapper = styled.div`
   .header {
     margin-bottom: 2rem;
     h2 {
-      color: var(--text-color);
+      color: var(--darkest);
+      font-size: 2rem;
     }
   }
 
   .filters-container {
-    background: var(--white);
+    background: var(--grey-50);
     padding: 2rem;
     border-radius: var(--border-radius);
     margin-bottom: 2rem;
@@ -46,7 +47,7 @@ const Wrapper = styled.div`
         margin-bottom: 0.5rem;
         text-transform: capitalize;
         letter-spacing: 1px;
-        color: var(--text-secondary-color);
+        color: var(--dark);
       }
 
       .form-input,
@@ -54,12 +55,12 @@ const Wrapper = styled.div`
         width: 100%;
         padding: 0.75rem;
         border-radius: var(--border-radius);
-        background: var(--background-secondary-color);
-        border: 1px solid var(--grey-100);
-        color: var(--text-color);
+        background: var(--lightest);
+        border: 1px solid var(--primary);
+        color: var(--dark);
 
         &:focus {
-          border-color: var(--primary-500);
+          border-color: var(--dark);
         }
       }
 
@@ -71,23 +72,24 @@ const Wrapper = styled.div`
     .clear-btn {
       height: 40px;
       align-self: end;
-      background: var(--grey-500);
-      color: var(--white);
+      background: var(--primary);
+      color: var(--light);
       transition: var(--transition);
       padding: 0.375rem 0.75rem;
       font-size: 0.9rem;
       text-transform: capitalize;
       border-radius: var(--border-radius);
-      border: none;
+      border: 1px solid var(--primary);
       cursor: pointer;
       letter-spacing: var(--letter-spacing);
-
+      
       @media (min-width: 1200px) {
         align-self: flex-end;
       }
-
+      
       &:hover {
-        background: var(--grey-600);
+        background: var(--light);
+        color: var(--dark);
       }
     }
   }
@@ -107,7 +109,7 @@ const Wrapper = styled.div`
   }
 
   .cart-card {
-    background: var(--background-color);
+    background: var(--grey-50);
     border-radius: var(--border-radius);
     padding: 1.5rem;
     box-shadow: var(--shadow-2);
@@ -123,21 +125,40 @@ const Wrapper = styled.div`
       align-items: center;
       margin-bottom: 1.5rem;
       padding-bottom: 1rem;
-      border-bottom: 1px solid var(--grey-100);
+      border-bottom: 1px solid var(--primary);
       font-weight: 600;
+
+      span{
+        color: var(--darkest);
+        line-height: 1.5;
+      }
+
+      span.date{
+        color: var(--darkest);
+        line-height: 1.5;
+      }
 
       .date {
         font-size: 0.9rem;
-        color: var(--text-secondary-color);
+        
       }
     }
 
     .cart-details {
       .user-info {
-        background: var(--background-secondary-color);
         padding: 1rem;
-        border-radius: var(--border-radius);
         margin-bottom: 1.5rem;
+
+        span.label {
+          color: var(--dark);
+          font-weight: 600;
+        }
+
+        span.value {
+          color: var(--primary);
+          font-weight: 500;
+        }
+
 
         p {
           margin: 0.5rem 0;
@@ -153,7 +174,9 @@ const Wrapper = styled.div`
 
           h4 {
             margin-bottom: 1rem;
-            color: var(--primary-500);
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1rem;
           }
 
           .meal-item {
@@ -166,18 +189,18 @@ const Wrapper = styled.div`
             background: var(--white);
             transition: var(--transition);
 
-            &:hover {
+            /* &:hover {
               background: var(--background-secondary-color);
-            }
+            } */
 
             .meal-name {
               font-weight: 500;
-              color: var(--text-color);
+              color: var(--dark);
             }
 
             .meal-total {
               font-weight: 600;
-              color: var(--primary-500);
+              color: var(--primary);
             }
           }
         }
@@ -185,7 +208,7 @@ const Wrapper = styled.div`
         .totals {
           margin-top: 1.5rem;
           padding-top: 1rem;
-          border-top: 2px dashed var(--grey-100);
+          border-top: 2px dashed var(--primary);
 
           p {
             display: flex;
@@ -196,7 +219,7 @@ const Wrapper = styled.div`
             &:last-child {
               margin-top: 1rem;
               padding-top: 1rem;
-              border-top: 1px solid var(--grey-100);
+              border-top: 1px solid var(--primary);
               font-size: 1.1rem;
             }
           }
@@ -211,11 +234,11 @@ const Wrapper = styled.div`
 
     .label {
       font-weight: 500;
-      color: var(--text-secondary-color);
+      color: var(--dark);
     }
 
     .value {
-      color: var(--text-color);
+      color: var(--primary);
     }
 
     .action-buttons {
@@ -227,19 +250,19 @@ const Wrapper = styled.div`
         width: 100%;
         padding: 0.75rem;
         border-radius: var(--border-radius);
-        border: none;
+        border: 1px solid var(--primary);
         cursor: pointer;
         transition: var(--transition);
-        font-weight: 500;
+        font-weight: 600;        
       }
 
       .delete-btn {
-        background: var(--red-light);
-        color: var(--red-dark);
+        background: var(--light);
+        color: var(--dark);
 
         &:hover {
-          background: var(--red-dark);
-          color: var(--white);
+          background: var(--primary);
+          color: var(--light);
         }
       }
     }
