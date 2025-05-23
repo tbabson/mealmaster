@@ -13,33 +13,63 @@ import path from 'path';
 
 export const getAllUsers = async (req, res) => {
     try {
-        // Fetch all users and populate orders and reminders
-        const users = await User.find({})
-            .populate('orders')
-            .populate('reminders');
+        const { search, role, sort, page } = req.query;
+        const queryObject = {};
 
-        // Need to handle cartItems separately since Cart references User via userId
+        // Filtering
+        if (role && role !== 'all') {
+            queryObject.role = role;
+        }
+
+        // Handle search query
+        if (search) {
+            queryObject.$or = [
+                { fullName: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        // Sorting
+        const sortOptions = {
+            newest: '-createdAt',
+            oldest: 'createdAt',
+            'a-z': 'fullName',
+            'z-a': '-fullName',
+        };
+
+        const sortKey = sortOptions[sort] || sortOptions.newest;        // Pagination
+        const currentPage = Number(page) || 1;
+        const limit = Number(req.query.limit) || 12;  // Users per page
+        const skip = (currentPage - 1) * limit;
+
+        // Execute main query with pagination
+        const users = await User.find(queryObject)
+            .select('-password')
+            .populate('orders')
+            .populate('reminders')
+            .sort(sortKey)
+            .skip(skip)
+            .limit(limit);        // Get cart items and enrich user data
         const usersWithData = await Promise.all(users.map(async (user) => {
             const userData = user.toObject();
-
-            // Find cart items for this user
             const cartItems = await Cart.find({ userId: user._id });
-
-            // Add cart items to user data using the correct field name from schema
-            return {
-                ...userData,
-                cartItems
-            };
+            return { ...userData, cartItems };
         }));
+
+        // Get total count for pagination
+        const totalUsers = await User.countDocuments(queryObject);
+        const numOfPages = Math.ceil(totalUsers / limit);
 
         res.status(StatusCodes.OK).json({
             users: usersWithData,
-            count: users.length
+            totalUsers,
+            numOfPages,
+            currentPage: page
         });
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             message: "An error occurred while fetching users",
-            error
+            error: error.message
         });
     }
 }

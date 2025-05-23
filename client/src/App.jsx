@@ -50,6 +50,7 @@ import { loader as singleMealLoader } from "./actionsAndLoaders/SingleMealLoader
 import { loader as ordersLoader } from "./actionsAndLoaders/OrderLoader";
 import { loader as singleOrder } from "./actionsAndLoaders/SingleOrderLoader";
 import { loader as adminOrdersLoader } from "./actionsAndLoaders/AdminOrdersLoader";
+import { loader as adminUsersLoader } from "./actionsAndLoaders/AdminUsersLoader";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -208,6 +209,7 @@ const router = createBrowserRouter([
             <AdminUsers />
           </ProtectedAdminRoute>
         ),
+        loader: adminUsersLoader(queryClient, store),
       },
       {
         path: "reviews",

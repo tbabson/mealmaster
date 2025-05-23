@@ -33,21 +33,38 @@ const Wrapper = styled.div`
   .sidebar {
     width: 250px;
     background: var(--primary-500);
-    padding: 4rem 1rem 2rem;
+    padding: 2rem 1rem;
     color: white;
     position: fixed;
-    height: 100vh;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
     transition: all 0.3s ease-in-out;
     z-index: 999;
+    display: flex;
+    flex-direction: column;
 
     @media (max-width: 768px) {
       width: 250px;
       left: -250px; // Off-screen by default on mobile
       top: 0;
-      bottom: 0;
+      padding-top: 4rem; // Space for toggle button
       
       &.open {
         left: 0; // Slide in when open
+      }
+
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: var(--primary-600);
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--primary-700);
+        border-radius: 3px;
       }
     }
   }

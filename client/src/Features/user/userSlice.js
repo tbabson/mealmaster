@@ -45,17 +45,17 @@ export const logoutUser = createAsyncThunk(
 );
 
 // Thunk to get all users
-export const getAllUsers = createAsyncThunk(
-    "user/getAllUsers",
-    async (_, { rejectWithValue }) => {
-        try {
-            const { data } = await customFetch.get("/users");
-            return data;
-        } catch (error) {
-            return rejectWithValue(error?.response?.data?.message || "Failed to fetch users");
-        }
-    }
-);
+// export const getAllUsers = createAsyncThunk(
+//     "user/getAllUsers",
+//     async (_, { rejectWithValue }) => {
+//         try {
+//             const { data } = await customFetch.get("/users");
+//             return data;
+//         } catch (error) {
+//             return rejectWithValue(error?.response?.data?.message || "Failed to fetch users");
+//         }
+//     }
+// );
 
 // Thunk to get single user
 export const getUser = createAsyncThunk(
@@ -191,19 +191,19 @@ const userSlice = createSlice({
             })
 
             // Get all users cases
-            .addCase(getAllUsers.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(getAllUsers.fulfilled, (state, action) => {
-                state.loading = false;
-                state.users = action.payload.users;
-                state.totalUsers = action.payload.count;
-            })
-            .addCase(getAllUsers.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-                toast.error(action.payload);
-            })
+            // .addCase(getAllUsers.pending, (state) => {
+            //     state.loading = true;
+            // })
+            // .addCase(getAllUsers.fulfilled, (state, action) => {
+            //     state.loading = false;
+            //     state.users = action.payload.users;
+            //     state.totalUsers = action.payload.count;
+            // })
+            // .addCase(getAllUsers.rejected, (state, action) => {
+            //     state.loading = false;
+            //     state.error = action.payload;
+            //     toast.error(action.payload);
+            // })
 
             // Get single user cases
             .addCase(getUser.pending, (state) => {
