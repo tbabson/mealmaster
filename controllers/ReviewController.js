@@ -28,8 +28,52 @@ export const createReview = async (req, res) => {
 }
 
 export const getAllReviews = async (req, res) => {
-    const reviews = await Review.find({}).populate('meal').populate({ path: 'user', select: ' fullName email' });
-    res.status(StatusCodes.OK).json({ reviews, count: reviews.length })
+    const { search, rating, sort } = req.query;
+    let queryObject = {};
+
+    // Handle search
+    if (search) {
+        queryObject.$or = [
+            { title: { $regex: search, $options: 'i' } },
+            { comment: { $regex: search, $options: 'i' } }
+        ];
+    }
+
+    // Handle rating filter
+    if (rating && rating !== 'all') {
+        queryObject.rating = Number(rating);
+    }
+
+    let result = Review.find(queryObject)
+        .populate('meal')
+        .populate({ path: 'user', select: 'fullName email' });
+
+    // Handle sorting
+    if (sort === 'latest') {
+        result = result.sort('-createdAt');
+    } else if (sort === 'oldest') {
+        result = result.sort('createdAt');
+    } else if (sort === 'highest rating') {
+        result = result.sort('-rating');
+    } else if (sort === 'lowest rating') {
+        result = result.sort('rating');
+    }
+
+    // Apply pagination
+    const page = Number(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    result = result.skip(skip).limit(limit);
+
+    const reviews = await result;
+    const totalReviews = await Review.countDocuments(queryObject);
+    const numOfPages = Math.ceil(totalReviews / limit);
+
+    res.status(StatusCodes.OK).json({
+        reviews,
+        count: totalReviews,
+        numOfPages
+    });
 }
 
 export const getSingleReview = async (req, res) => {

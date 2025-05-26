@@ -3,6 +3,7 @@ import cartReducer, { syncCart } from './Features/Cart/cartSlice';
 import userReducer from './Features/user/userSlice';
 import reminderSliceReducer from './Features/Reminder/reminderSlice';
 import blogReducer from './Features/Blog/blogSlice';
+import reviewReducer from './Features/Review/reviewSlice';
 import { persistStore, persistReducer, createTransform } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
@@ -82,6 +83,7 @@ const store = configureStore({
         user: userReducer,
         reminders: reminderSliceReducer,
         blog: blogReducer, // Add the blog reducer
+        review: reviewReducer // Add the review reducer
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
