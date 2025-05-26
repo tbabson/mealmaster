@@ -340,6 +340,32 @@ const Wrapper = styled.section`
       gap: 0.3rem;
       font-weight: 500;
     }
+
+    .edit-form {
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--grey-200);
+  border-radius: var(--border-radius);
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.btn-success {
+  background: var(--green-light);
+  color: var(--green-dark);
+}
+
+/* .btn-info {
+  background: var(--blue-light);
+  color: var(--blue-dark);
+  font-size: 0.8rem;
+} */
   }
 `;
 

@@ -4,8 +4,12 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import Wrapper from "../assets/wrappers/AdminReviews";
 import { FormRow, FormRowSelect, Loading } from "../components";
-import { deleteReview, getAllReviews } from "../Features/Review/reviewSlice";
-import { FaEdit, FaTrash, FaStar } from "react-icons/fa";
+import {
+  deleteReview,
+  getAllReviews,
+  updateReview,
+} from "../Features/Review/reviewSlice";
+import { FaEdit, FaTrash, FaStar, FaSave, FaTimes } from "react-icons/fa";
 import { HiChevronDoubleLeft, HiChevronDoubleRight } from "react-icons/hi";
 import { formatDate } from "../utils/formatDate";
 
@@ -27,6 +31,14 @@ const AdminReviews = () => {
     rating: "all",
     sort: "latest",
     page: 1,
+  });
+
+  // State for inline editing
+  const [editingReview, setEditingReview] = useState(null);
+  const [editForm, setEditForm] = useState({
+    title: "",
+    comment: "",
+    rating: 1,
   });
 
   // Get search params from URL
@@ -90,14 +102,75 @@ const AdminReviews = () => {
     }
   };
 
+  // Start editing a review
+  const handleEditStart = (review) => {
+    setEditingReview(review._id);
+    setEditForm({
+      title: review.title,
+      comment: review.comment,
+      rating: review.rating,
+    });
+  };
+
+  // Cancel editing
+  const handleEditCancel = () => {
+    setEditingReview(null);
+    setEditForm({
+      title: "",
+      comment: "",
+      rating: 1,
+    });
+  };
+
+  // Handle form input changes during editing
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({
+      ...prev,
+      [name]: name === "rating" ? parseInt(value) : value,
+    }));
+  };
+
+  // Save edited review
+  const handleEditSave = async (reviewId) => {
+    try {
+      await dispatch(
+        updateReview({
+          id: reviewId,
+          reviewData: editForm,
+        })
+      ).unwrap();
+
+      toast.success("Review updated successfully");
+      setEditingReview(null);
+      setEditForm({
+        title: "",
+        comment: "",
+        rating: 1,
+      });
+
+      // Refresh reviews to show updated data
+      dispatch(getAllReviews(searchParams));
+    } catch (error) {
+      toast.error(error || "Failed to update review");
+    }
+  };
+
+  // Navigate to detailed edit page (alternative action)
+  // const handleNavigateToEdit = (reviewId) => {
+  //   navigate(`/admin/reviews/${reviewId}/edit`);
+  // };
+
   const renderStars = (rating) => {
     return [...Array(5)].map((_, index) => (
       <FaStar key={index} color={index < rating ? "#f4ce14" : "#e4e5e9"} />
     ));
   };
+
   if (isLoading) {
     return <Loading />;
   }
+
   if (error) {
     return (
       <Wrapper>
@@ -175,6 +248,7 @@ const AdminReviews = () => {
       </Wrapper>
     );
   }
+
   return (
     <Wrapper>
       <div className="reviews-container">
@@ -184,28 +258,99 @@ const AdminReviews = () => {
             <div key={review._id} className="review-card">
               <div className="review-header">
                 <div className="review-info">
-                  <h4 className="review-title">{review.title}</h4>
-                  <div className="review-rating">
-                    {renderStars(review.rating)}
-                  </div>
+                  {editingReview === review._id ? (
+                    // Edit mode
+                    <div className="edit-form">
+                      <FormRow
+                        type="text"
+                        name="title"
+                        value={editForm.title}
+                        handleChange={handleEditFormChange}
+                        labelText="Review Title"
+                      />
+                      <FormRowSelect
+                        name="rating"
+                        value={editForm.rating.toString()}
+                        handleChange={handleEditFormChange}
+                        list={["1", "2", "3", "4", "5"]}
+                        labelText="Rating"
+                      />
+                    </div>
+                  ) : (
+                    // Display mode
+                    <>
+                      <h4 className="review-title">{review.title}</h4>
+                      <div className="review-rating">
+                        {renderStars(review.rating)}
+                      </div>
+                    </>
+                  )}
                 </div>
                 <div className="review-actions">
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => handleDelete(review._id)}
-                  >
-                    <FaTrash />
-                  </button>
-                  <button
-                    className="btn"
-                    onClick={() => navigate(`/reviews/${review._id}`)}
-                  >
-                    <FaEdit />
-                  </button>
+                  {editingReview === review._id ? (
+                    // Edit mode actions
+                    <>
+                      <button
+                        className="btn btn-success"
+                        onClick={() => handleEditSave(review._id)}
+                        title="Save changes"
+                      >
+                        <FaSave />
+                      </button>
+                      <button
+                        className="btn btn-secondary"
+                        onClick={handleEditCancel}
+                        title="Cancel editing"
+                      >
+                        <FaTimes />
+                      </button>
+                    </>
+                  ) : (
+                    // Normal mode actions
+                    <>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(review._id)}
+                        title="Delete review"
+                      >
+                        <FaTrash />
+                      </button>
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => handleEditStart(review)}
+                        title="Edit inline"
+                      >
+                        <FaEdit />
+                      </button>
+                      {/* <button
+                        className="btn btn-info"
+                        onClick={() => handleNavigateToEdit(review._id)}
+                        title="Edit in detail page"
+                      >
+                        Edit Page
+                      </button> */}
+                    </>
+                  )}
                 </div>
               </div>
 
-              <p className="review-content">{review.comment}</p>
+              {editingReview === review._id ? (
+                // Edit mode content
+                <div className="edit-form">
+                  <label className="form-label">Comment</label>
+                  <textarea
+                    name="comment"
+                    value={editForm.comment}
+                    onChange={handleEditFormChange}
+                    className="form-textarea"
+                    rows="4"
+                    placeholder="Review comment..."
+                  />
+                </div>
+              ) : (
+                // Display mode content
+                <p className="review-content">{review.comment}</p>
+              )}
 
               <div className="review-meta">
                 <span>Meal: {review.meal?.name || "N/A"}</span>
@@ -214,14 +359,14 @@ const AdminReviews = () => {
               </div>
             </div>
           ))}
-        </div>{" "}
+        </div>
+
         {totalReviews > 0 && (
           <div className="pagination-container">
             <button
               className="btn prev-btn"
               onClick={() => {
                 const prevPage = Math.max(1, searchParams.page - 1);
-                // Create synthetic event object
                 const event = { target: { name: "page", value: prevPage } };
                 handleFilterChange(event);
               }}
