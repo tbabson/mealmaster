@@ -179,6 +179,10 @@ const Wrapper = styled.section`
     &.processing {
       background-color: #3498db;
     }
+
+    &.processed {
+      background-color: #ffa500;
+    }
     
     &.shipped {
       background-color: #2ecc71;

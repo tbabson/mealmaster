@@ -200,22 +200,6 @@ const AdminOrders = () => {
                 </div>
                 <div className="status-container">
                   <div className="select-group">
-                    <label>Order Status</label>
-                    <select
-                      value={order.status}
-                      onChange={(e) =>
-                        handleUpdateOrderStatus(order._id, e.target.value)
-                      }
-                    >
-                      {Object.values(ORDERS).map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="select-group">
                     <label>Delivery Status</label>
                     <select
                       value={order.deliveryStatus}
@@ -224,6 +208,22 @@ const AdminOrders = () => {
                       }
                     >
                       {Object.values(DELIVERY).map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="select-group">
+                    <label>Order Status</label>
+                    <select
+                      value={order.status}
+                      onChange={(e) =>
+                        handleUpdateOrderStatus(order._id, e.target.value)
+                      }
+                    >
+                      {Object.values(ORDERS).map((status) => (
                         <option key={status} value={status}>
                           {status}
                         </option>

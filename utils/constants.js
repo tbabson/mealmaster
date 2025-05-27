@@ -25,6 +25,7 @@ export const SORT = {
 
 export const DELIVERY = {
     SCHEDULED: 'Scheduled',
+    CLEARING: 'Clearing',
     OUTFORDELIVERY: 'Out for Delivery',
     DELIVERED: 'Delivered',
     FAILED: 'Failed',
@@ -32,6 +33,7 @@ export const DELIVERY = {
 
 export const ORDERS = {
     PENDING: 'Pending',
+    PROCESSING: 'Processing',
     PROCESSED: 'Processed',
     DELIVERED: 'Delivered',
     CANCELLED: 'Cancelled',

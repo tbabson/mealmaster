@@ -128,6 +128,9 @@ export const updateOrderStatus = async (req, res) => {
     } else if (status === ORDERS.PROCESSED) {
       // When the order is processed, delivery status becomes out for delivery
       order.deliveryStatus = DELIVERY.OUTFORDELIVERY;
+    } else if (status === ORDERS.PROCESSING) {
+      // If the order is processing, we can set delivery status to clearing
+      order.deliveryStatus = DELIVERY.CLEARING;
     } else if (status === ORDERS.CANCELLED) {
       // If the order is cancelled, set delivery as failed
       order.deliveryStatus = DELIVERY.FAILED;
